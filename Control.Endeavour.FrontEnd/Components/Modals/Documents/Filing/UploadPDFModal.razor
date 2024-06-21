@@ -1,0 +1,52 @@
+﻿<div class="UploadPDFModal">
+    <NotificationsComponentModal @ref="NotificationModal"></NotificationsComponentModal>
+    <TelerikRootComponent>
+        <GenericModalComponent Title="@Title" IsVisible="ModalStatus" OnModalClosed="HandleModalClosed" Width="55%">
+            <ChildContent>
+
+                <div class="container-fluid mt-1">
+                    <div class="row d-flex justify-content-center">
+                        <div class="col-lg-11 mb-3 mt-1 @uploadPDF">
+                            <label class="noti-2">@formatMessage:</label>
+                        </div>
+                        <div class="col-lg-11 @uploadPDF">
+                            <DragAndDropTemplateComponent AllowedExtensions="@AllowedExtensions" MaxFileCount="1" MaxFileSizeMB="@FileSize" OnFileListChanged="HandleFile"></DragAndDropTemplateComponent>
+                            <span class="red-noti mt-5">@AlertMessage</span>
+                        </div>
+                        <div class="col-lg-11 mt-2 @ViewPDF">
+
+                            <TelerikPdfViewer @ref="@PdfViewerRef"
+                                              Width="100%"
+                                              Height="50vh"
+                                              Data="@FileData">
+                                              <PdfViewerToolBar>
+                                                <PdfViewerToolBarSelectionTool />
+                                                <PdfViewerToolBarSeparator />
+                                                <PdfViewerToolBarSearchTool />
+                                                <PdfViewerToolBarSeparator />
+                                                <PdfViewerToolBarPrintTool />
+                                                <PdfViewerToolBarDownloadTool />
+                                                <PdfViewerToolBarSeparator />
+                                                <PdfViewerToolBarSpacer /> 
+                                                <PdfViewerToolBarPagerTool />
+                                                <PdfViewerToolBarSpacer /> 
+                                                <PdfViewerToolBarSeparator />
+                                                <PdfViewerToolBarZoomTool />
+                                              </PdfViewerToolBar>
+                            </TelerikPdfViewer>
+
+                            <label class="noti-2 mt-3 @uploadPDF">@string.Format(Translation["DisplayedPdfCorrectMessage"], BtnLabelText):</label>
+                        </div>
+
+                        <div class="col-lg-11 d-flex justify-content-center mt-4 @ViewPDF ">
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="btnStyle--Verify" BtnType="button" BtnText="@BtnText" BtnOnClick="HandleFormVerify" BtnIcon="fa-solid fa-circle-check" BtnDisabled="@Disabled" BtnVisible="ButtonVisblefiling"></ButtonComponent>
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="btnStyle--Verify" BtnType="button" BtnText="@BtnText" BtnOnClick="HandleUploadVolumeRecord" BtnIcon="fa-solid fa-circle-check" BtnDisabled="@Disabled" BtnVisible="ButtonVisibleRecord"></ButtonComponent>
+                        </div>
+
+                    </div>
+                </div>
+
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>

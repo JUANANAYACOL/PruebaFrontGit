@@ -1,0 +1,301 @@
+﻿@page "/DocumentSearchEngine"
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.ThirdUser.Response
+@layout MainLayout;
+
+<GenericUserSearchModal @ref="genericUserSearch" Title=@(Translation["Administration"] + " - " + Translation["ManagementActions"]) IsVisible="modalUserStatus"
+                        AllowCopiesSelection="false"
+                        AllowMultipleSelection="true"
+                        ValidateSenderAndRecipient="false"
+                        IsValidateReplacements="false"
+                        OnSelectedUserData="HandleSelectedUserData"
+                        TypeOfSearch="@UserSearchModalType"
+                        OnModalClosed="HandleModalClosed" Width="90%">
+</GenericUserSearchModal>
+<MetaDataRecordsFilter @ref="metaDataFilterModal" OnChangeMetaDataFilter="HandleMetaDataFilter"></MetaDataRecordsFilter>
+<GeneralInformationModal @ref="generalInformation"></GeneralInformationModal>
+<LabelModal @ref="LabelModal" OnModalClosed="HandleModalClosedLabel"></LabelModal>
+<GenericDocTypologySearchModal @ref="DocTypologySearchModal" title="@titleView" OnStatusChanged="HandleTRDSelectedChanged"></GenericDocTypologySearchModal>
+<NotificationsComponentModal @ref="notificationModal"></NotificationsComponentModal>
+
+<div class="container-fluid mt-1">
+    <!-- Parte 1: Título y Contenido alineado a la izquierda -->
+    <div class="row titulo">
+        <div class="col-md-10">
+            <h3>@titleView</h3>
+        </div>
+
+    </div>
+    <div class="row @HideFilterSearchPanel">
+        <div class="col-lg-3 mt-1">
+            <InputModalComponent @bind-InputValue="ControlId" IsDisabled="false" LabelText=@Translation["ControlID"] Placeholder="IdControl" MethodValueChanged="@((string Value) => UpdateControlId(Value))" />
+        </div>
+        <div class="col-lg-3 mt-1">
+
+            <InputModalComponent @bind-InputValue="DocumentSearchDtoRequest.FilingCode" LabelText="@(Translation["FilingNumber"]+":")" Placeholder="@Translation["FilingNumber"]" />
+
+        </div>
+        <div class="col-lg-3 mt-1">
+            <InputModalComponent @bind-InputValue="DocumentSearchDtoRequest.NroGuia" LabelText=@(Translation["TrackingNumber"] + " / " + Translation["ZIPCode"]+":") Placeholder="" InputMaxLength="20" />
+        </div>
+        <div class="col-lg-3 mt-1">
+
+            <InputModalComponent @bind-InputValue="DocumentSearchDtoRequest.NroDocument" LabelText=@(Translation["InternalDocumentNumber"]+":") IsVisible="true" Placeholder="" InputType="text" InputMaxLength="100" />
+
+        </div>
+        <div class="col-lg-3 mt-1">
+            <label class="mb-2">@Translation["StartDate"]:</label>
+            <TelerikDatePicker @bind-Value="@DocumentSearchDtoRequest.StartDate"
+                               Class="DisabledInput"
+                               Format="dd MMMM yyyy"
+                               Min="@Min" Max="@Max">
+            </TelerikDatePicker>
+        </div>
+        <div class="col-lg-3 mt-1">
+            <label class="mb-2">@Translation["EndDate"]:</label>
+            <TelerikDatePicker @bind-Value="@DocumentSearchDtoRequest.EndDate"
+                               Class="DisabledInput"
+                               Format="dd MMMM yyyy"
+                               Min="@Min" Max="@Max">
+            </TelerikDatePicker>
+        </div>
+        <div class="col-lg-3 mt-1">
+            <label class="mb-2">@Translation["ReceptionMeans"]: </label>
+            <TelerikDropDownList Data="@lstReceptionCode"
+                                 @bind-Value="@ReceptionCode"
+                                 Id="GR_ReceptionCode"
+                                 DefaultText=@Translation["SelectAnOption"]
+                                 TextField="Value"
+                                 ValueField="Code"
+                                 Filterable="true"
+                                 FilterOperator="StringFilterOperator.Contains">
+            </TelerikDropDownList>
+        </div>
+        <div class="col-lg-3 mt-1">
+            <label class="mb-2">@Translation["ComunicationClass"]:</label>
+            <TelerikDropDownList Data="@classCodeList"
+                                 Value="DocumentSearchDtoRequest.ClassCode"
+                                 ValueChanged="@((string Value) => EnableUserSearch(Value))"
+                                 Id="GR_TipoDoc"
+                                 DefaultText=@Translation["SelectAnOption"]
+                                 TextField="Value"
+                                 ValueField="Code"
+                                 Filterable="true">
+            </TelerikDropDownList>
+        </div>
+        <div class="col-lg-3 mt-1">
+            <label class="form-label">@Translation["SearchTypology"]:</label>
+            <div class="input-group">
+                <input type="text" class="form-control" id="recipientUsername" @bind-value="TRDSelected.TypologyName" placeholder="@Translation["SearchTypology"]" disabled>
+                <button class="btn btn-secondary @SearchMetaDatosClass" type="button">
+                    <i class="fa-solid fa-trash" @onclick="showModalMetaDataAsync"></i>
+                </button>
+                <button class="btn btn-primary" type="button" @onclick="showModalTRD">
+                    <i class="fa-solid fa-square-plus"></i>
+                </button>
+                <button class="btn btn-danger" type="button">
+                    <i class="fa-solid fa-trash" @onclick="DeleteTypologySelected"></i>
+                </button>
+
+            </div>
+        </div>
+        <div class="col-lg-3 mt-1">
+            <label class="form-label">@Translation["UserName"]:</label>
+            <div class="input-group">
+                <input type="text" class="form-control" id="recipientUsername" @bind-value="@UserSelected.UserName" placeholder="@Translation["UserName"]" disabled>
+                <button class="btn btn-primary" type="button" @onclick="showUserSerch">
+                    <i class="fa-solid fa-user-plus"></i>
+                </button>
+                <button class="btn btn-danger" type="button">
+                    <i class="fa-solid fa-trash" @onclick="DeleteSenderSelected"></i>
+                </button>
+            </div>
+        </div>
+        <div class="col-lg-3 d-flex flex-column justify-content-between mt-1">
+            <label class="titulo-azul">
+                @Translation["UserType"]
+            </label>
+            <div class="k-form k-form-md k-form-vertical">
+                <div class="k-form-field">
+
+                    <div class="k-form-field-wrap">
+                        <TelerikRadioGroup Data="@optionsFilter"
+                                           Value="@ResponseFilter"
+                                           Layout="@RadioGroupLayout.Horizontal"
+                                           ValueChanged="@( (string newValue) => OnValueChangedFilter(newValue) )">
+                        </TelerikRadioGroup>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 mt-2">
+            <div class="row gx-2">
+                <div class="col-lg-12 mt-1">
+                    <label>
+                        <TelerikCheckBox @bind-Value="@DocumentSearchDtoRequest.SearchCreateDocument"/>
+                        @Translation["FilingDocumentsCheck"]
+                    </label>
+                </div>
+                <div class="col-lg-12 mt-1">
+                    <label>
+                        <TelerikCheckBox @bind-Value="@DocumentSearchDtoRequest.SearchDocumentCanceled"/>
+                        @Translation["CancelledDocumentsCheck"]
+                    </label>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row mt-3 @HideFilterSearchPanel">
+        <div class="col-md-12">
+            <h6 class="titulo-azul">
+                @Translation["SearchEngineUserSearch"]:
+                <i class="fa-solid fa-circle-question" title="@Translation["EnableSearchUserDestinationsMessage"]"></i>
+            </h6>
+        </div>
+        <div class="row @SearchEngineUserSearchPanel">
+            <div class="col-lg-4 d-flex align-items-center justify-content-center mt-2">
+                <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Add"] BtnIcon="fa-solid fa-users" BtnOnClick="showRecipient"></ButtonComponent>
+            </div>
+
+            <div class="col-lg-8" id="tableUsers">
+                <div class="table-responsive custom-table-container custom-table--destinations">
+                    <table class="table">
+                        <thead>
+                            <tr class="text-center">
+                                <th>@Translation["Sender"]</th>
+                                <th>@Translation["Recipient"]</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="center-item table-users">
+                                    @foreach (var sender in listSender)
+                                    {
+                                        <div class="row table-users__recipient">
+                                            <div class="col-lg-2 table-users__recipient__icon">
+                                                <img src="../img/deleteIcon.svg" alt="Delete Icon" Title=@Translation["DeleteUser"] @onclick="() => RemoveUser(sender)" />
+                                            </div>
+                                            <div class="col-lg-10 text-center">
+                                                <span class="d-block">@sender.UserName</span>
+                                            </div>
+                                        </div>
+                                    }
+                                </td>
+                                <td class="align-items-center table-users">
+                                    @foreach (var recipient in listRecipient)
+                                    {
+                                        <div class="row table-users__recipient">
+                                            <div class="col-lg-2 table-users__recipient__icon">
+                                                <img src="../img/deleteIcon.svg" alt="Delete Icon" Title=@Translation["DeleteUser"] @onclick="() => RemoveUser(recipient)" />
+                                            </div>
+                                            <div class="col-lg-10 text-center">
+                                                <span class="d-block">@recipient.UserName</span>
+                                            </div>
+                                        </div>
+                                    }
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 d-flex align-items-end justify-content-end mt-3">
+            <i class=""></i>
+            <div class="text-md-end">
+                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10 mt-2" BtnType="button" BtnText=@buttonTextHide BtnIcon="@buttonClassIcon" BtnOnClick="HidePanelSearch"></ButtonComponent>
+                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnClassModifiers="ml-10 mt-2" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="CleanFilter"></ButtonComponent>
+                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10 mt-2" BtnType="button" BtnText=@Translation["Search"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="SearchDocuemntData"></ButtonComponent>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <TelerikGrid Data="@DocumentsList"
+                     Sortable="true"
+                     FilterMode="GridFilterMode.FilterMenu"
+                     Resizable="true"
+                     SelectionMode="GridSelectionMode.None">
+            <GridColumns>
+
+
+                <GridCommandColumn Width="120px" Title="@Translation["Actions"]" HeaderClass="center-wrap" Visible="true">
+                    <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+
+                        <GridCommandButton Icon="@SvgIcon.InfoCircle" Title=@Translation["GeneralInformation"] OnClick="@((args)=> ShowModalGeneralInformation((SearchDtoResponse)args.Item))"> </GridCommandButton>
+
+                        <GridCommandButton Icon="@SvgIcon.Barcode" Title=@Translation["Label"] OnClick="@((args)=> ShowModalLabelAsync((SearchDtoResponse)args.Item))"> </GridCommandButton>
+                    </div>
+
+                </GridCommandColumn>
+                <GridColumn Width="310px">
+                    <HeaderTemplate>
+                        <label> @Translation["GeneralInformation"] </label>
+                    </HeaderTemplate>
+                    <Template>
+                        @{
+                            var data = (SearchDtoResponse)context;
+                            <div class="row d-flex align-items-center">
+                                <div class="col">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <label><b>@Translation["FilingUpper"]:</b> @data?.FilingCode</label>
+                                        </div>
+                                        <div class="col-6">
+                                            <label><b>@Translation["ControlID"]:</b> @data?.ControlId</label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <label><b>@Translation["Subject"]:</b> @data?.DocDescription</label>
+                                    </div>
+                                    <div class="row">
+                                        <label><b>@Translation["Signatories"]:</b> @data?.DocumentSignatories</label>
+                                    </div>
+                                    <div class="row">
+                                        <label><b>@Translation["Recipient(s)"]:</b> @data?.DocumentReceivers</label>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="CreateDate" Title="@Translation["FilingDate"]" Width="150px" Filterable="true" TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap" />
+                <GridColumn Field="DueDate" Title=@Translation["DueDate"] Width="150px" Filterable="true" TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap">
+                    <Template>
+                        @{
+                            var data = (SearchDtoResponse)context;
+                            var dueDate = data.DueDate;
+
+                            if (dueDate.HasValue)
+                            {
+                                var daysDifference = (dueDate.Value - DateTime.Today).Days;
+                                var remainingOrExpired = daysDifference >= 0 ? @Translation["RemainingDays"] : @Translation["ExpiredDays"];
+
+                                <div class="text-center">
+                                    @dueDate.Value.ToString("dd/MM/yyyy HH:mm:ss") <br>
+                                    @remainingOrExpired: @Math.Abs(daysDifference)
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-center">
+                                    @Translation["NotApply"]
+                                </div>
+                            }
+
+                        }
+
+                    </Template>
+                </GridColumn>
+
+            </GridColumns>
+        </TelerikGrid>
+    </div>
+    <NewPaginationComponent @ref="paginationComponent" T="SearchDtoResponse" M="SearchDtoRequest" Filter="@DocumentSearchDtoRequest" PaginationInfo="@paginationInfo" Uri="@UriSearchEngine" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+</div>
+    
+
+
+

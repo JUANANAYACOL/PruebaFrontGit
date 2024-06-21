@@ -1,0 +1,46 @@
+﻿<div class="my-modal">
+    <TelerikRootComponent>
+        <GenericModalComponent Title=@(Translation["Administration"] + " - " + Translation["ManagementInstructions"]) IsVisible="modalStatus" OnModalClosed="HandleModalClosed" Width="50%">
+            <ChildContent>
+                <EditForm Model="@instruccionDtoResponse" OnValidSubmit="HandleValidSubmit">
+
+                    <div class="row p-2">
+                        <div class="col-md-12 mb-2">
+                            <InputModalComponent LabelText=@(Translation["Name"]+":") Placeholder=@Translation["InstructionName"] MethodValueChanged="ValidateEnableButton" IsRequired="true" @bind-InputValue="instruccionDtoResponse.Name"></InputModalComponent>
+                        </div>
+                    </div>
+                    <div class="row p-2">
+                        <div class="col-md-8">
+                            <label class="mb-2">@Translation["Class"]:<span class="red">*</span></label>
+                            <TelerikDropDownList Data="@classCodeList"
+                                                 @bind-Value="instruccionDtoResponse.ClassCode"
+                                                 Id="GR_TipoDoc"
+                                                 DefaultText=@Translation[ClassNameText]
+                                                 TextField="Value"
+                                                 ValueField="Code"
+                                                 OnChange="ValidateEnableButton"
+                                                 Filterable="true">
+                            </TelerikDropDownList>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end justify-content-end">
+                            <div class="px-2">
+                                <TelerikSwitch @bind-Value="@instruccionDtoResponse.ActiveState" />
+                            </div>
+                            <div class="px-2">
+                                @(instruccionDtoResponse.ActiveState ? Translation["Enabled"] : Translation["Disabled"])
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="from-group from-group--margin-top justify-content-center">
+                            <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="ResetFormAsync"></ButtonComponent>
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="submit" BtnDisabled="@enableButton" BtnIcon="fa-solid fa-floppy-disk"></ButtonComponent>
+                        </div>
+                    </div>
+                </EditForm>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>
+
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>

@@ -1,0 +1,172 @@
+﻿@using Control.Endeavour.FrontEnd.Models.Models.Administration.VDocumentaryTypology.Request
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.VDocumentaryTypology.Response;
+
+<div class="my-modal">
+    <TelerikRootComponent>
+        <GenericModalComponent Title="@title" IsVisible="modalStatus" Width="80%" OnModalClosed="HandleModalClosed">
+            <ChildContent>
+                <div class="selectorBlock pb-2 px-4">
+                    <div class="row m-0">
+                        <!-- dropdowns encargados de filtra la busqueda -->
+                        <div class="col-md-3 mt-4">
+                            <label class="selectorBlock--labelDropDown">@Translation["DocumentalVer"]: <span class="red">*</span></label>
+                            <TelerikDropDownList Data="@docVersionList"
+                                                 ValueField="DocumentalVersionId"
+                                                 Value="@idDocVersion"
+                                                 TextField="Code"
+                                                 ValueChanged="@( (int newValue) => GetAdministrativeUnits(newValue) )"
+                                                 Filterable="true"
+                                                 DefaultText=@Translation["SelectAnOption"]>
+                            </TelerikDropDownList>
+                        </div>
+
+                        <div class="col-md-3 mt-4">
+                            <label for="input2" class="selectorBlock--labelDropDown">@Translation["AdministrativeDepartment"]: <span class="red">*</span></label>
+                            <TelerikDropDownList Data="@adminUnitList"
+                                                 ValueField="AdministrativeUnitId"
+                                                 Value="@idAdminUnit"
+                                                 TextField="Name"
+                                                 ValueChanged="@( (int newValue) => GetProducOffice(newValue) )"
+                                                 Enabled="isEnableAdminUnit"
+                                                 Filterable="true"
+                                                 DefaultText=@Translation["SelectAnOption"]>
+                            </TelerikDropDownList>
+                        </div>
+                        <div class="col-md-3 mt-4">
+                            <label class="selectorBlock--labelDropDown">@Translation["ProductionOffice"]: <span class="red">*</span></label>
+                            <TelerikDropDownList Data="@proOfficesList"
+                                                 ValueField="ProductionOfficeId"
+                                                 Value="@idProOffice"
+                                                 TextField="Name"
+                                                 ValueChanged="@( (int newValue) => GetSeries(newValue) )"
+                                                 Enabled="isEnableProOffice"
+                                                 Filterable="true"
+                                                 DefaultText=@Translation["SelectAnOption"]>
+                            </TelerikDropDownList>
+                        </div>
+                        <div class="col-md-3 mt-4">
+                            <label class="selectorBlock--labelDropDown">@Translation["DocumentarySerie"]:</label>
+                            <TelerikDropDownList Data="@seriesList"
+                                                 ValueField="SeriesId"
+                                                 Value="@idSerie"
+                                                 TextField="Name"
+                                                 ValueChanged="@( (int newValue) => GetSubSeries(newValue) )"
+                                                 Enabled="isEnableSerie"
+                                                 Filterable="true"
+                                                 DefaultText=@Translation["SelectAnOption"]>
+                            </TelerikDropDownList>
+                        </div>
+                    </div>
+                    <div class="row m-0 pb-10">
+                        <!-- dropdowns encargados de filtra la busqueda y el boton -->
+                        <div class="col-md-3 mt-4">
+                            <label class="selectorBlock--labelDropDown">@Translation["DocumentarySubSerie"]:</label>
+                            <TelerikDropDownList Data="@subSeriesList"
+                                                 ValueField="SubSeriesId"
+                                                 Value="@idSubSerie"
+                                                 TextField="Name"
+                                                 ValueChanged="@( (int newValue) => GetDocTypologiesBySubSerieId(newValue) )"
+                                                 Enabled="isEnableSubSerie"
+                                                 Filterable="true"
+                                                 DefaultText=@Translation["SelectAnOption"]>
+                            </TelerikDropDownList>
+                        </div>
+                        <div class="col-md-3 mt-4">
+                            <label class="selectorBlock--labelDropDown">@Translation["DocumentaryTypology"]:</label>
+                            <TelerikDropDownList Data="@docTypologiesList"
+                                                 ValueField="DocumentaryTypologyId"
+                                                 Value="@idDocTypologies"
+                                                 TextField="TypologyName"
+                                                 ValueChanged="@((int newValue) => idDocTypologies = newValue)"
+                                                 Enabled="isEnableDocTypology"
+                                                 Filterable="true"
+                                                 DefaultText=@Translation["SelectAnOption"]>
+                            </TelerikDropDownList>
+                        </div>
+                        <div class="col-md-3 mt-4">
+                            <InputModalComponent @ref="typologyNameInput" @bind-InputValue="filterVDocTypology.TypologyName" InputMaxLength="50" LabelText="@Translation["ManualSearch"]" Placeholder="@Translation["DocTypologyName"]" IsVisible="isVisibleTypologyNameInput"></InputModalComponent>
+                        </div>
+                        <div class="col-md-3 align-self-end">
+                            <button class="btnStyle btnStyle--primary" type="button" onclick="@(()=>OnClickButton())" disabled="@(isEnableButton)">@Translation["Search"]</button>
+                        </div>
+                    </div>
+                    <div class="row m-0 pb-8">
+                        <!-- grilla donde se muestran las tipologias documentales -->
+                        <TelerikGrid Data="@docTypologyList"
+                                     Sortable="true"
+                                     ScrollMode="@GridScrollMode.Scrollable"
+                                     Height="680px"
+                                     RowHeight="60">
+                            <GridColumns>
+                                <GridColumn Width="10%">
+                                    <HeaderTemplate>
+                                        <label> @Translation["Selection"] </label>
+                                    </HeaderTemplate>
+                                    <Template>
+                                        @{
+                                            var docTypologySelected = (VDocumentaryTypologyDtoResponse)context;
+
+                                            <div class="mt-1">
+                                                <TelerikCheckBox @bind-Value="@docTypologySelected.Selected" OnChange="@(() => SelectDocTypology(docTypologySelected))">
+                                                </TelerikCheckBox>
+                                            </div>
+                                        }
+                                    </Template>
+                                </GridColumn>
+                                <GridColumn>
+                                    <HeaderTemplate>
+                                        <label> @Translation["DocumentaryTypologies"] </label>
+                                    </HeaderTemplate>
+                                    <Template>
+                                        @{
+                                            var docTypologySelected = (VDocumentaryTypologyDtoResponse)context;
+
+                                            <div class="row">
+                                                <div class="col">
+                                                    <div class="row">
+                                                        <label><b>@Translation["DocumentaryTypology"]:</b> @docTypologySelected?.TypologyName</label>
+                                                    </div>
+                                                    <div class="row">
+                                                        <label> <b>@Translation["DocumentalVer"]:</b> @docTypologySelected?.DocumentalVersionName</label>
+                                                    </div>
+                                                    <div class="row">
+                                                        <label> <b>@Translation["AdministrativeDepartment"]:</b> @docTypologySelected?.AdministrativeUnitName</label>
+                                                    </div>
+                                                    <div class="row">
+                                                        <label><b>@Translation["ProductionOffice"]:</b> @docTypologySelected?.ProductionOfficeName</label>
+                                                    </div>
+                                                    <div class="row">
+                                                        <label><b>@Translation["Serie"]:</b> @docTypologySelected?.SeriesName</label>
+                                                    </div>
+                                                    <div class="row">
+                                                        <label><b>@Translation["SubSerie"]:</b> @docTypologySelected?.SubSeriesName</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </Template>
+                                </GridColumn>
+                                <GridColumn>
+                                    <HeaderTemplate>
+                                        <label> @Translation["Manager"] </label>
+                                    </HeaderTemplate>
+                                    <Template>
+                                        @{
+                                            var docTypologySelected = (VDocumentaryTypologyDtoResponse)context;
+
+                                            <UserCardComponent LeadManagerId="docTypologySelected?.LeadManagerId" FullName="@docTypologySelected?.LmfullName" ValidLeadManager="true"
+                                                               AdministrativeUnitName="@docTypologySelected?.LmadministrativeUnitName" Positionname="@docTypologySelected?.LmadministrativeUnitName"
+                                                               ProductionOfficeName="@docTypologySelected?.LmproductionOfficeName"></UserCardComponent>
+                                        }
+                                    </Template>
+                                </GridColumn>
+                            </GridColumns>
+                        </TelerikGrid>
+                        <NewPaginationComponent @ref="paginationComponent" T="VDocumentaryTypologyDtoResponse" M="VDocumentaryTypologyDtoRequest" Filter="@filterVDocTypology" Uri="@UriFilterTypology" PaginationInfo="@paginationInfo" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+                    </div>
+                </div>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+    <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose" Height="425px"></NotificationsComponentModal>
+</div>

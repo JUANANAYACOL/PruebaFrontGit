@@ -1,0 +1,9 @@
+﻿.custom-table-container {
+    border: 1px solid #7D7D7D;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.custom-table {
+    width: 100%;
+}

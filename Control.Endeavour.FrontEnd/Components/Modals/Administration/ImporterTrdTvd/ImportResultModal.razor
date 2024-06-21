@@ -1,0 +1,38 @@
+﻿<div class="my-modal">
+
+    <TelerikRootComponent>
+        <GenericModalComponent Title=@Translation["Information"] IsVisible=@modalStatus Width="33%" OnModalClosed="HandleModalClosed">
+            <ChildContent>
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="row">
+                                <div class="col-lg-12 mt-2">
+                                    <p>@Translation["ImportMessage"]: @total .</p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-12 mt-2">
+                                    <p><b>@Translation["CreatedUnits"]:</b> @importerResponse.contUnity @Translation["Created"]</p>
+                                    <p><b>@Translation["CreatedOffices"]:</b> @importerResponse.contOffice @Translation["Created"]</p>
+                                    <p><b>@Translation["CreatedSeries"]:</b> @importerResponse.contSeries @Translation["Created"]</p>
+                                    <p><b>@Translation["CreatedSubSeries"]:</b> @importerResponse.contSubseries @Translation["Created"]</p>
+                                    <p><b>@Translation["CreatedTypologies"]:</b> @importerResponse.contTypologies @Translation["Created"]</p>
+                                    <p><b>@Translation["CreatedWithholdings"]:</b> @importerResponse.contRetentions @Translation["Created"]</p>
+                                    <p><b>@Translation["CreatedDRT"]:</b> @importerResponse.contTRD @Translation["Created"]</p>
+                                    <p><b>@Translation["CreatedDRTB"]:</b> @importerResponse.contTRDC @Translation["Created"]</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="from-group from-group--margin-top justify-content-center">
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Accept"] BtnIcon="fa fa-check" BtnOnClick="HandleModalClosed"></ButtonComponent>
+                        </div>
+                    </div>
+                </div>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>

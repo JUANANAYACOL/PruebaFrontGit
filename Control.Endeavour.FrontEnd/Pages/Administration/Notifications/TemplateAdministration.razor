@@ -1,0 +1,95 @@
+﻿@page "/TemplateAdministration"
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.Notifications.Response
+@layout MainLayout;
+
+
+<Control.Endeavour.FrontEnd.Components.Modals.Administration.Notifications.TemplateNotificationsModal @ref="templateNotifications" OnChangeData="HandleRefreshGridData"></Control.Endeavour.FrontEnd.Components.Modals.Administration.Notifications.TemplateNotificationsModal>
+
+<div class="row">
+    <div class="col-md-8">
+        <h1>@(Translation["Parametrization"] + " - " + Translation["TemplateAdministration"])</h1>
+    </div>
+    
+    <div class="col-md-4 text-end">
+        <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers=" ml-10" BtnType="button" BtnText=@Translation["Create"] BtnOnClick="ShowModalCreate" BtnIcon="fa-solid fa-plus"></ButtonComponent>
+    </div>
+</div>
+@* <div class="row">
+    <div class="col-md-12">
+        <h6 class="titulo-azul"> @Translation["SearchByFilters"]:</h6>
+    </div>
+    <div class="col-md-3">
+        
+    </div>
+    <div class="col-md-3">
+       
+    </div>
+    <div class="col-md-3">
+        
+        
+    </div>
+    <div class="col-md-3">
+        
+    </div>
+    <div class="col-md-12 d-flex align-items-end justify-content-end mt-3">
+        <div class="text-md-end">
+            <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="CleanFilter"></ButtonComponent>
+            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Search"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="SearchByFilter"></ButtonComponent>
+        </div>
+    </div>
+</div> *@
+<div class="row mt-4">
+    <div class="col">
+        <TelerikGrid Data="@templateDtoResponsesList" PageSize="10"
+                     Sortable="true"
+                     FilterMode="GridFilterMode.FilterMenu"
+                     Resizable="true"
+                     Reorderable="false"
+                     EditMode="GridEditMode.Popup"
+                     SelectionMode="GridSelectionMode.None">
+            <GridColumns>
+                @* <GridCommandColumn Width="80px" Title=@Translation["Edit"] HeaderClass="center-wrap" Visible="true">
+
+                    <GridCommandButton Title=@Translation["Edit"] Icon="@SvgIcon.Pencil" OnClick="@((args)=> ShowModalEdit((BranchOfficesDtoResponse)args.Item))"></GridCommandButton>
+
+
+                </GridCommandColumn>
+
+                <GridCommandColumn Width="80px" Title=@Translation["Delete"] HeaderClass="center-wrap" Visible="true">
+                    <div class="d-flex justify-content-around">
+                        <GridCommandButton Title=@Translation["Delete"] Icon="@SvgIcon.Trash" OnClick="@((args)=> ShowModalDelete((BranchOfficesDtoResponse)args.Item))"></GridCommandButton>
+                    </div>
+                </GridCommandColumn> *@
+
+
+                <GridColumn Field="@nameof(TemplateDtoResponse.Name)"
+                            Title=@Translation["Name"]
+                            Width="150px"
+                            Filterable="false"
+                            TextAlign="ColumnTextAlign.Center"
+                            HeaderClass="center-wrap" />
+                <GridColumn Field="@nameof(TemplateDtoResponse.SubjectText)"
+                            Title=@Translation["Subject"]
+                            Width="150px"
+                            Filterable="false"
+                            TextAlign="ColumnTextAlign.Center"
+                            HeaderClass="center-wrap" />
+                <GridColumn Field="@nameof(TemplateDtoResponse.TemplateText)"
+                            Title=@Translation["RegionalMacro"]
+                            Width="150px"
+                            Filterable="false"
+                            TextAlign="ColumnTextAlign.Center"
+                            HeaderClass="center-wrap" />
+            </GridColumns>
+            <NoDataTemplate>
+                <img src="../img/noDataFound.png" width="8%" height="8%" />
+                <p> @Translation["NoGridInfo"]</p>
+            </NoDataTemplate>
+        </TelerikGrid>
+        
+            
+        
+    </div>
+</div>
+
+

@@ -1,0 +1,259 @@
+﻿@using Control.Endeavour.FrontEnd.Models.Models.Administration.ThirdParty.Request
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.ThirdUser.Response
+
+
+<ThirdPartyUsersSearchModal @ref="ViewThirdPartyUserModal" ThirdUsersChecked="@ThirdUsersChecked" OnDataChanged="HandleDataChanged" AllowCopiesSelection="@AllowCopiesSelection" AllowMultipleSelection="@AllowMultipleSelection" OnModalOpenChanged="HandleModalOpenChanged"></ThirdPartyUsersSearchModal>
+<NotificationsComponentModal @ref="notificationModal" ></NotificationsComponentModal>
+<div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+    <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked @onclick="@(() => TabChangedHandler("PN"))">
+    <label class="btn btn-outline-primary" for="btnradio1">
+        <i class="fa-solid fa-user-large"></i>  @Translation["NaturalPerson"]
+    </label>
+
+    <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" @onclick="@(() => TabChangedHandler("PJ"))">
+    <label class="btn btn-outline-primary" for="btnradio2">
+        <i class="fa-regular fa-building"></i>  @Translation["LegalPerson"]
+    </label>
+</div>
+
+
+<div class="@PanelPnPerson">
+    <div class="row mt-1 p-3">
+        <div class="col-lg-3">
+            <InputModalComponent @bind-InputValue="thirdPartyFilterPN.Names" IsRequired="false" InputMaxLength="100" LabelText=@(Translation["NameSurname"]+":") Placeholder="" />
+        </div>
+        <div class="col-lg-3">
+            <InputModalComponent @bind-InputValue="thirdPartyFilterPN.IdentificationNumber" InputMaxLength="20" IsRequired="false" LabelText=@(Translation["IdentificationNumber"]+":") Placeholder="" />
+        </div>
+        <div class="col-lg-3">
+            <InputModalComponent @bind-InputValue="thirdPartyFilterPN.Email" IsRequired="false" InputMaxLength="150" LabelText="@(Translation["Email"]+":")" Placeholder="" />
+        </div>
+        <div class="col-lg-3 d-flex align-items-end justify-content-end mt-3">
+            <div class="text-md-end">
+                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText="@Translation["Clear"]" BtnIcon="fa-solid fa-eraser" BtnOnClick="CleanFilter"></ButtonComponent>
+                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText="@Translation["Search"]" BtnOnClick="SearchByFilter" BtnIcon="fa-solid fa-magnifying-glass"></ButtonComponent>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-1 p-3">
+        <TelerikGrid Data="@thirdPartyListPN" Sortable="true">
+            <GridColumns>
+                <GridColumn Width="80px" TextAlign="ColumnTextAlign.Center">
+                    <HeaderTemplate>
+                        <label title="@Translation["Grid_Select"]"> @Translation["SelectAbv"]</label>
+                    </HeaderTemplate>
+                    <Template>
+                        @{
+                            var thirdPartySelected = (ThirdPartyDtoResponse)context;
+                            <TelerikCheckBox Value="@thirdPartySelected.Selected"
+                                             ValueChanged="@( (bool value) => OnCheckBoxChanged(value, thirdPartySelected,"SelectedRecord") )" />
+                        }
+                    </Template>
+                </GridColumn>
+                <GridColumn Width="80px" Visible="@AllowCopiesSelection" Title="@Translation["Copies"]" TextAlign="ColumnTextAlign.Center">
+                    <HeaderTemplate>
+                        <label> @Translation["Copies"]   </label>
+                    </HeaderTemplate>
+                    <Template>
+                        @{
+                            var thirdPartySelected = (ThirdPartyDtoResponse)context;
+                            <TelerikCheckBox Value="@thirdPartySelected.Copy"
+                                             ValueChanged="@( (bool value) => OnCheckBoxChanged(value, thirdPartySelected, "SelectedCopies") )" />
+                        }
+                    </Template>
+                </GridColumn>
+
+@*                 <GridCommandColumn Width="80px" Title=@Translation["Edit"] HeaderClass="center-wrap" Visible="true">
+                    <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                        <GridCommandButton Icon="@SvgIcon.Pencil" Title=@Translation["Edit"] />
+                    </div>
+                </GridCommandColumn> *@
+
+                <GridColumn Field="IdentificationNumber"
+                            Title="@Translation["Identification"]"
+                            Width="150px"
+                            Filterable="true"
+                            TextAlign="ColumnTextAlign.Center"
+                            HeaderClass="center-wrap" />
+                <GridColumn Field="Names"
+                            Title=@($"{Translation["Name"]}/{Translation["LastName"]}" )
+                            Width="150px"
+                            Filterable="true"
+                            TextAlign="ColumnTextAlign.Center"
+                            HeaderClass="center-wrap" />
+
+                <GridColumn Width="300px" TextAlign="ColumnTextAlign.Center">
+                    <HeaderTemplate>
+                        <label>@Translation["Email"]</label>
+                    </HeaderTemplate>
+                    <Template>
+                        @{
+                            var thirdPartySelected = context as ThirdPartyDtoResponse;
+                            <div class="col">
+                                <div class="row">
+                                    <label> @(thirdPartySelected?.Email1 ?? thirdPartySelected?.Email2)</label>
+                                </div>
+                            </div>
+                        }
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="Charge"
+                            Title="@Translation["Position"]"
+                            Width="150px"
+                            Filterable="true"
+                            TextAlign="ColumnTextAlign.Center"
+                            HeaderClass="center-wrap" />
+                <GridColumn Field="Country"
+                            Title="@Translation["Country"]"
+                            Width="150px"
+                            Filterable="true"
+                            TextAlign="ColumnTextAlign.Center"
+                            HeaderClass="center-wrap" />
+                <GridColumn Field="StateC"
+                            Title="@Translation["State"]"
+                            Width="150px"
+                            Filterable="true"
+                            TextAlign="ColumnTextAlign.Center"
+                            HeaderClass="center-wrap" />
+                <GridColumn Field="City"
+                            Title="@Translation["City"]"
+                            Width="150px"
+                            Filterable="true"
+                            TextAlign="ColumnTextAlign.Center"
+                            HeaderClass="center-wrap" />
+            </GridColumns>
+
+            <NoDataTemplate>
+                <img src="../img/noDataFound.png" width="8%" height="8%" />
+                <p> @Translation["NoGridInfo"]</p>
+            </NoDataTemplate>
+        </TelerikGrid>
+        <NewPaginationComponent @ref="PaginationComponentThirdPartyPN" Filter="@thirdPartyFilterPN" T="ThirdPartyDtoResponse" M="ThirdPartyFilterDtoRequest" Uri="@ThirdPartyFilterUri" PaginationInfo="@PaginationInfoThirdPartyPN" OnPaginationRefresh="HandlePaginationGridPN"></NewPaginationComponent>
+
+
+    </div>
+
+        
+        
+</div>
+
+<div class="@PanelPjPerson">
+    <div class="row mt-1 p-3">
+        <div class="col-lg-3">
+            <InputModalComponent @bind-InputValue="thirdPartyFilterPJ.Names" IsRequired="false" InputMaxLength="100" LabelText=@(Translation["BusinessName"]+":") Placeholder="" />
+        </div>
+        <div class="col-lg-3">
+            <InputModalComponent @bind-InputValue="thirdPartyFilterPJ.IdentificationNumber" InputMaxLength="20" IsRequired="false" LabelText=@(Translation["TINidentificationInitials"]+":") Placeholder="" />
+        </div>
+        <div class="col-lg-3">
+            <InputModalComponent @bind-InputValue="thirdPartyFilterPJ.Email" IsRequired="false" InputMaxLength="150" LabelText="@(Translation["Email"]+":")" Placeholder="" />
+        </div>
+        <div class="col-lg-3">
+            <div class="from-group from-group--margin-top justify-content-center">
+                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText="@Translation["Clear"]" BtnIcon="fa-solid fa-eraser" BtnOnClick="CleanFilter"></ButtonComponent>
+                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText="@Translation["Search"]" BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="SearchByFilter"></ButtonComponent>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-1 p-3">
+        <TelerikGrid Data="@thirdPartyListPJ"
+                     Sortable="true">
+            <GridColumns>
+                <GridColumn Width="80px" TextAlign="ColumnTextAlign.Center">
+                    <HeaderTemplate>
+                        <label title="@Translation["Grid_Select"]"> @Translation["SelectAbv"]</label>
+                    </HeaderTemplate>
+                    <Template>
+                        @{
+                            var thirdPartySelected = (ThirdPartyDtoResponse)context;
+                            <TelerikCheckBox Value="@thirdPartySelected.Selected"
+                                             ValueChanged="@( (bool value) => OnCheckBoxChanged(value, thirdPartySelected,"SelectedRecord") )" />
+                        }
+                    </Template>
+                </GridColumn>
+                <GridColumn Width="80px" Visible="@AllowCopiesSelection" TextAlign="ColumnTextAlign.Center">
+                    <HeaderTemplate>
+                        <label> @Translation["Copies"]</label>
+                    </HeaderTemplate>
+                    <Template>
+                        @{
+                            var thirdPartySelected = (ThirdPartyDtoResponse)context;
+                            <TelerikCheckBox Value="@thirdPartySelected.Copy"
+                                             ValueChanged="@( (bool value) => OnCheckBoxChanged(value, thirdPartySelected, "SelectedCopies") )" />
+
+                        }
+                    </Template>
+                </GridColumn>
+
+                @* <GridCommandColumn Width="80px" Title=@Translation["Edit"] HeaderClass="center-wrap" Visible="true">
+                    <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                        <GridCommandButton Icon="@SvgIcon.Pencil" Title=@Translation["Edit"] />
+                    </div>
+
+                </GridCommandColumn> *@
+                <GridCommandColumn Width="100px" Title="@Translation["Entrusts"]" HeaderClass="center-wrap" Visible="true">
+                    <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                        <GridCommandButton Icon="@SvgIcon.Plus" Title="Encargados" OnClick="@((args)=> ShowModalThirdUser((ThirdPartyDtoResponse) args.Item ))" />
+                    </div>
+                </GridCommandColumn>
+                <GridColumn Field="IdentificationNumber"
+                            Title="@Translation["Identification"]"
+                            Width="150px"
+                            Filterable="true"
+                            TextAlign="ColumnTextAlign.Center"
+                            HeaderClass="center-wrap" />
+                <GridColumn Field="Names"
+                            Title="@Translation["BusinessName"]"
+                            Width="150px"
+                            Filterable="true"
+                            TextAlign="ColumnTextAlign.Center"
+                            HeaderClass="center-wrap" />
+
+                <GridColumn Width="300px" TextAlign="ColumnTextAlign.Center">
+                    <HeaderTemplate>
+                        <label>@Translation["Email"]</label>
+                    </HeaderTemplate>
+                    <Template>
+                        @{
+                            var thirdPartySelected = context as ThirdPartyDtoResponse;
+                            <div class="col">
+                                <div class="row">
+                                    <label> @(thirdPartySelected?.Email1 ?? thirdPartySelected?.Email2)</label>
+                                </div>
+                            </div>
+                        }
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="Country"
+                            Title="@Translation["Country"]"
+                            Width="150px"
+                            Filterable="true"
+                            TextAlign="ColumnTextAlign.Center"
+                            HeaderClass="center-wrap" />
+                <GridColumn Field="StateC"
+                            Title="@Translation["State"]"
+                            Width="150px"
+                            Filterable="true"
+                            TextAlign="ColumnTextAlign.Center"
+                            HeaderClass="center-wrap" />
+                <GridColumn Field="City"
+                            Title="@Translation["City"]"
+                            Width="150px"
+                            Filterable="true"
+                            TextAlign="ColumnTextAlign.Center"
+                            HeaderClass="center-wrap" />
+            </GridColumns>
+
+
+            <NoDataTemplate>
+                <img src="../img/noDataFound.png" width="8%" height="8%" />
+                <p> @Translation["NoGridInfo"]</p>
+            </NoDataTemplate>
+        </TelerikGrid>
+    </div>
+    <NewPaginationComponent @ref="PaginationComponentThirdPartyPJ" Filter="@thirdPartyFilterPJ" T="ThirdPartyDtoResponse" M="ThirdPartyFilterDtoRequest" Uri="@ThirdPartyFilterUri" PaginationInfo="@PaginationInfoThirdPartyPJ" OnPaginationRefresh="HandlePaginationGridPJ"></NewPaginationComponent>
+
+</div>
+        
+
+

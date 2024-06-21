@@ -1,0 +1,70 @@
+﻿@using Control.Endeavour.FrontEnd.Models.Models.Records.Response
+
+<div class="my-modal">
+    <TelerikRootComponent>
+
+        <GenericModalComponent Title=@(Translation["Records"] + " - " + Translation["Volumes"]) IsVisible="@modalStatus" OnModalClosed="HandleModalClosedAsync" Width="60%">
+            <ChildContent>
+                <div class="mx-4 my-2">
+                    <div class="row p-2">
+                        <div class="col-md-8">
+                            <div class="row">
+                                <div class="col-12 col-md">
+                                    <h3 class="mb-0 titulo-azul">@Translation["RecordNumber"]:</h3>
+                                </div>
+                                <div class="col-12 col-md">
+                                    <h3 class="mb-0 titulo-azul">@recordNumber</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end justify-content-end">
+                            <div class="text-md-end">
+                                <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Create"] BtnIcon="fa-solid fa-plus" BtnOnClick="CreateNewVolume"></ButtonComponent>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row p-2">
+                        <TelerikGrid Data="@recordVolumens"
+                                     ScrollMode="@GridScrollMode.Scrollable"
+                                     Height="400px" RowHeight="60" PageSize="@recordVolumens.Count()"
+                                     Sortable="true">
+                            <GridColumns>
+
+                                <GridCommandColumn Title=@Translation["UploadImage"] HeaderClass="center-wrap" Visible="true">
+                                    @{
+                                        <div class="d-flex justify-content-around command-button-container">
+                                            <GridCommandButton Title=@Translation["Upload"] Icon="@SvgIcon.FilePdf" Size="24px" OnClick="@((args)=> ShowModalGeneralInformation((VolumeDtoResponse)args.Item))"></GridCommandButton>
+                                        </div>
+                                    }
+                                </GridCommandColumn>
+                                <GridColumn Field="Code"
+                                            Title=@Translation["Code"]
+                                            Filterable="true"
+                                            TextAlign="ColumnTextAlign.Center"
+                                            HeaderClass="center-wrap" />
+                                <GridColumn Field="NameTome"
+                                            Title=@Translation["Name"]
+                                            Filterable="true"
+                                            TextAlign="ColumnTextAlign.Center"
+                                            HeaderClass="center-wrap" />
+                                <GridColumn Field="TomeNumber"
+                                            Title=@Translation["Number"]
+                                            Filterable="true"
+                                            TextAlign="ColumnTextAlign.Center"
+                                            HeaderClass="center-wrap" />
+                            </GridColumns>
+                        </TelerikGrid>  
+                    </div>
+                </div>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>
+<CreateVolumeRecordModal @ref="CreateVolumeRecordModal" OnRefreshData="HandleRefreshGrid"></CreateVolumeRecordModal>
+<NotificationsComponentModal @ref="NotificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+<UploadPDFModal @ref="UploadPDFModal" OnChangeData="HandleUploadPDFModal" IsRecord="true" Title=@Translation["UploadImage"]></UploadPDFModal>
+
+
+
+
+

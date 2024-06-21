@@ -1,0 +1,22 @@
+﻿<div id="dropdown2">
+    <TelerikDropDownList Data="@LanguageDtoResponses"
+                         Value="@CodeLanguage"
+                         Id=""
+                         DefaultText="@DefaultText"
+                         TextField="NameTraslated"
+                         ValueField="CodeLanguage"
+                         Filterable="true"
+                         ValueChanged="@((string Value) => ChangeLanguage(Value ))"
+                         FilterOperator="StringFilterOperator.Contains">
+    </TelerikDropDownList>
+</div>
+
+<style>
+    #dropdown2 .k-picker-solid {
+        background-color: transparent !important;
+    }
+
+    #dropdown2 .k-input, #dropdown2 .k-picker {
+        border-style: none !important;
+    }
+</style>

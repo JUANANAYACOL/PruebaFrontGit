@@ -1,0 +1,218 @@
+﻿@page "/SubSeries"
+@layout MainLayout;
+
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.AdministracionTRD.Request
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.AdministracionTRD.Response
+
+<DocumentaryTypologiesBagMetaDataModal ConfigurationId=3 TitleModal="@SubSeriesSelectedModalTitle" Title="@( $"{Translation["DocumentarySubSeries"]} - {Translation["Edit"]}/{Translation["Create"]} - {Translation["Metadatas"]}")" @ref="documentaryTypologiesBagMetaDataModal" OnStatusChanged="HandleStatusMetaDataChanged"></DocumentaryTypologiesBagMetaDataModal>
+
+<div class="container-fluid mt-5">
+    <SubSeriesModal @ref="modalSubseries" OnStatusUpdate="HandleChangedData"></SubSeriesModal>
+
+
+    <!-- Parte 1: Título y Contenido alineado a la izquierda -->
+    <div class="row titulo">
+        <div class="col-lg-8">
+            <h1>@(Translation["Administration"] + " - " + Translation["DocumentarySubSeries"])</h1>
+
+        </div>
+        <!-- Parte 2: Botón azul alineado a la derecha -->
+        <div class="col-lg-4 text-end">
+            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers=" ml-10" BtnType="button" BtnText="@(Translation["Create"])" BtnOnClick="ShowModalCreate" BtnIcon="fa-solid fa-plus"></ButtonComponent>
+        </div>
+    </div>
+
+    <div class="row m-0">
+
+        <div class="col-lg-12">
+            <h6 class="titulo-azul"> @Translation["SearchByFilters"]:</h6>
+        </div>
+        <div class="col-lg-3 mt-1">
+            <label for="input2" class="mb-2">@Translation["DocumentaryVersions"]<span class="red">*</span></label>
+            <TelerikDropDownList Data="@documentalVersionsList"
+                                 Id="DocTypeJ"
+                                 DefaultText="@Translation["SelectAType"]"
+                                 TextField="Code"
+                                 ValueField="DocumentalVersionId"
+                                 Value="@IdDocumental"
+                                 ValueChanged="@( (int newValue) => GetAdministrativeUnits(newValue) )"
+                                 OnChange="EnableSaveButton"
+                                 Filterable="true"
+                                 FilterOperator="StringFilterOperator.Contains">
+            </TelerikDropDownList>
+        </div>
+
+        <div class="col-lg-3 mt-1">
+            <label for="input2" class="mb-2">@Translation["AdministrativeUnits"]<span class="red">*</span></label>
+            <TelerikDropDownList Data="@administrativeUnitsList"
+                                 DefaultText="@Translation["SelectAType"]"
+                                 TextField="Name"
+                                 ValueField="AdministrativeUnitId"
+                                 Value="@idAdUnit"
+                                 ValueChanged="@( (int newValue) => GetProductionOffices(newValue) )"
+                                 OnChange="EnableSaveButton"
+                                 Filterable="true"
+                                 Enabled="@administrativeUnitEnable"
+                                 FilterOperator="StringFilterOperator.Contains">
+            </TelerikDropDownList>
+        </div>
+
+        <div class="col-lg-3 mt-1">
+            <label for="input2" class="mb-2">@Translation["ProductionOffices"]<span class="red">*</span></label>
+            <TelerikDropDownList Data="@productionOfficesList"
+                                 DefaultText="@Translation["SelectAType"]"
+                                 TextField="Name"
+                                 ValueField="ProductionOfficeId"
+                                 Value="@IdproOffice"
+                                 ValueChanged="@( (int newValue) => GetSeries(newValue) )"
+                                 OnChange="EnableSaveButton"
+                                 Filterable="true"
+                                 Enabled="@productionOfficeEnable"
+                                 FilterOperator="StringFilterOperator.Contains">
+            </TelerikDropDownList>
+        </div>
+
+        <div class="col-lg-3 mt-1">
+            <label for="input2" class="mb-2">@Translation["DocumentarySeries"]<span class="red">*</span></label>
+            <TelerikDropDownList Data="@seriesList"
+                                 DefaultText="@Translation["SelectAType"]"
+                                 TextField="Name"
+                                 ValueField="SeriesId"
+                                 @bind-Value="IdSerie"
+                                 OnChange="EnableSaveButton"
+                                 Filterable="true"
+                                 Enabled="@serieEnable"
+                                 FilterOperator="StringFilterOperator.Contains">
+            </TelerikDropDownList>
+        </div>
+
+    </div>
+
+    <div class="row m-0 pb-10">
+
+        <div class="col-lg-3 mt-3">
+            <InputModalComponent @bind-InputValue="codeFilter" IsDisabled="false" LabelText="@Translation["Code"]" Placeholder="@Translation["Code"]" InputMaxLength="5" />
+        </div>
+        <div class="col-lg-3 mt-3">
+            <InputModalComponent @bind-InputValue="NameFilter" IsDisabled="false" LabelText="@Translation["Name"]" Placeholder="@Translation["Name"]" InputMaxLength="100" />
+        </div>
+
+        <div class="col-lg-6 mt-3 d-flex justify-content-end">
+            <div class="from-group mt-4">
+                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnClassModifiers="btn-block" BtnType="button" BtnText=@Translation["Clear"] BtnOnClick="ResetFiltersAsync" BtnIcon="fa-solid fa-eraser"></ButtonComponent>
+
+                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10 btn-block" BtnType="button" BtnText=@Translation["Search"] BtnOnClick="ApplyFiltersAsync" BtnIcon="fa-solid fa-magnifying-glass" BtnDisabled="saveIsDisable"></ButtonComponent>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Parte 3: Grilla -->
+    <div class="row mt-4">
+        <div class="col">
+
+            <TelerikGrid Data="subSeriesList" PageSize="10"
+                         Sortable="true"
+                         FilterMode="GridFilterMode.FilterMenu"
+                         Resizable="true"
+                         Reorderable="false"
+                         EditMode="GridEditMode.Popup"
+                         SelectionMode="GridSelectionMode.None">
+                <GridToolBarTemplate>
+                    <GridCommandButton Command="ExcelExport" Icon="@SvgIcon.FileExcel" Enabled="subSeriesList.Count>0">@Translation["ExportToExcel"] </GridCommandButton>
+                    <label class="k-checkbox-label"><TelerikCheckBox @bind-Value="@ExportAllPages" Enabled="subSeriesList.Count>0" /> @Translation["ExportAllPages"]</label>
+                </GridToolBarTemplate>
+                <GridExport>
+                    <GridExcelExport FileName="telerik-grid-export" AllPages="@ExportAllPages" OnBeforeExport="@OnBeforeExcelExport" />
+                </GridExport>
+                <GridColumns>
+                    <GridCommandColumn Width="80px" Title=@Translation["Edit"] HeaderClass="center-wrap" Visible="true">
+                        <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                            <GridCommandButton Title=@Translation["Edit"] Icon="@SvgIcon.Pencil" OnClick="@((args)=>ShowModalEditAsync(args.Item as SubSeriesDtoResponse))"></GridCommandButton>
+                        </div>
+                    </GridCommandColumn>
+                    <GridCommandColumn Width="80px" Title=@Translation["Delete"] HeaderClass="center-wrap" Visible="true">
+                        <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                            <GridCommandButton Title=@Translation["Delete"] Icon="@SvgIcon.Trash" OnClick="@((args)=> ShowModalDelete(args.Item as SubSeriesDtoResponse))"></GridCommandButton>
+                        </div>
+
+                    </GridCommandColumn>
+                    <GridCommandColumn Width="80px" Title=@Translation["Metadatas"] HeaderClass="center-wrap" Visible="true">
+
+
+                        <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                            <GridCommandButton Title=@Translation["Metadatas"] Icon="@SvgIcon.Print" OnClick="@((args)=> ShowModalMetaData((SubSeriesDtoResponse)args.Item))"></GridCommandButton>
+                        </div>
+                    </GridCommandColumn>
+
+
+
+                    <GridColumn Field=@nameof(SubSeriesDtoResponse.Name)
+                                Title=@Translation["Name"]
+                                Width="150px"
+                                Filterable="false"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(SubSeriesDtoResponse.Code)
+                                Title=@Translation["Code"]
+                                Width="150px"
+                                Filterable="false"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(SubSeriesDtoResponse.ActiveState)
+                                Title=@Translation["Status"]
+                                Width="150px"
+                                Filterable="false"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap">
+                        <Template>
+                            @{
+                                SubSeriesDtoResponse rowData = (SubSeriesDtoResponse)context;
+                                if (rowData != null)
+                                {
+                                    bool activeState = (bool)rowData.ActiveState!;
+                                    string active = activeState ? Translation["Enabled"] : Translation["Disabled"];
+                                    @active
+                                }
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field=@nameof(SubSeriesDtoResponse.CreateUser)
+                                Title=@Translation["UserRecorded"]
+                                Width="200px"
+                                TextAlign="ColumnTextAlign.Center"
+                                Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(SubSeriesDtoResponse.CreateDate)
+                                Title=@Translation["DateRecorded"]
+                                Width="200px"
+                                TextAlign="ColumnTextAlign.Center"
+                                Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(SubSeriesDtoResponse.UpdateUser)
+                                Title=@Translation["UserUpdated"]
+                                Width="200px"
+                                TextAlign="ColumnTextAlign.Center"
+                                Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(SubSeriesDtoResponse.UpdateDate)
+                                Title=@Translation["DateUpdated"]
+                                Width="200px"
+                                TextAlign="ColumnTextAlign.Center"
+                                Filterable="false" HeaderClass="center-wrap" />
+
+                </GridColumns>
+                <NoDataTemplate>
+                    <img src="../img/noDataFound.png" width="8%" height="8%" />
+                    <p> @Translation["NoGridInfo"]</p>
+                </NoDataTemplate>
+            </TelerikGrid>
+        </div>
+    </div>
+
+    <!-- Parte 4: Botones en la izquierda, centro y derecha -->
+    @if (dataChargue)
+    {
+        <NewPaginationComponent @ref="PaginationComponent" T="SubSeriesDtoResponse" M="SubSeriesFilterDtoRequest" Uri="@UriFilterSubSeries" PaginationInfo="@paginationInfo" Filter="@SubSeriesFilterDtoRequest" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+    }
+    <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+
+</div>

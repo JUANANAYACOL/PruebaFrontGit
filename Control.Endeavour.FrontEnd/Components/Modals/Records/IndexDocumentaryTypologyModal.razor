@@ -1,0 +1,109 @@
+﻿<div class="my-modal">
+    <TelerikRootComponent>
+
+        <GenericModalComponent Title=@(Translation["TypologyIndexing"]) IsVisible="@ModalStatus" OnModalClosed="HandleModalClosedAsync" Width="60%">
+            <ChildContent>
+                <div class="mx-4 my-2">
+
+                    <div class="row mt-4">
+                        <div class="col-lg-6">
+                            <InputModalComponent @ref="inputStartFolio" @bind-InputValue="Start_Folio" InputMaxLength="10" LabelText=@(Translation["StartFolio"] + ":") IsRequired="true" Placeholder=@Translation["StartFolio"] InputType="number" FieldType="InputModalTypeEnum.NumbersOnly" IsDisabled="IsDisabledStartFolio" />
+                        </div>
+                         <div class="col-lg-6">
+                            <InputModalComponent @ref="inputEndFolio" @bind-InputValue="End_Folio" InputMaxLength="10" LabelText=@(Translation["EndFolio"] + ":") IsRequired="true" Placeholder=@Translation["EndFolio"] InputType="number" FieldType="InputModalTypeEnum.NumbersOnly" IsDisabled="IsDisabledEndFolio" />
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-lg-12">
+                            <label class="mb-2">@Translation["Comment"] <span style="color:gray">@string.Format(Translation["CharactersOutOf"], contadorcarac, "500")</span>:<span class="red"> *</span></label>
+                            <textarea @bind="IndexDocumentaryTypologyDtoRequest.Observation" class="w-100 custom-textarea" placeholder="" required maxlength="500" @oninput="@(e => ContarCaracteres(e))"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+
+                        <div class="col-lg-6">
+                            <label class="mb-2">@Translation["Origin"]: <span class="red">*</span></label>
+                            <TelerikDropDownList Data="@lstOrigin"
+                                                 Value="@IndexDocumentaryTypologyDtoRequest.Origin"
+                                                 Id="ID_Origin"
+                                                 DefaultText=@Translation["SelectAnOption"]
+                                                 TextField="Value"
+                                                 ValueField="Code"
+                                                 Filterable="true"
+                                                 ValueChanged="@((string Value) => ActivarPanel(Value))"
+                                                 FilterOperator="StringFilterOperator.Contains">
+                            </TelerikDropDownList>
+                        </div>
+
+                        <div class="col-lg-6 @PanelTypeOptions">
+                            <div class="form-group">
+                                <TelerikCheckBox Value="@IsEmail" ValueChanged="@((bool newValue) =>HandleCheckTypeOptions(newValue,"OPORI,CEL"))"> </TelerikCheckBox>
+                                <label>@Translation["Email"]</label>
+                            </div>
+                            <div class="form-group">
+                                <TelerikCheckBox Value="@IsInformationSystem" ValueChanged="@((bool newValue) =>HandleCheckTypeOptions(newValue,"OPORI,SIF"))"> </TelerikCheckBox>
+                                <label>@Translation["InformationSystem"]</label>
+                            </div>
+                            <div class="form-group">
+                                <TelerikCheckBox Value="@IsOther" ValueChanged="@((bool newValue) =>HandleCheckTypeOptions(newValue,"OPORI,OTR"))"> </TelerikCheckBox>
+                                <label>@Translation["Other"]</label>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="row mt-4 @PanelDescriptionOrigin">
+                        <div class="col-lg-12">
+                            <label class="mb-2">@Translation["DescriptionOrigin"] <span style="color:gray">@string.Format(Translation["CharactersOutOf"], contadorcarac2, "500")</span>:<span class="red"> *</span></label>
+                            <textarea @bind="IndexDocumentaryTypologyDtoRequest.OptionValue" class="w-100 custom-textarea" placeholder="" required maxlength="500" @oninput="@(e => ContarCaracteres(e,"ORIGEN"))"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4 text-center">
+                        <div class="col-lg-3  mt-2">
+                            <div class="col">
+                                <img src="../img/completo.png" />
+                            </div>
+                            <TelerikCheckBox Value="Complete" ValueChanged="@((bool newValue) =>HandleCheckBoxes(newValue,1))"></TelerikCheckBox>
+                            <label>Completo</label>
+                        </div>
+                        <div class="col-lg-3 mt-2">
+                            <div class="col">
+                                <img src="../img/ausente.png" />
+                            </div>
+                            <TelerikCheckBox Value="Absent" ValueChanged="@((bool newValue) =>HandleCheckBoxes(newValue,2))"></TelerikCheckBox>
+                            <label>@Translation["Absent"]</label>
+                        </div>
+
+                        <div class="col-lg-3 mt-2">
+                            <div class="col">
+                                <img src="../img/incompleto.png" />
+                            </div>
+                            <TelerikCheckBox Value="Incomplete" ValueChanged="@((bool newValue) =>HandleCheckBoxes(newValue,3))"></TelerikCheckBox>
+                            <label>@Translation["Incomplete"]</label>
+                        </div>
+                        <div class="col-lg-3 mt-2">
+                            <div class="col">
+                                <img src="../img/noAplica.png" />
+                            </div>
+                            <TelerikCheckBox Value="None" ValueChanged="@((bool newValue) =>HandleCheckBoxes(newValue,4))"></TelerikCheckBox>
+                            <label>@Translation["NotApply"]</label>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="from-group from-group--margin-top justify-content-center">
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Save"] BtnIcon="fa-solid fa-floppy-disk" BtnOnClick="HandleSave"></ButtonComponent>
+                        </div>
+                    </div>
+
+                </div>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>
+
+<NotificationsComponentModal @ref="NotificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+

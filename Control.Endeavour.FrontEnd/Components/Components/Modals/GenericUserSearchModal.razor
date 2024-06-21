@@ -1,0 +1,100 @@
+﻿<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+<TelerikWindow Class="myWindow"
+               Modal=true
+               Resizable=false
+               Width="@regularWidth"
+               Height="@regularHeight"
+               Centered="true"
+               Visible="IsVisible"
+               Draggable="false"
+               MaxHeight="@regularMaxHeight">
+    <WindowTitle>
+        <div class="row w-100">
+            <div class="col-10">
+                <strong>@Title</strong>
+            </div>
+
+            <div class="col-2 d-flex gap-4 d-flex  justify-content-end ">
+                <button class="svg-button d-none @modalExpanded d-sm-inline-block" @onclick="ExpandModal">
+                    <img src="../img/dimensionar.svg" />
+                </button>
+                <button class="svg-button">
+                    <img src="../img/vector.svg" @onclick="CloseModal" />
+                </button>
+            </div>
+        </div>
+
+    </WindowTitle>
+    <WindowContent>
+        <div class="contenedor-modal @classExpand">
+            <div class="position-container-fluid">
+                
+
+                   @if (TypeOfSearch == 1)
+                    {
+                        <UsersSearchModal AllowCopiesSelection="@AllowCopiesSelection" AllowMultipleSelection="@AllowMultipleSelection"
+                                          UsersChecked="@UserCheckeds" OnDataChanged="HandleDataChangedUserAsync" 
+                                          AllowToCheckReplament="@AllowToCheckReplament" IsValidateReplacements="@IsValidateReplacements" >
+                        </UsersSearchModal>
+                    }
+                    else if (TypeOfSearch == 2)
+                    {
+                        <ThirdPartyUserSearchModal @ref="thirPartyUserSearchModalRef" AllowCopiesSelection="@AllowCopiesSelection"
+                                                   ThirdPartyChecked="@ThirdPartyUserCheckeds" ThirdUsersChecked="@ThirdUsersChecked"
+                                                   AllowMultipleSelection="@AllowMultipleSelection" OnDataChangedThirdParty="HandleDataChangedThirdPartyAsync"
+                                                   OnDataChanged="HandleDataChangedAsync" OnModalOpenChanged="HandleModalOpenChanged">
+                        </ThirdPartyUserSearchModal>
+                    }
+                    else if (TypeOfSearch == 3 || TypeOfSearch == 4 || TypeOfSearch == 5)
+                    {
+                        <TelerikTabStrip PersistTabContent="true" ActiveTabIndex="ActiveTabIndex" ActiveTabIndexChanged="TabChangedHandler">
+                            <TabStripTab Title=@Translation["Sender"]>
+                                @if (TypeOfSearch == 5)
+                                {
+                                    <ThirdPartyUserSearchModal @ref="thirPartyUserSearchModalRef" AllowCopiesSelection="@false"
+                                                               ThirdPartyChecked="@ThirdPartyUserSenderCheckeds" ThirdUsersChecked="@ThirdUsersSenderChecked"
+                                                               AllowMultipleSelection="@true" OnDataChangedThirdParty="HandleDataChangedThirdPartyAsync"
+                                                               OnDataChanged="HandleDataChangedAsync" OnModalOpenChanged="HandleModalOpenChanged">
+                                    </ThirdPartyUserSearchModal>
+                                }
+                                else 
+                                {
+                                    <UsersSearchModal @ref="userSearhModalRef" AllowCopiesSelection="@false" AllowMultipleSelection="@true"
+                                                      UsersChecked="@UserSenderCheckeds" OnDataChanged="HandleDataChangedUserAsync"
+                                                      AllowToCheckReplament="@true" IsValidateReplacements="@false">
+                                    </UsersSearchModal>
+                                }
+                            </TabStripTab>
+                            <TabStripTab Title=@(Translation["Recipient"])>
+                                @if (TypeOfSearch == 3)
+                                {
+                                <ThirdPartyUserSearchModal @ref="thirPartyUserSearchModalRef" AllowCopiesSelection="@ShowCopiesFiling"
+                                                               ThirdPartyChecked="@ThirdPartyUserRecipientCheckeds" ThirdUsersChecked="@ThirdUsersRecipientChecked"
+                                                               AllowMultipleSelection="@true" OnDataChangedThirdParty="HandleDataChangedThirdPartyAsync"
+                                                               OnDataChanged="HandleDataChangedAsync" OnModalOpenChanged="HandleModalOpenChanged">
+                                    </ThirdPartyUserSearchModal>
+                                }
+                                else 
+                                {
+                                <UsersSearchModal @ref="userSearhModalRef" AllowCopiesSelection="@ShowCopiesFiling" AllowMultipleSelection="@true"
+                                                      UsersChecked="@UserRecipientCheckeds" OnDataChanged="HandleDataChangedUserAsync"
+                                                  AllowToCheckReplament="@ValidateReplacementsfiling" IsValidateReplacements="@true">
+                                    </UsersSearchModal>
+                                }
+                            </TabStripTab>
+                        </TelerikTabStrip> 
+                     } 
+
+                    
+                
+            </div>
+        </div>
+
+    </WindowContent>
+    
+    <WindowFooter>
+        <div class="row d-flex justify-content-center mt-1">
+            <ButtonComponent BtnClassColor="btnStyle--primary" BtnVisible="@IsButtonVisible" BtnType="button" BtnText=@Translation["Add"] BtnOnClick="ReturnMassiveSelectedUserAsync" BtnIcon="fa-solid fa-user-plus"></ButtonComponent>
+        </div>
+    </WindowFooter>
+</TelerikWindow>

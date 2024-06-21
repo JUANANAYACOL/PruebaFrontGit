@@ -1,0 +1,157 @@
+﻿@page "/FormatMasterList"
+@layout MainLayout
+@* FormatMasterList *@
+
+<PageTitle>FormatMasterList</PageTitle>
+
+<TemplateModal @ref="templateModal" OnChangeData="HandleRefreshGridDataAsync"></TemplateModal>
+<ViewDocumentModal @ref="viewDocumentModal"></ViewDocumentModal>
+<div class="container-fluid mt-1">
+    <!-- Parte 1: Título y Contenido alineado a la izquierda -->
+    <div class="row titulo">
+        <div class="col-8">
+            <h2>@(Translation["Administration"] + " - " + Translation["FormatMasterList"])</h2>
+        </div>
+    </div>
+    <div class="row">
+        <!-- Contenedor para los Tres Inputs -->
+        <div class="col-md-8">
+            <div class="row">
+                <!-- Parte Izquierda: Input y Label -->
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <InputModalComponent @ref="CodeInput" @bind-InputValue="Code" IsDisabled="false" InputMaxLength="10" LabelText=@Translation["Code"] Placeholder=@Translation["Code"] />
+                    </div>
+                    <div class="mb-3">
+                        <InputModalComponent @ref="NametemplateInput" @bind-InputValue="Name" IsDisabled="false" InputMaxLength="50" LabelText=@Translation["TemplateName"] Placeholder=@Translation["TemplateName"] />
+                    </div>
+                </div>
+                <!-- Parte Izquierda: Input y Label -->
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <InputModalComponent @ref="VersionInput" @bind-InputValue="Version" IsDisabled="false" InputMaxLength="5" LabelText=@Translation["TemplateVersion"] Placeholder=@Translation["TemplateVersion"] FieldType="InputModalTypeEnum.Filing" InputType="number" />
+                    </div>
+                    <div class="mb-3">
+                        <InputModalComponent @ref="ProcessInput" @bind-InputValue="Process" IsDisabled="false" InputMaxLength="100" LabelText=@Translation["Process"] Placeholder=@Translation["Process"] />
+                    </div>
+                </div>
+                <!-- Parte Izquierda: Input y Label -->
+                <div class="col-md-4" >
+                    <label for="input2" style="margin-bottom:6px;">@Translation["FormatType"] <span class="darkred"></span></label>
+                    <TelerikDropDownList Data="@FormatDoc"
+                                         Value="@ValueFormatDoc"
+                                         ValueField="Code"
+                                         TextField="Value"
+                                         Filterable="true"
+                                         DefaultText="@textFD"
+                                         ValueChanged="@((string value) => ValueFormatDoc = value)">
+                    </TelerikDropDownList>
+                </div>
+            </div>
+        </div>
+        <!-- Contenedor para los Tres Botones -->
+        <div class="col-md-4">
+            <div class="row ">
+                <!-- Parte Derecha: Dos Botones -->
+                <div class="from-group from-group--margin-top justify-content-center">
+                    <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="ResetFiltersAsync"></ButtonComponent>
+                    <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Search"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="GetByFilter"></ButtonComponent>
+                    <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Create"] BtnIcon="fa-solid fa-plus" BtnOnClick="ShowTemplateModal"></ButtonComponent>
+                </div>
+            </div>
+        </div>
+    </div> 
+    <!-- Parte 3: Grilla -->
+    <div class="row mt-4">
+        <div class="col">
+           <TelerikGrid Data="DocTemplatelist" PageSize="10"
+                         Resizable="true"
+                         OnRowExpand="@OnRowExpandHandler"
+                         SelectionMode="GridSelectionMode.None">
+@*                 <GridToolBarTemplate>
+                    <GridCommandButton Command="ExcelExport" Icon="@SvgIcon.FileExcel">@Translation["ExportToExcel"]</GridCommandButton>
+                    <label class="k-checkbox-label"><TelerikCheckBox @bind-Value="@ExportAllPages" /> @Translation["ExportAllPages"]</label>
+                </GridToolBarTemplate>
+                <GridExport>
+                    <GridExcelExport FileName="telerik-grid-export" AllPages="@ExportAllPages" OnBeforeExport="@OnBeforeExcelExport" />
+                </GridExport> *@
+                <DetailTemplate>
+                    @{
+                        <TelerikGrid Data="DocTemplatelistCode" Pageable="true" PageSize="5">              
+                            <GridColumns>                             
+                                <GridColumn Field="TempCode" Title=@Translation["Code"] Width="150px" TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap" />
+                                <GridColumn Field="TempName" Title=@Translation["TemplateName"] Width="170px" TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap" />
+                                <GridColumn Field="TempVersion" Title=@Translation["TemplateVersion"] Width="150px" TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap" />
+                                <GridColumn Field="Process" Title=@Translation["Process"] Width="150px" TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap" />
+                                <GridColumn Field="CreateUser" Title=@Translation["UserRecorded"] Width="150px" TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap" />
+                                <GridColumn Field="CreateDate" Title=@Translation["DateRecorded"] Width="150px" TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap" />
+                            </GridColumns>
+                        </TelerikGrid>
+                    }
+                </DetailTemplate>
+                <GridColumns>
+                    <GridCommandColumn Width="80px" Title=@Translation["Edit"] HeaderClass="center-wrap" Visible="true">
+                        <div class="d-flex justify-content-around">
+                            <GridCommandButton Icon="@SvgIcon.Pencil" Title=@Translation["Edit"] OnClick="@((args)=> ShowModalEdit((TemplateDocumentDtoResponse)args.Item))"></GridCommandButton>
+                        </div>                
+                    </GridCommandColumn>
+                    <GridCommandColumn Width="80px" Title="Archivo" HeaderClass="center-wrap" Visible="true">
+                        <div class="d-flex justify-content-around">
+                            <GridCommandButton Icon="@SvgIcon.FileTxt" Title=@Translation["File"] OnClick="@((args)=> HandleViewAttachment((TemplateDocumentDtoResponse)args.Item))"></GridCommandButton>
+                        </div>                    
+                    </GridCommandColumn>
+                    <GridCommandColumn Width="80px" Title=@Translation["Delete"] HeaderClass="center-wrap" Visible="true">
+                        <div class="d-flex justify-content-around">
+                            <GridCommandButton Icon="@SvgIcon.Trash" Title=@Translation["Delete"] OnClick="@((args)=> ShowModalDelete((TemplateDocumentDtoResponse)args.Item))"></GridCommandButton>
+                        </div>              
+                    </GridCommandColumn>
+                        <GridColumn Field="TempCode" Title=@Translation["Code"] Width="110px" TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap" />
+                        <GridColumn Field="TempName" Title=@Translation["TemplateName"] Width="150px" TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap" />
+                        <GridColumn Field="TempType" Title=@Translation["FormatType"] Width="150px" TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap">
+                            <Template>
+                                @{
+                                    TemplateDocumentDtoResponse rowData = (TemplateDocumentDtoResponse)context;
+                                    if (rowData != null)
+                                    {
+                                        string tempType = rowData.TempType;
+                                    string formatType = tempType.Equals("TFOR,DTXT") ? "DOCOUMENTO DE TEXTO" : "HOJA DE CÁLCULO";
+                                        @formatType
+                                    }
+                                }
+                            </Template>
+                        </GridColumn>
+                        <GridColumn Field="TempVersion" Title=@Translation["TemplateVersion"] Width="110px" TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap" />
+                        <GridColumn Field="Process" Title=@Translation["Process"] Width="150px" TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap" />
+                        <GridColumn Field="ActiveState"
+                                    Title=@Translation["Status"]
+                                    Width="150px"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap">
+
+                            <Template>
+                                @{
+                                    TemplateDocumentDtoResponse rowData = (TemplateDocumentDtoResponse)context;
+                                    if (rowData != null)
+                                    {
+                                        bool activeState = (rowData.ActiveState);
+                                        string active = activeState ? Translation["Enabled"] : Translation["Disabled"];
+                                        @active
+                                    }
+                                }
+                            </Template>
+                        </GridColumn>
+                        <GridColumn Field="CreateUser" Title=@Translation["UserRecorded"] Width="150px" TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap" />
+                        <GridColumn Field="CreateDate" Title=@Translation["DateRecorded"] Width="150px" TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap" />                  
+                </GridColumns>
+                <NoDataTemplate>
+                    <img src="../img/noDataFound.png" width="8%" height="8%" />
+                    <p> @Translation["NoGridInfo"]</p>
+                </NoDataTemplate>
+            </TelerikGrid>         
+        </div>
+    </div> 
+    <!-- Parte 4: Botones en la izquierda, centro y derecha -->
+    <NewPaginationComponent @ref="paginationComponent" T="TemplateDocumentDtoResponse" M="TemplateFilterDtoRequest" Filter="@filtro" Uri="@UriFilterTemplate" PaginationInfo="@paginationInfo" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+</div>
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+<NotificationsComponentModal @ref="notificationModalSucces"></NotificationsComponentModal>

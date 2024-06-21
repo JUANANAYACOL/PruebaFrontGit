@@ -1,0 +1,224 @@
+﻿/*#region Segundo Menu Vertical*/
+
+/* Animación de entrada y salida para el submenu */
+
+.style-submenu {
+    margin-left: calc(0% - 20px);
+    margin-top: -21px;
+    width: 380px;
+    background-color: var(--color-blanco);
+    border-top-right-radius: 20px !important;
+    border-bottom-right-radius: 20px !important;
+    -webkit-box-shadow: 10px 10px 22px -12px rgba(0,0,0,0.75);
+}
+
+body.dark .style-submenu {
+    background-color: var(--color-gris-oscuro-5);
+}
+
+.submenu {
+    height: auto;
+    min-height: 978px;
+    position: absolute;
+    z-index: 3000;
+    transform: translateX(-103%);
+    visibility: hidden;
+    transition: transform 0.5s ease-out, visibility 0.5s ease-out;
+}
+
+.show-submenu {
+    transform: translateX(0);
+    transform: translateX(0);
+    visibility: visible;
+    transition: transform 0.5s ease-in-out, visibility 0.5s ease-in-out;
+}
+
+/*#region Estilo para el boton del menu*/
+
+.menu-option {
+    min-height: 47px;
+    border-bottom: 2px solid var(--color-gris-sidebar);
+    color: var(--color-gris-text);
+}
+
+body.dark .menu-option {
+    min-height: 47px;
+    border-bottom: 2px solid var(--color-gris-oscuro-2);
+}
+
+body.dark .menu-option {
+    color: var(--color-blanco);
+}
+
+.menu-option:active {
+    border: 0px;
+}
+
+.icon-menu {
+    width: 25px;
+    margin-right: 6px;
+    margin-right: 1.5rem !important;
+}
+
+/*Estilo para el boton del menu cuando este seleccionado*/
+.menu-option.main-button {
+    background-color: var(--color-gris-sidebar); /*Color azul por defecto */
+    position: relative;
+    padding-left: 12px;
+    color: var(--color-celeste-control);
+    border-left: 4px solid var(--color-celeste-control);
+    border-bottom: 2px solid var(--color-gris-sidebar);
+}
+
+body.dark .menu-option.main-button {
+    background-color: var(--color-gris-oscuro-2); /*Color azul por defecto */
+    color: var(--color-celeste-control);
+    border-bottom: 2px solid var(--color-gris-oscuro-2);
+}
+
+/*Estilos para la linea azul que indica un nav-link (icono) activo*/
+.menu-option.main-button::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px; /*  Ancho de la línea azul */
+    background-color: var(--color-celeste-control);
+    border-radius: 20px 20px 0px 0px;
+}
+
+.btn-notselected {
+    padding: 10px 0px 10px 30px;
+    border-bottom: 2px solid var(--color-gris-sidebar);
+    border-radius: 0px;
+}
+
+body.dark .btn-notselected {
+    border-bottom: 2px solid var(--color-gris-oscuro-4);
+}
+
+/*Estilo para el icono de flecha en el botón principal seleccionado*/
+.main-button.btn-selected .bi {
+    color: var(--color-celeste-control);
+}
+
+/* Estilos para todas las opciones/subniveles */
+.sub-option {
+    color: var(--color-gris-text);
+}
+
+    .sub-option:hover {
+        color: var(--color-celeste-control);
+    }
+
+body.dark .sub-option {
+    color: var(--color-blanco);
+}
+
+    body.dark .sub-option:hover {
+        color: var(--color-celeste-control);
+    }
+
+.sub-option:active {
+    border: 0px !important;
+}
+
+/* Cambiar el color del texto solo cuando una subopción está seleccionada */
+.sub-option.btn-selected .text-color-sub {
+    color: var(--color-celeste-control);
+}
+
+/* Aplicar el color original del texto cuando no está seleccionado */
+.sub-option:not(.btn-selected) .text-color-sub {
+    font-weight: normal; /*Hacer que el texto vuelva a la fuente normal cuando no está seleccionado */
+}
+
+/* Evitar que se aplique ningún otro estilo a las subopciones seleccionadas */
+.sub-option .btn-selected {
+    background-color: transparent; /*Fondo transparente */
+    border: none; /* Sin borde */
+}
+
+    .sub-option .btn-selected .bi {
+        display: none; /*Ocultar el ícono de flecha*/
+    }
+
+.levels {
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+.icon-menu {
+    width: 25px;
+    margin-right: 6px;
+}
+
+.item-icon {
+    color: var(--color-gris-text) !important;
+    padding-right: 5px;
+}
+
+.btn-selected-with-options {
+    border-bottom: 2px var(--color-celeste-control) solid !important;
+    background-color: transparent;
+    border: none;
+    border-radius: 0 0 5px 5px;
+    color: var(--color-celeste-control);
+    padding: 12px 13px 12px 20px;
+    transition: background-color 0.3s ease;
+}
+
+body.dark .btn-selected-with-options {
+    color: var(--color-celeste-control);
+}
+
+.sub-nivel3 {
+    padding: 5px 0px 5px 30px;
+    border-bottom: 2px solid var(--color-gris-sidebar);
+    border-radius: 0px;
+}
+
+body.dark .sub-nivel3 {
+    border-bottom: 2px solid var(--color-gris-oscuro-4);
+}
+
+.btn-without-options {
+    background-image: url('../img/menu/iconPoint.svg');
+    background-position: left center;
+    background-repeat: no-repeat;
+    padding-left: 20px;
+    color: #697A8D;
+    position: relative;
+}
+
+    .btn-without-options:hover {
+        color: var(--color-celeste-control);
+    }
+
+.btn-selected.btn-without-options {
+    background-image: url('../img/menu/iconPointSelected.svg');
+    background-position: left center;
+    background-repeat: no-repeat;
+    padding-left: 12px;
+    color: #41BAEA;
+    position: relative;
+}
+
+/*#endregion*/
+
+/* Estilos Scroll lateral*/
+
+::-webkit-scrollbar-track {
+    margin: 30px 0px;
+    border-radius: 5px;
+}
+
+/*
+.columnGrid {
+    display: grid !important;
+    gap: 10px;
+    grid-template-columns: repeat(3, 1fr);
+}
+    */
+/*#endregion*/

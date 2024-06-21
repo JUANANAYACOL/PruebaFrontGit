@@ -1,0 +1,57 @@
+﻿<div class="my-modal">
+    <TelerikRootComponent>
+
+        <GenericModalComponent Title=@(Translation["Administration"] + " - " + Translation["BranchData"]) IsVisible="modalStatus" OnModalClosed="HandleModalClosed" Width="50%">
+            <ChildContent>
+                <div class="container mt-5">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <InputModalComponent @ref="inputCode" @bind-InputValue="branchOfficeRequest.Code" MethodValueChanged="EnableSaveButton" IsRequired="true"   InputMaxLength="5" LabelText=@Translation["Code"] Placeholder=@Translation["EnterCode"] FieldType="InputModalTypeEnum.Code" />
+
+                        </div>
+                        <div class="col-lg-6">
+                            <InputModalComponent @ref="inputName" @bind-InputValue="branchOfficeRequest.NameOffice" MethodValueChanged="EnableSaveButton" IsRequired="true" LabelText=@Translation["Name"] InputMaxLength="100" Placeholder=@Translation["EnterName"] FieldType="InputModalTypeEnum.Name" />
+                        </div>
+                        <div class="col-lg-6 mt-2">
+                            <InputModalComponent @ref="inputRegion" @bind-InputValue="branchOfficeRequest.Region" InputMaxLength="100" LabelText=@Translation["RegionalMacro"] Placeholder=@Translation["EnterRegionalFramework"] FieldType="InputModalTypeEnum.None" />
+                        </div>
+                        <div class="col-lg-6 mt-2">
+                            <InputModalComponent @ref="inputTerritory" @bind-InputValue="branchOfficeRequest.Territory"  InputMaxLength="100"  LabelText=@Translation["Territory"] Placeholder=@Translation["EnterTerritory"] FieldType="InputModalTypeEnum.None" />
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-lg-8 mt-1">
+                            <ButtonGroupComponent LabelText=@(Translation["Address"]+":") InputPlaceholder=@Translation["EnterAddress"] BtnTitle=@Translation["EnterAddress"] @ref="inputAddress" @bind-InputValue="addressString" InputRequired="false" BtnClassColor="btnStyle--primary" BtnClassModifiers="" BtnIcon="fa-solid fa-plus" BtnOnClick="OpenNewModal"></ButtonGroupComponent>
+                        </div>
+
+                        <div class="col-lg-4 mt-3">
+
+                            <div class="from-group mt-4 d-flex align-items-end justify-content-start">
+
+
+                                <div class="px-2">
+                                    <TelerikSwitch @bind-Value="@activeState" />
+                                </div>
+                                <div class="px-2">
+                                    @(activeState ? Translation["Enabled"] : Translation["Disabled"])
+                                </div>
+
+                            </div>
+
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="from-group from-group--margin-top justify-content-center">
+                            <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="ResetFormAsync "></ButtonComponent>
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnIcon="fa-solid fa-floppy-disk" BtnOnClick="HandleValidSubmit" BtnDisabled="saveIsDisable"></ButtonComponent>
+                        </div>
+                    </div>
+                </div>
+                <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>
+
+

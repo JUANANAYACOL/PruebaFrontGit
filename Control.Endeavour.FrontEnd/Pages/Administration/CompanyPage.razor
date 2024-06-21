@@ -1,0 +1,78 @@
+﻿@page "/Company"
+@layout MainLayout;
+
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.Company.Request;
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.Company.Response;
+
+
+<CompanyModal @ref="modalCompanies" OnStatusChanged="HandleStatusChanged" OnDataSaved="HandleNewData" OnResetForm="HandleForm" OnChangeData="HandleRefreshGridData"></CompanyModal>
+<AddressModal @ref="modalAddress" Id="modal-Address" OnStatusChangedMultipleSelection="HandleUserSelectedChanged"></AddressModal>
+
+<div class="container-fluid mt-5">
+    <!-- Parte 1: Título y Contenido alineado a la izquierda -->
+    <div class="row titulo">
+        <div class="col-lg-8">
+            <h1>@(Translation["Administration"] + " - " + Translation["OrganizationData"])</h1>
+
+        </div>
+        <!-- Parte 2: Botón azul alineado a la derecha -->
+        <div class="col-lg-4 text-end">
+            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10  btn-block" BtnType="button" BtnText=@Translation["Create"] BtnOnClick="ShowModal" BtnIcon="fa-solid fa-plus"></ButtonComponent>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <h6 class="titulo-azul"> @Translation["SearchByFilters"]:</h6>
+        </div>
+        <div class="col-md-3">
+            <InputModalComponent LabelText=@(Translation["BusinessName"]+":") Placeholder=@Translation["BusinessName"] @bind-InputValue="companyDtoRequest.BusinessName"></InputModalComponent>
+        </div>
+        <div class="col-md-3">
+            <InputModalComponent LabelText=@(Translation["TIN"]+":") Placeholder=@Translation["TIN"] @bind-InputValue="companyDtoRequest.Identification"></InputModalComponent>
+        </div>
+        <div class="col-md-6 d-flex align-items-end justify-content-end mt-3">
+            <div class="text-md-end">
+                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="CleanFilter"></ButtonComponent>
+                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Search"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="SearchByFilter"></ButtonComponent>
+            </div>
+        </div>
+    </div>
+
+    <!-- Parte 3: Grilla -->
+    <div class="row mt-4">
+        <div class="col">
+            <TelerikGrid Data="CompaniesList" PageSize="10"
+                         Sortable="true">
+                <GridColumns>
+
+                    <GridCommandColumn Width="90px" Title=@Translation["Edit"] HeaderClass="center-wrap" Visible="true">
+                        <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                            <GridCommandButton Title=@Translation["Edit"]   Icon="@SvgIcon.Pencil" OnClick="@((args)=> ShowModalEdit((CompanyDtoResponse)args.Item))"></GridCommandButton>
+                        </div>
+                    </GridCommandColumn>
+                    <GridCommandColumn Width="90px" Title=@Translation["Delete"] HeaderClass="center-wrap" Visible="true">
+                        <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                            <GridCommandButton Title=@Translation["Delete"] Icon="@SvgIcon.Trash" OnClick="@((args)=> HandleRecordToDelete((CompanyDtoResponse)args.Item))"></GridCommandButton>
+                        </div>
+                    </GridCommandColumn>
+                    <GridColumn Field="BusinessName" Title=@Translation["BusinessName"] Width="160px"  TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap" />
+                    <GridColumn Field="Identification" Title=@Translation["TIN"] Width="170px"  TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap" />
+                    <GridColumn Field="PhoneNumber" Title=@Translation["Phone"] Width="150px"  TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap" />
+                    <GridColumn Field="CellPhoneNumber" Title=@Translation["CellPhone"] Width="150px"  TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap" />
+                    <GridColumn Field="Address" Title=@Translation["Address"] Width="150px"  TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap" />
+                    <GridColumn Field="Email" Title=@Translation["Email"] Width="220px"  TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap" />
+                    <GridColumn Field="WebAddress" Title=@Translation["Website"] Width="180px"  TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap" />
+                    <GridColumn Field="CountryName" Title=@Translation["Country"] Width="150px"  TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap" />
+                    <GridColumn Field="StateName" Title=@Translation["State"] Width="190px" TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap" />
+                    <GridColumn Field="CityName" Title=@Translation["City"] Width="150px" TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap" />
+                </GridColumns>
+                <NoDataTemplate>
+                    <img src="../img/noDataFound.png" width="8%" height="8%" />
+                    <p> @Translation["NoGridInfo"]</p>
+                </NoDataTemplate>
+            </TelerikGrid>
+            <NewPaginationComponent @ref="PaginationComponent" T="CompanyDtoResponse" M="CompanyFilterDtoRequest" Uri="@UriFilterCompany" Filter="@companyDtoRequest" PaginationInfo="@paginationInfo" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+        </div>
+    </div>
+</div>
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>

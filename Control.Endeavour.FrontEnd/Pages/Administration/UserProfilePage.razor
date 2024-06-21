@@ -1,0 +1,111 @@
+﻿@page "/UserProfile"
+@layout MainLayout;
+
+<ChangePasswordUserModal @ref="changePasswordUserModal" Title=@($"{Translation["Administration"]} - {Translation["Users"]} - {Translation["ChangePassword"]}") />
+<div class="row">
+    <div class="col-11">
+        <h5 class="title-profile">@Translation["UserProfiles"]</h5>
+    </div>
+</div>
+<div class="row">
+    <div class="row mb-4">
+        <div class="card shadow-sm bg-white rounded-3">
+            <div class="card-body">
+                <div class="row row-container">
+                    <div class="col-md-2">
+                        <DragAndDropImageComponent @ref="userProfilePicture" Width="100%" Height="100%" AllowedExtensions="@AllowedExtensions" MaxFileSizeMB="@FileSize"
+                                                   MaxFileCount="1" TypeOfFiles="TypeOfFilesEnum.Picture" FileInfos="bannerFileInfoData" OnFileListChanged="HandleUserProfilePicture" ></DragAndDropImageComponent>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row input-container">
+                            <h2 class="p-0 user-name">@fullName</h2>
+                            <input placeholder=@Translation["Position"] @bind-value="@charge" disabled style="background-color: white" />
+                            <input class="mt-2" placeholder="@Translation["Profile"] " @bind-value="@profile" disabled style="background-color: white" />
+                            <input class="mt-2" placeholder="@Translation["AdministrativeUnit"] " @bind-value="@administrativeUnit" disabled style="background-color: white" />
+                            <input class="mt-2" placeholder="@Translation["ProductionOffice"] " @bind-value="@productionOffice" disabled style="background-color: white" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-11">
+        <h5 class="title-profile">@Translation["ProfileInformation"] @* <span class="span-gray">(Editable)</span> *@</h5>
+    </div>
+</div>
+<div class="row">
+    <div class="row mb-4">
+        <div class="card shadow-sm bg-white rounded-3">
+            <div class="card-body">
+                <div class="row">
+                    <h5 class="title-profile">@Translation["Password"] <span class="span-gray">(Editable)</span></h5>
+                    <div class="d-flex justify-content-start my-3 gap-4">
+                        @if (!UserDataToShow.OriginAd)
+                        {
+                            <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["UserPassword"] BtnIcon="fa-solid fa-eraser" BtnOnClick="(e) => ShowChangePaswwordModal(false)"></ButtonComponent>
+                        }
+                        <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["SecondUserPassword"] BtnIcon="fa-solid fa-eraser" BtnOnClick="(e) => ShowChangePaswwordModal(true)"></ButtonComponent>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h3 class="title-profile my-2">@Translation["MechanicalSignature"]</h3>
+                            <div class="col-md-12">
+                                <div class="card bg-white rounded-3 h-100">
+                                    <div class="card-body">
+                                        @if (!string.IsNullOrEmpty(SourceMechanicalSignature))
+                                        {
+                                            <img src="@SourceMechanicalSignature" alt="Descripción alternativa" class="signature-image" />
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h3 class="title-profile my-2">@Translation["RubricSignature"]</h3>
+                            <div class="col-md-12">
+                                <div class="card bg-white rounded-3 h-100">
+                                    <div class="card-body">
+                                        @if (!string.IsNullOrEmpty(SourceSignatureHeading))
+                                        {
+                                            <img src="@SourceSignatureHeading" alt="Descripción alternativa" class="signature-image" />
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-11">
+        <h5 class="title-profile">@Translation["PersonalInformation"] <span class="span-gray">(No editable)</span></h5>
+    </div>
+</div>
+<div class="row">
+    <div class="row mb-4">
+        <div class="card shadow-sm bg-white rounded-3">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 col-sm-6">
+                        <InputModalComponent LabelText=@Translation["Names"] Placeholder=@Translation["Names"] @bind-InputValue="name" IsDisabled="true" Style="background-color: white"></InputModalComponent>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <InputModalComponent LabelText=@Translation["LastName"] Placeholder=@Translation["LastName"] @bind-InputValue="lastName" IsDisabled="true" Style="background-color: white"></InputModalComponent>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <InputModalComponent LabelText=@Translation["Email"] Placeholder=@Translation["Email"] @bind-InputValue="email" IsDisabled="true" Style="background-color: white"></InputModalComponent>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <InputModalComponent LabelText=@Translation["CellPhoneNumber"] Placeholder=@Translation["CellPhoneNumber"] @bind-InputValue="celphone" IsDisabled="true" Style="background-color: white"></InputModalComponent>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<NotificationsComponentModal @ref="notificationModal"></NotificationsComponentModal>

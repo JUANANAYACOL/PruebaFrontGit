@@ -1,0 +1,216 @@
+﻿@page "/RecordClosingOpening"
+@using Control.Endeavour.FrontEnd.Models.Models.Records.Request
+@using Control.Endeavour.FrontEnd.Models.Models.Records.Response
+@layout MainLayout
+
+<div class="container-fluid mt-1">
+    <div class="row titulo">
+        <div class="col-md-10">
+            <h3>@(Translation["Records"] + " - " + Translation["ClosingOpening"])</h3>
+        </div>
+    </div>
+    <div>
+        <div class="row mt-4">
+            <TelerikTabStrip PersistTabContent="true" ActiveTabIndex="ActiveTabIndex" ActiveTabIndexChanged="TabChangedHandler">
+                <TabStripTab Title=@Translation["OpenRecords"] >
+
+                    <div class="row mt-4">
+                        <div class="col-md-3">
+                            <label class="selectorBlock--labelDropDown mb-2">@Translation["DocumentaryVersion"]:</label>
+                            <TelerikDropDownList Data="@DocVersionList"
+                                                 ValueField="DocumentalVersionId"
+                                                 Value="@IdDocVersion"
+                                                 TextField="Code"
+                                                 ValueChanged="@( (int newValue) => GetAdministrativeUnits(newValue,"Closing") )"
+                                                 Filterable="true"
+                                                 DefaultText=@Translation["DocumentaryVersions"]>
+                            </TelerikDropDownList>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="input2" class="selectorBlock--labelDropDown mb-2">@Translation["AdministrativeUnits"]:</label>
+                            <TelerikDropDownList Data="@AdminUnitList"
+                                                 ValueField="AdministrativeUnitId"
+                                                 Value="@IdAdminUnit"
+                                                 TextField="Name"
+                                                 ValueChanged="@( (int newValue) => GetProducOffice(newValue,"Closing") )"
+                                                 Enabled="IsEnableAdminUnit"
+                                                 Filterable="true"
+                                                 DefaultText="@Translation["AdministrativeUnits"]">
+                            </TelerikDropDownList>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="selectorBlock--labelDropDown mb-2">@Translation["ProductionOffices"]:</label>
+                            <TelerikDropDownList Data="@ProOfficesList"
+                                                 ValueField="ProductionOfficeId"
+                                                 Value="@IdProOffice"
+                                                 TextField="Name"
+                                                 ValueChanged="@( (int newValue) => GetValue(newValue,"Closing") )"
+                                                 Enabled="IsEnableProOffice"
+                                                 Filterable="true"
+                                                 DefaultText="@Translation["ProductionOffices"]">
+                            </TelerikDropDownList>
+                        </div>
+                        <div class="col-md-3">
+                            <InputModalComponent @bind-InputValue="@IdExpediente" LabelText=@(Translation["RecordNumber"]+":") IsVisible="true" Placeholder="" InputType="number" />
+                        </div>
+                        <div class="col-md-12 d-flex align-items-end justify-content-end mt-4">
+                            <div class="text-md-end">
+                                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnClassModifiers="mx-4" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="HandleCleanFilter"></ButtonComponent>
+                                <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Search"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="HandleSearchFilter"></ButtonComponent>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <TelerikGrid Data="@RecordsInfoList" PageSize="10">
+                            <GridColumns>
+                                <GridCommandColumn Width="80px" Title=@Translation["Grid_Lock"] HeaderClass="center-wrap" Visible="true">
+                                    <GridCommandButton Icon="@SvgIcon.XOutline" OnClick="@((args)=> RecordClosing(args.Item as VRecordsDtoResponse))" Title="Cerrar expediente"></GridCommandButton>
+                                </GridCommandColumn>
+                                <GridColumn Field="RecordNumber"
+                                            Title="@Translation["RecordNumber"]"
+                                            Width="150px"
+                                            TextAlign="ColumnTextAlign.Center"
+                                            HeaderClass="center-wrap" />
+
+                                <GridColumn Field="RecordFileTypeName"
+                                            Title="@Translation["FileRecordType"]"
+                                            Width="150px"
+                                            TextAlign="ColumnTextAlign.Center"
+                                            HeaderClass="center-wrap" />
+                                <GridColumn Width="350px">
+                                    <HeaderTemplate>
+                                        <label> @Translation["DRTInformation"]</label>
+                                    </HeaderTemplate>
+                                    <Template>
+                                        @{
+                                            var data = (VRecordsDtoResponse)context;
+                                            <div>
+                                                <div class="mb-1">
+                                                    <label><b>@Translation["AdministrativeDepartment"]:</b> @(!string.IsNullOrEmpty(data?.NameAdministrativeUnits) ? data.NameAdministrativeUnits : "N/A")</label>
+                                                </div>
+                                                <div class="mb-1">
+                                                    <label><b>@Translation["ProductionOffice"]:</b> @(!string.IsNullOrEmpty(data?.NameProductionOffices) ? data.NameProductionOffices : "N/A")</label>
+                                                </div>
+                                                <div class="mb-1">
+                                                    <label><b>@Translation["Serie"]:</b> @(!string.IsNullOrEmpty(data?.NameSeries) ? data.NameSeries : "N/A")</label>
+                                                </div>
+                                                <div class="mb-1">
+                                                    <label><b>@Translation["SubSerie"]:</b> @(!string.IsNullOrEmpty(data?.NameSubSeies) ? data.NameSubSeies : "N/A")</label>
+                                                </div>
+                                            </div>
+                                        }
+                                    </Template>
+                                </GridColumn>
+                            </GridColumns>
+                        </TelerikGrid>
+                        <NewPaginationComponent @ref="PaginationComponentCloseRecords" Filter="@RecordFilter" T="VRecordsDtoResponse" M="RecordFilterDtoRequest" Uri="@UriFilterRecords" PaginationInfo="@PaginationInfoCloseRecords" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+                    </div>
+
+                </TabStripTab>
+                
+                <TabStripTab Title="@Translation["ClosedRecord"]">
+
+                    <div class="row mt-4">
+                        <div class="col-md-3">
+                            <label class="selectorBlock--labelDropDown mb-2">@Translation["DocumentaryVersion"]:</label>
+                            <TelerikDropDownList Data="@DocVersionOpeningList"
+                                                 ValueField="DocumentalVersionId"
+                                                 Value="@IdDocVersionOpening"
+                                                 TextField="Code"
+                                                 ValueChanged="@( (int newValue) => GetAdministrativeUnits(newValue,"Opening") )"
+                                                 Filterable="true"
+                                                 DefaultText=@Translation["DocumentaryVersions"]>
+                            </TelerikDropDownList>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label for="input2" class="selectorBlock--labelDropDown mb-2">@Translation["AdministrativeUnits"]:</label>
+                            <TelerikDropDownList Data="@AdminUnitOpeningList"
+                                                 ValueField="AdministrativeUnitId"
+                                                 Value="@IdAdminUnitOpening"
+                                                 TextField="Name"
+                                                 ValueChanged="@( (int newValue) => GetProducOffice(newValue,"Opening") )"
+                                                 Enabled="IsEnableAdminUnitOpening"
+                                                 Filterable="true"
+                                                 DefaultText="@Translation["AdministrativeUnits"]">
+                            </TelerikDropDownList>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="selectorBlock--labelDropDown mb-2">@Translation["ProductionOffices"]:</label>
+                            <TelerikDropDownList Data="@ProOfficesOpeningList"
+                                                 ValueField="ProductionOfficeId"
+                                                 Value="@IdProOfficeOpening"
+                                                 TextField="Name"
+                                                 ValueChanged="@( (int newValue) => GetValue(newValue,"Opening") )"
+                                                 Enabled="IsEnableProOfficeOpening"
+                                                 Filterable="true"
+                                                 DefaultText="@Translation["ProductionOffices"]">
+                            </TelerikDropDownList>
+                        </div>
+                        <div class="col-md-3">
+                            <InputModalComponent @bind-InputValue="@IdExpedienteOpening" LabelText=@(Translation["RecordNumber"]+":") IsVisible="true" Placeholder="" InputType="number" />
+                        </div>
+                        <div class="col-md-12 d-flex align-items-end justify-content-end mt-4">
+                            <div class="text-md-end">
+                                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnClassModifiers="mx-4" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="HandleOpeningCleanFilter"></ButtonComponent>
+                                <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Search"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="HandleOpeningSearchFilter"></ButtonComponent>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <TelerikGrid Data="@RecordsOpenList" PageSize="10">
+                            <GridColumns>
+                                <GridCommandColumn Width="80px" Title=@Translation["Reopen"] HeaderClass="center-wrap" Visible="true">
+                                    <GridCommandButton Icon="@SvgIcon.CheckOutline" OnClick="@((args)=> RecordOpening(args.Item as VRecordsDtoResponse))" Title="Reabrir el expediente"></GridCommandButton>
+                                </GridCommandColumn>
+                                <GridColumn Field="RecordNumber"
+                                            Title="@Translation["RecordNumber"]"
+                                            Width="150px"
+                                            TextAlign="ColumnTextAlign.Center"
+                                            HeaderClass="center-wrap" />
+
+                                <GridColumn Field="RecordFileTypeName"
+                                            Title="@Translation["FileRecordType"]"
+                                            Width="150px"
+                                            TextAlign="ColumnTextAlign.Center"
+                                            HeaderClass="center-wrap" />
+                                <GridColumn Width="350px">
+                                    <HeaderTemplate>
+                                        <label> @Translation["DRTInformation"]</label>
+                                    </HeaderTemplate>
+                                    <Template>
+                                        @{
+                                            var data = (VRecordsDtoResponse)context;
+                                            <div>
+                                                <div class="mb-1">
+                                                    <label><b>@Translation["AdministrativeDepartment"]:</b> @(!string.IsNullOrEmpty(data?.NameAdministrativeUnits) ? data.NameAdministrativeUnits : "N/A")</label>
+                                                </div>
+                                                <div class="mb-1">
+                                                    <label><b>@Translation["ProductionOffice"]:</b> @(!string.IsNullOrEmpty(data?.NameProductionOffices) ? data.NameProductionOffices : "N/A")</label>
+                                                </div>
+                                                <div class="mb-1">
+                                                    <label><b>@Translation["Serie"]:</b> @(!string.IsNullOrEmpty(data?.NameSeries) ? data.NameSeries : "N/A")</label>
+                                                </div>
+                                                <div class="mb-1">
+                                                    <label><b>@Translation["SubSerie"]:</b> @(!string.IsNullOrEmpty(data?.NameSubSeies) ? data.NameSubSeies : "N/A")</label>
+                                                </div>
+                                            </div>
+                                        }
+                                    </Template>
+                                </GridColumn>
+                            </GridColumns>
+                        </TelerikGrid>
+                        <NewPaginationComponent @ref="PaginationComponentReOpenRecords" Filter="@RecordFilter" T="VRecordsDtoResponse" M="RecordFilterDtoRequest" Uri="@UriFilterRecords" PaginationInfo="@PaginationInfoReOpenRecords" OnPaginationRefresh="HandlePaginationGrid2"></NewPaginationComponent>
+                    </div>
+                </TabStripTab>
+            </TelerikTabStrip>
+        </div>
+    </div>
+</div>
+
+<NotificationsComponentModal @ref="NotificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+<RecordClosingModal @ref="RecordClosingModal" OnRefreshData="HandleRefreshOpening"></RecordClosingModal>
+<RecordOpeningModal @ref="RecordOpeningModal" OnRefreshData="HandleRefreshClosing"></RecordOpeningModal>

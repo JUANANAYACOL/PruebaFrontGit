@@ -1,0 +1,32 @@
+﻿<Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">
+        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+            <Authorizing>
+                <div>
+                    <row class="centered-element container-fluid">
+                        <h6>
+                            <span>Autorizando...</span>
+                        </h6>
+                    </row>
+                </div>
+            </Authorizing>
+            <NotAuthorized>
+                <div>
+                    <row class="centered-element container-fluid">
+                        <h6>
+                            <span>No está Autorizado...</span>
+                        </h6>
+                    </row>
+                </div>
+            </NotAuthorized>
+        </AuthorizeRouteView>
+    </Found>
+    <NotFound>
+        <CascadingAuthenticationState>
+            <LayoutView Layout="@typeof(NotFoundLayout)">
+
+
+            </LayoutView>
+        </CascadingAuthenticationState>
+    </NotFound>
+</Router>

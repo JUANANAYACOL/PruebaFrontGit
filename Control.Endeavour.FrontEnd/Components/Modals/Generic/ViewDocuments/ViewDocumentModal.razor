@@ -1,0 +1,31 @@
+﻿
+<div class="my-modal">
+    <TelerikRootComponent>
+        <GenericModalComponent Title=@Translation["ViewImage"] IsVisible="modalStatus" Width="60%" OnModalClosed="HandleModalClosed">
+            <ChildContent>
+                <div class="d-flex flex-row justify-content-center">
+                    <TelerikPdfViewer @ref="@PdfViewerRef"
+                                      Width="90%"
+                                      Height="1000px"
+                                      Data="@FileData">
+                        <PdfViewerToolBar>
+                            <PdfViewerToolBarSelectionTool />
+                            <PdfViewerToolBarSeparator />
+                            <PdfViewerToolBarSearchTool />
+                            <PdfViewerToolBarSeparator />
+                            <PdfViewerToolBarPrintTool />
+                            <PdfViewerToolBarDownloadTool />
+                            <PdfViewerToolBarSeparator />
+                            <PdfViewerToolBarSpacer />
+                            <PdfViewerToolBarPagerTool />
+                            <PdfViewerToolBarSpacer />
+                            <PdfViewerToolBarSeparator />
+                            <PdfViewerToolBarZoomTool />
+                        </PdfViewerToolBar>
+                    </TelerikPdfViewer>
+                </div>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>
+<NotificationsComponentModal @ref="notificationModal"></NotificationsComponentModal>

@@ -1,0 +1,199 @@
+﻿<div class="my-modal">
+    <TelerikRootComponent>
+        <GenericModalComponent Title=@Title IsVisible="modalStatus" OnModalClosed="HandleModalClosed" Width="70%">
+            <ChildContent>
+                 <div class="container padding-modals-container">
+                    
+                    <div class="row p-2">
+                        <div class="col-md-8">
+                            <div class="row">
+                                <div class="col-12 col-md">
+                                    <h3 class="mb-0 titulo-azul">@Translation["FilingUpper"]:</h3>
+                                </div>
+                                <div class="col-12 col-md">
+                                    <h3 class="mb-0 titulo-azul">@worKFlowDtoResponse.FilingCode</h3>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 col-md">
+                                    <h5 class="mb-0 titulo-azul">@Translation["DocumentID"]:</h5>
+                                </div>
+                                <div class="col-12 col-md">
+                                    <h5 class="mb-0">@worKFlowDtoResponse.ControlId</h5>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 pt-3">
+                            <TelerikTabStrip PersistTabContent="true">
+                                <TabStripTab Title=@Translation["DocumentaryProcess"]>
+                                <div class="my-modal">
+                                    <div class="row">
+                                        <TelerikGrid Data="@worKFlowDtoResponse.DocumentManagements" PageSize="@(meta.PageSize)"
+                                                     
+                                                     >
+                                            <GridColumns>
+                                                <GridColumn Width="80px" TextAlign="ColumnTextAlign.Center">
+                                                    <HeaderTemplate>
+                                                        <label>@Translation["Order"]</label>
+                                                    </HeaderTemplate>
+                                                    <Template>
+                                                        @{
+                                                            var data = (DocumentManagementsDtoResponse)context;
+                                                            <div class="d-flex justify-content-around">
+                                                                    <div class="numero"><h2>@data.ManagementOrder</h2></div>
+                                                            </div>
+                                                            
+                                                        }
+                                                    </Template>
+                                                </GridColumn>
+                                                <GridColumn Title=@Translation["Information"] TextAlign="ColumnTextAlign.Left" Width="300px">
+                                                    <HeaderTemplate>
+                                                            <label>@Translation["Information"] </label>
+                                                    </HeaderTemplate>
+                                                    <Template>
+                                                        @{
+                                                            var data = (DocumentManagementsDtoResponse)context;
+                                                            <div class="row d-flex align-items-center">
+                                                                <div class="col">
+                                                                    <div class="row">
+                                                                            <label><b>@Translation["DateAssigned"]:</b> @data?.AssingDate</label>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                            <label><b>@Translation["InstructionReceived"]:</b> @data?.InstructionCode</label>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                            <label><b>@Translation["Action"]:</b> @data?.ActionCode</label>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                            <label><b>@Translation["CommentJustificationReceived"]:</b> @data?.Commentary</label>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                            <label><b>@Translation["StatusProcessed"]:</b> @data?.FlowStateCode</label>
+                                                                    </div>
+                                                                    <div class="row">
+                                                                            <label><b>@Translation["UserOfficeProcessed"]:</b> @data?.ProcessUserBrachOffice</label>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    </Template>
+                                                </GridColumn>
+                                                <GridColumn TextAlign="ColumnTextAlign.Left" Width="300px">
+                                                    <HeaderTemplate>
+                                                            <label> @Translation["Manager"] </label>
+                                                    </HeaderTemplate>
+                                                    <Template>
+                                                        @{
+                                                            var data = (DocumentManagementsDtoResponse)context;
+                                                            <UserCardComponent FullName="@data?.ProcessUserName"
+                                                                               AdministrativeUnitName="@data?.ProcessUserAdministrativeUnit"
+                                                                               ProductionOfficeName="@(data?.ProcessUserProductionOffice ?? "N/A")"
+                                                                               Positionname="@(data?.ProcessUserCharge ?? "N/A")">
+                                                            </UserCardComponent>
+                                                        }
+
+                                                    </Template>
+                                                </GridColumn>
+                                            </GridColumns>
+                                        </TelerikGrid>
+                                    </div>
+                                    <!-- Parte 4: Botones en la izquierda, centro y derecha -->
+                                    @if (dataChargue)
+                                    {
+                                        @* <PaginationComponent ObjectMeta="@meta" T="ThirdPartyDtoResponse" M="DocumentManagementsDtoResponse" Filter="@thirdPartyFilter" OnPaginationRefresh="HandlePaginationGrid"></PaginationComponent> *@
+                                    }
+                                </div>
+                            </TabStripTab>
+                                <TabStripTab Title=@Translation["DocumentGeneration"] Visible="@isGenerationDocumentVisible">
+                                <div class="my-modal">
+                                    <div class="row">
+                                            <TelerikGrid Data="@documentWorkFlowLst" PageSize="@documentWorkFlowLst.Count()"
+                                                         Sortable="true"
+                                                         Resizable="true"
+                                                         ScrollMode="@GridScrollMode.Scrollable"
+                                                         Height="400px"
+                                                         RowHeight="60"
+                                                         Reorderable="true">
+                                                <GridColumns>
+                                                    <GridColumn Width="10%" TextAlign="ColumnTextAlign.Center">
+                                                        <HeaderTemplate>
+                                                            <label>@Translation["Order"]  </label>
+                                                        </HeaderTemplate>
+                                                        <Template>
+                                                            @{
+                                                                var data = (DocumentWorkFlowDtoResponse)context;
+                                                                <div class="numero"><h2>@data.ManagementOrder</h2></div>
+                                                            }
+                                                        </Template>
+                                                    </GridColumn>
+                                                    <GridColumn Title=@Translation["Information"] TextAlign="ColumnTextAlign.Left" Width="50%">
+                                                        <HeaderTemplate>
+                                                            <label>@Translation["Information"] </label>
+                                                        </HeaderTemplate>
+                                                        <Template>
+                                                            @{
+                                                                var data = (DocumentWorkFlowDtoResponse)context;
+                                                                var instruccion = (string.IsNullOrEmpty(data?.Instruction)) ? "N/A" : data.Instruction;
+                                                                var comentary = (string.IsNullOrEmpty(data?.Comentary)) ? "N/A" : data.Comentary;
+                                                                var process = (string.IsNullOrEmpty(data?.Process)) ? "N/A" : data.Process;
+                                                                <div class="row d-flex align-items-center">
+                                                                    <div class="col">
+                                                                        <div class="row">
+                                                                            <label><b>@Translation["CreationDate"]:</b> @data?.CreateDate</label>
+                                                                        </div>
+                                                                        
+                                                                        <div class="row">
+                                                                            <label><b>@Translation["Action"]:</b> @data.Process</label>
+                                                                        </div>
+                                                                        <div class="row">
+                                                                            <label><b>@Translation["InstructionReceived"]:</b> @instruccion</label>
+                                                                        </div>
+                                                                        <div class="row">
+                                                                            <label><b>@Translation["Observations"]:</b> @comentary</label>
+                                                                        </div>
+                                                                        
+                                                                        
+                                                                    </div>
+                                                                </div>
+                                                            }
+                                                        </Template>
+                                                    </GridColumn>
+                                                    <GridColumn TextAlign="ColumnTextAlign.Left" Width="40%">
+                                                        <HeaderTemplate>
+                                                            <label> @Translation["Manager"] </label>
+                                                        </HeaderTemplate>
+                                                        <Template>
+                                                            @{
+                                                                var data = (DocumentWorkFlowDtoResponse)context;
+                                                                <UserCardComponent FullName="@data?.UserTaskName"
+                                                                                   AdministrativeUnitName="@data?.AdministrativeUnitName"
+                                                                                   ProductionOfficeName="@data?.OfficeProductionName"
+                                                                                   Positionname="@data?.ChargeName"
+                                                                                   >
+                                                                </UserCardComponent>
+                                                            }
+
+                                                        </Template>
+                                                    </GridColumn>
+                                                </GridColumns>
+                                            </TelerikGrid>
+
+                                    </div>
+                                    <!-- Parte 4: Botones en la izquierda, centro y derecha -->
+
+                                </div>
+                            </TabStripTab>
+                        </TelerikTabStrip>
+                        </div>
+                    </div>
+                </div>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+    
+</div>
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>

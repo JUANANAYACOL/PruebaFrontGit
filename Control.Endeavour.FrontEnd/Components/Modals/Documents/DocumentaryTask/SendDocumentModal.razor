@@ -1,0 +1,58 @@
+﻿
+<div class="my-modal">
+    <TelerikRootComponent>
+        <GenericModalComponent Title=@Translation["SendDocument"] IsVisible="modalStatus" Width="60%" OnModalClosed="HandleModalClosed">
+            <ChildContent>
+                <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+                <div class="row send-pt">
+                    <div class="d-flex flex-row  gap-3">
+                        <div class="col-8">
+                            <ButtonGroupComponent LabelText=@Translation["Recipient"] InputPlaceholder=@Translation["SelectAnOption"] BtnTitle="Buscar Destinatario" @bind-InputValue="@vUserSelected.UserName" InputRequired="true" BtnClassColor="btnStyle--primary"
+                                                  BtnClassModifiers="" BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="OpenNewModalUser"></ButtonGroupComponent>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-column mt-4">
+                        <label class="mb-1">@Translation["Instructions"] <span class="red">*</span></label>
+                        <div class="button-group gap-3 mt-3">
+                            <button class="@GetButtonClass(InstructionCodeEnum.Review)" @onclick="() => HandleSelection(InstructionCodeEnum.Review)">
+                                <span><i class="fa-solid fa-check"></i></span>
+                                @Translation[InstructionCodeEnum.Review.GetDisplayValue()].Value
+                            </button>
+                            <button class="@GetButtonClass(InstructionCodeEnum.Approve)" @onclick="() => HandleSelection(InstructionCodeEnum.Approve)">
+                                <span><i class="fa-solid fa-file-circle-check"></i></span>
+                                @Translation[InstructionCodeEnum.Approve.GetDisplayValue()].Value
+                            </button>
+                            <button class="@GetButtonClass(InstructionCodeEnum.Signature)" @onclick="() => HandleSelection(InstructionCodeEnum.Signature)">
+                                <span><i class="fa-solid fa-file-signature"></i></span>
+                                @Translation[InstructionCodeEnum.Signature.GetDisplayValue()].Value
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xl-12 mt-4">
+                            <label class="mb-1">@Translation["Observations"]<span class="red">* </span><span class="span-gray">@string.Format(Translation["CharactersOutOf"], contadorcarac, "500")</span></label>
+                            <textarea @bind="descriptionInput" class="w-100 custom-textarea" id="DT_Asunto" required placeholder=@(string.Format(Translation["ProcedureInformationMaxCharacters", "500"])) maxlength="500" @oninput="ContarCaracteres"></textarea>
+                        </div>
+                        <div class="row d-flex mt-3 pb-10 justify-content-center">
+                            <div class="col-2 d-flex justify-content-center">
+                                <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Accept"] BtnIcon="fa-solid fa-check" BtnDisabled="enableButton" BtnOnClick="SelectSendDocument"></ButtonComponent>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>
+
+
+
+<GenericUserSearchModal @ref="genericUserSearch" Title="@Translation["UserFinder"]" IsVisible="UserModalStatus"
+                        OnSelectedUserData="HandleSelectedUserData"
+                        TypeOfSearch="1"
+                        OnModalClosed="HandleModalUserClosed" Width="90%"
+                        AllowMultipleSelection="@false"
+                        IsValidateReplacements="@true"
+                        AllowToCheckReplament="@false"
+                        AllowCopiesSelection="@false">
+</GenericUserSearchModal>

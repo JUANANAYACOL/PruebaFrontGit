@@ -1,0 +1,97 @@
+﻿<div class="my-modal">
+    <TelerikRootComponent>
+
+        
+        <GenericModalComponent Title=@Translation["DocumentCopies"] IsVisible="@modalStatus" OnModalClosed="HandleModalClosed" Width="70%">
+            <ChildContent>
+                <div class="container padding-modals-container">
+                    <div class="row p-2">
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-12 col-md">
+                                    <h3 class="mb-0 titulo-azul">@Translation["FilingUpper"]:</h3>
+                                </div>
+                                <div class="col-12 col-md">
+                                    <h3 class="mb-0 titulo-azul">@filingCode</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 d-flex align-items-end justify-content-end">
+                            <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                                <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked @onclick="@(() => OpenModalSearchUser(1))">
+                                <label class="btn btn-outline-primary" for="btnradio1">
+                                    <i class="fa-solid fa-user-large"></i>  @Translation["CopiesUsers"]
+                                </label>
+
+                                <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" @onclick="@(() => OpenModalSearchUser(2))">
+                                <label class="btn btn-outline-primary" for="btnradio2">
+                                    <i class="fa-regular fa-building"></i>  @Translation["CopiesThirdParties"]
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row p-2">
+                        <TelerikGrid Data="@copiesUserDocument" PageSize="@copiesUserDocument.Count()"
+                                     Sortable="true"
+                                     FilterMode="GridFilterMode.FilterMenu"
+                                     Resizable="true"
+                                     Reorderable="false"
+                                     EditMode="GridEditMode.Popup"
+                                     SelectionMode="GridSelectionMode.None">
+                            <GridColumns>
+
+                                <GridColumn Width="40%">
+                                    <HeaderTemplate>
+                                        <label>@Translation["User"]</label>
+                                    </HeaderTemplate>
+                                    <Template>
+                                        @{
+                                            var data = (DocumentCopiesDtoResponse)context;
+                                            <div class="row d-flex align-items-center ">
+                                                <div class="col-md-3 text-center">
+
+                                                    <img src="..\img\userCardImage.svg" />
+                                                </div>
+                                                <div class="col-md-9 d-flex flex-column align-items-start">
+                                                    <div class="row">
+                                                        <label><b>@Translation["Name"]:</b> @data.FullName</label>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                        }
+                                    </Template>
+                                </GridColumn>
+
+                                <GridColumn Field="CreateDate"
+                                            Title=@Translation["AssignmentDate"]
+                                            Width="200px"
+                                            Filterable="true"
+                                            TextAlign="ColumnTextAlign.Center"
+                                            HeaderClass="center-wrap" />
+
+                            </GridColumns>
+                            <NoDataTemplate>
+                                <img src="../img/noDataFound.png" width="8%" height="8%" />
+                                <p> @Translation["NoCopies4Document"]</p>
+                            </NoDataTemplate>
+                        </TelerikGrid>
+                    </div>
+                </div>
+                
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+
+</div>
+
+
+<GenericUserSearchModal @ref="genericUserSearch" Title="@Translation["UserFinder"]" IsVisible="UserModalStatus"
+                        OnSelectedUserData="HandleOnModalUserChangeAsync"
+                        TypeOfSearch="@TypeOfSearchUserModal"
+                        OnModalClosed="HandleModalUserClosed" Width="90%"
+                        AllowMultipleSelection="@false"
+                        AllowCopiesSelection="@false">
+</GenericUserSearchModal>
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>

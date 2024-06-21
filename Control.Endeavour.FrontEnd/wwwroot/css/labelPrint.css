@@ -1,0 +1,123 @@
+﻿.labelModalContiner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--color-gris-main);
+    border-radius: 13px;
+    padding: 14px;
+    height: 233px;
+}
+
+body.dark .labelModalContiner {
+    background-color: #2d2d2d;
+}
+
+.contenedor-modal {
+    width: 500px;
+    height: 190px;
+    border-radius: 20px;
+    padding: 26px;
+    position: relative;
+    z-index: 2000;
+    background-color: var(--color-blanco);
+/*    overflow-x: auto;
+    overflow-y: hidden;*/
+}
+
+body.dark .contenedor-modal {
+    background-color: var(--color-gris-oscuro-5);
+}
+
+.contenedor-modal__column1 {
+    float: left;
+    width: 100px;
+}
+
+.contenedor-modal__column2 {
+    float: left;
+    width: 366px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.row {
+    width: 100%;
+}
+
+.svg-button {
+    border: none;
+    padding: 0;
+    margin: 0;
+    background: none;
+}
+
+.t-window-action-close::before {
+    content: url('../icons/Close.png') !important;
+}
+
+.contenedor-modal__esquema, .text-Container {
+    width: 466px;
+}
+
+    .text-Container label {
+        font-size: 12px;
+    }
+
+@font-face {
+    font-family: CCode39;
+    src: url("/fonts/ConnectCode39.woff") format('woff')
+}
+
+#barcode {
+    font-weight: normal;
+    font-style: normal;
+    line-height: normal;
+    font-family: 'CCode39', sans-serif;
+    text-align: center;
+    font-size: 15px;
+}
+@media print {
+    html, body {
+        width: 210mm; /* Asumiendo tamaño A4 */
+        height: 297mm; /* Asumiendo tamaño A4 */
+        margin: 10mm; /* Margen para evitar cortes en los bordes */
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Centrado horizontal */
+        justify-content: flex-start; /* Alineación vertical al inicio */
+    }
+
+    .contenido-rotulo, .labelModalContiner, .contenedor-modal {
+        width: 100%; /* Toma el 100% del ancho disponible */
+        height: auto; /* Altura automática basada en el contenido */
+        box-sizing: border-box; /* Incluye padding y border en el ancho y alto */
+    }
+
+    .contenedor-modal__column1, .contenedor-modal__column2 {
+        float: none; /* Elimina float para que se ajuste en bloque */
+        width: auto; /* Ancho automático para ajuste flexible */
+        display: inline-block; /* Muestra en línea para mantener en la misma línea si es posible */
+    }
+
+    .row {
+        display: flex; /* Flexbox para mejor ajuste de los elementos */
+        flex-wrap: wrap; /* Permite que los elementos se envuelvan si no hay espacio */
+    }
+
+    .contenedor-modal__column2 {
+        flex-grow: 1; /* Permite que esta columna crezca para llenar el espacio */
+    }
+
+    #barcode {
+        font-size: 5vw; /* Tamaño de fuente basado en el ancho de la ventana */
+    }
+}
+

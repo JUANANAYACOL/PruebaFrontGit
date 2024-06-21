@@ -1,0 +1,137 @@
+﻿<div class="my-modal">
+    <TelerikRootComponent>
+        <GenericModalComponent Title=@Title IsVisible="modalStatus" OnModalClosed="HandleModalClosed" Width="90%">
+            @{
+                switch (ConfigurationInUse)
+                {
+                    //seleccion de usuarios
+                    case 1:
+                        <UserSearchModal @ref="_userSearchComponet"
+                                         multipleSelection="@multipleSelection"
+                                         showCarge="@showCarge"
+                                         showParamTrdDdl="@showParamTrdDdl"
+                                         showCopiesColumn="@showCopiesColumn"
+                                         showNameField="@showNameField"
+                                         showLastNameField="@showLastNameField"
+                                         hasEmail="@hasEmailUsers"
+                                         OnStatusChanged="UserModalOneSelection"
+                                         OnStatusChangedMultipleSelection="UserModalMultipleSelection">
+                        </UserSearchModal>
+                        if (multipleSelection)
+                        {
+                            <div class="row d-flex justify-content-center mt-4 mb-2 px-3">
+                                <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Add"] BtnIcon="fa-solid fa-user-plus" BtnOnClick="OnClickAssignUserData"></ButtonComponent>
+                            </div>
+                        }
+                        break;
+                    case 2:
+                        //seleccion de terceros
+                        <ThirdPartySearchModal @ref="_thirdUserSearchComponet"
+                                               multipleSelection=@multipleSelection
+                                               showCopiesColumn="@showCopiesColumn"
+                                               hasEmail="@hasEmailThirdUsers"
+                                               entrust="@entrust"
+                                               OnStatusChanged="ThirdPartyModalOneSelection"
+                                               OnStatusChangedMultipleSelection="ThirdPartyMultipleSelection">
+                        </ThirdPartySearchModal>
+                        if (multipleSelection)
+                        {
+                            <div class="row d-flex justify-content-center mt-4 mb-2 px-3">
+                                <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Add"] BtnIcon="fa-solid fa-user-plus" BtnOnClick="OnClickAssignThirdPartyData"></ButtonComponent>
+                            </div>
+                        }
+                        break;
+                    case 3:
+                        //radicacion recibida
+                        <TelerikTabStrip PersistTabContent="true">
+                            <TabStripTab Title=@(Translation["Sender"] + "*")>
+                                <ThirdPartySearchModal @ref="_thirdUserSearchComponet"
+                                                       hasEmail="@hasEmailThirdUsers"
+                                                       multipleSelection="true"
+                                                       showCopiesColumn="false"
+                                                       entrust="true"
+                                                       OnStatusChangedMultipleSelection="SenderList">
+                                </ThirdPartySearchModal>
+                            </TabStripTab>
+                            <TabStripTab Title=@(Translation["Recipient"] + "*")>
+                                <UserSearchModal @ref="_userSearchComponet"
+                                                 hasEmail="@hasEmailUsers"
+                                                 multipleSelection="true"
+                                                 showCarge="true"
+                                                 showParamTrdDdl="true"
+                                                 showCopiesColumn="true"
+                                                 showNameField="true"
+                                                 showLastNameField="true"
+                                                 OnStatusChangedMultipleSelection="RecipientList">
+                                </UserSearchModal>
+                            </TabStripTab>
+                        </TelerikTabStrip>
+                        <div class="row d-flex justify-content-center mt-4 mb-2 px-3">
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Add"] BtnIcon="fa-solid fa-user-plus" BtnOnClick="OnClickAssignRadication"></ButtonComponent>
+                        </div>
+                        break;
+                    case 4:
+                        //radicacion enviada
+                        <TelerikTabStrip PersistTabContent="true">
+                            <TabStripTab Title=@(Translation["Sender"] + "*")>
+                                <UserSearchModal @ref="_userSearchComponet"
+                                                 hasEmail="@hasEmailUsers"
+                                                 multipleSelection="true"
+                                                 showCarge="true"
+                                                 showParamTrdDdl="true"                                                
+                                                 showNameField="true"
+                                                 showLastNameField="true"
+                                                 OnStatusChangedMultipleSelection="SenderList">
+                                </UserSearchModal>
+                            </TabStripTab> <TabStripTab Title=@(Translation["Recipient"] + "*")>
+                                <ThirdPartySearchModal @ref="_thirdUserSearchComponet"
+                                                       hasEmail="@hasEmailThirdUsers"
+                                                       multipleSelection="true"
+                                                       showCopiesColumn="true"
+                                                       entrust="true"
+                                                       OnStatusChangedMultipleSelection="RecipientList">
+                                </ThirdPartySearchModal>
+                            </TabStripTab>
+                        </TelerikTabStrip>
+                        <div class="row d-flex justify-content-center mt-4 mb-2 px-3">
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Add"] BtnIcon="fa-solid fa-user-plus" BtnOnClick="OnClickAssignRadication"></ButtonComponent>
+                        </div>
+                        break;
+                    case 5:
+                        //radicacion interna
+                        <TelerikTabStrip PersistTabContent="true">
+                            <TabStripTab Title=@(Translation["Sender"] + "*")>
+                                <UserSearchModal @ref="_userSearchComponet"
+                                                 hasEmail="@hasEmailUsers"
+                                                 multipleSelection="true"
+                                                 showCarge="true"
+                                                 showParamTrdDdl="true"
+                                                 showCopiesColumn="true"
+                                                 showNameField="true"
+                                                 showLastNameField="true"
+                                                 OnStatusChangedMultipleSelection="SenderList">
+                                </UserSearchModal>
+                            </TabStripTab>
+                            <TabStripTab Title=@(Translation["Recipient"] + "*")>
+                                <UserSearchModal @ref="_userSearchComponet2"
+                                                 hasEmail="@hasEmailUsers2"
+                                                 multipleSelection="true"
+                                                 showCarge="true"
+                                                 showParamTrdDdl="true"
+                                                 showCopiesColumn="true"
+                                                 showNameField="true"
+                                                 showLastNameField="true"
+                                                 OnStatusChangedMultipleSelection="RecipientList">
+                                </UserSearchModal>
+                            </TabStripTab>
+                        </TelerikTabStrip>
+                        <div class="row d-flex justify-content-center mt-4 mb-2 px-3">
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Add"] BtnIcon="fa-solid fa-user-plus" BtnOnClick="OnClickAssignRadication"></ButtonComponent>
+                        </div>
+                        break;
+                }
+            }
+        </GenericModalComponent>
+    </TelerikRootComponent>
+    <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+</div>

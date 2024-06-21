@@ -1,0 +1,34 @@
+﻿/* Estilos para el componente Switch */
+.switch-container {
+    width: 60px;
+    height: 30px;
+    border-radius: 15px; /* Redondeado */
+    position: relative;
+    cursor: pointer;
+    overflow: hidden; /* Para ocultar el desbordamiento del interruptor cuando está desactivado */   
+}
+
+    .switch-container.active {
+        background-color: #2196F3; /* Color de fondo cuando está activo (usamos el parámetro ActiveColor) */
+    }
+
+.switch-toggle {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    position: absolute;
+    top: 0.15rem;
+    transform: translateX(-50%);
+    left: 27%;    
+    background-color: #FFFFFF;   
+}
+
+    .switch-toggle.active {
+        transform: translateX(30px); /* Mueve el círculo a la derecha cuando está activo */
+        bottom: -3%;
+        left: 3%;
+    }
+
+.word-in-container {
+    width: 10%;
+}

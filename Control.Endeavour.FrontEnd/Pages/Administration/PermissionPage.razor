@@ -1,0 +1,133 @@
+﻿@page "/Permission"
+@layout MainLayout;
+<PermissionModal PerfilID="IdPerfil" @ref="ModalPermission" OnStatusChanged="HandleRefreshGridDataAsync"></PermissionModal>
+
+<div class="container-fluid mt-5">
+    <!-- Parte 1: Título y Contenido alineado a la izquierda -->
+    <div class="row">
+        <div class="col-8">
+            <h1>@(Translation["Administration"] + " - " + Translation["Permissions"])</h1>
+
+        </div>
+        <!-- Parte 2: Botón azul alineado a la derecha -->
+        <div class="col-4 text-end">
+            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers=" ml-10" BtnType="button" BtnText=@Translation["Create"] BtnOnClick="ShowModal" BtnIcon="fa-solid fa-plus" BtnDisabled=Habilitar></ButtonComponent>
+        </div>
+
+    </div>
+</div>
+
+<!-- Parte 3: DropdownList Telerik -->
+
+<div class="row">
+
+
+    <div class="col-5 input-container">
+
+
+        <label for="input2" style="margin-bottom:6px;">@Translation["Profile"]: <span class="darkred">*</span></label>
+        <TelerikDropDownList Data="@PerfilesList"
+                             @bind-Value="@IdPerfil"
+                             DefaultText=@Translation["SelectAnOption"]
+                             TextField="Profile1"
+                             ValueField="ProfileId"
+                             OnChange="GetPermission"
+                             Filterable="true"
+                             FilterOperator="StringFilterOperator.Contains">
+        </TelerikDropDownList>
+
+    </div>
+    <!-- Parte 3: Grilla -->
+    <div class="row mt-4">
+        <div class="col">
+            <TelerikGrid Data="PermisosList" PageSize="10"
+                         Sortable="true"
+                         FilterMode="GridFilterMode.FilterMenu"
+                         Resizable="true"
+                         Reorderable="true"
+                         EditMode="GridEditMode.Popup"
+                         SelectionMode="GridSelectionMode.None">
+                <GridColumns>
+                    <GridCommandColumn Width="80px" Title=@Translation["Actions"] HeaderClass="center-wrap" Visible="true">
+                        <GridCommandButton Icon="@SvgIcon.Pencil" OnClick="@((args)=> ShowModalEdit(args.Item as PermissionDtoResponse))"></GridCommandButton>
+                        <GridCommandButton Icon="@SvgIcon.Trash" OnClick="@((args)=> ShowModalDelete(args.Item as PermissionDtoResponse))"></GridCommandButton>
+                    </GridCommandColumn>
+                    
+                    <GridColumn Field="FunctionalityName"
+                                Title=@Translation["Functionality"]
+                                Width="150px"
+                                Filterable="true"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="AccessF"
+                                Title=@Translation["Access"]
+                                Width="150px"
+                                Filterable="true"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="CreateF"
+                                Title=@Translation["Save"]
+                                Width="150px"
+                                Filterable="true"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="ModifyF"
+                                Title=@Translation["Modify"]
+                                Width="150px"
+                                Filterable="true"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="ConsultF"
+                                Title=@Translation["Consult"]
+                                Width="150px"
+                                Filterable="true"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="DeleteF"
+                                Title=@Translation["Delete"]
+                                Width="150px"
+                                Filterable="true"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="PrintF"
+                                Title=@Translation["Print"]
+                                Width="150px"
+                                Filterable="true"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="ActiveState"
+                                Title=@Translation["Active"]
+                                Width="150px"
+                                Filterable="true"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+
+                </GridColumns>
+                <NoDataTemplate>
+                    <img src="../img/noDataFound.png" width="8%" height="8%" />
+                    <p> @Translation["NoGridInfo"]</p>
+                </NoDataTemplate>
+            </TelerikGrid>
+
+        </div>
+    </div>
+
+    <!-- Parte 4: Botones en la izquierda, centro y derecha -->
+    <div class="row mt-4">
+        <div class="col-4">
+            <button class="btn btn-secondary">Botón Izquierda</button>
+        </div>
+        <div class="col-4 text-center">
+            <a href="tu_url">
+                <img src="../img/paginacion.svg" alt="Texto Alternativo" class="img-fluid">
+            </a>
+        </div>
+        <div class="col-4 text-end">
+            <a href="tu_url">
+                <img src="../img/botonExcel.svg" alt="Texto Alternativo" class="img-fluid">
+            </a>
+        </div>
+    </div>
+    <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+    <NotificationsComponentModal @ref="notificationModalSucces" ></NotificationsComponentModal>
+</div>

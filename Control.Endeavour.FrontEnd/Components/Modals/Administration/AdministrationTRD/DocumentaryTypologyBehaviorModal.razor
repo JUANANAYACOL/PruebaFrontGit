@@ -1,0 +1,89 @@
+﻿@using Control.Endeavour.FrontEnd.Models.Models.Administration.AdministracionTRD.Request
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.AdministracionTRD.Response
+
+
+
+<TRDCBehaviourModal @ref=trdcBehaviourModal OnStatusChanged="TRDCBehaviourOnModalStatus" OnChangeData="HandleRefreshGridData"></TRDCBehaviourModal>
+<div class="my-modal">
+    <TelerikRootComponent>
+        <GenericModalComponent Title="@title" IsVisible="modalStatus" Width="80%" OnModalClosed="HandleModalClosed">
+            <ChildContent>
+                <div class="selectorBlock pb-2 px-4">
+
+                    <div class="col-lg-12 text-end">
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10  btn-block" BtnType="button" BtnText=@Translation["Create"] BtnOnClick="ShowModal" BtnIcon="fa-solid fa-plus"></ButtonComponent>
+                    </div>
+
+                    <div class="row m-0 pb-8 mt-3">
+                        <TelerikGrid Data="@documentaryTypologiesBehaviorList" PageSize="10"
+                                     Sortable="true"
+                                     FilterMode="GridFilterMode.FilterMenu"
+                                     Resizable="true"
+                                     Reorderable="false"
+                                     EditMode="GridEditMode.Popup"
+                                     SelectionMode="GridSelectionMode.None">
+                            <GridColumns>
+                                <GridCommandColumn Width="80px" Title=@Translation["Edit"] HeaderClass="center-wrap" Visible="true">
+                                    <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                                        <GridCommandButton Title=@Translation["Edit"] Icon="@SvgIcon.Pencil" OnClick="@((args)=> ShowModalEditAsync((DocumentaryTypologiesBehaviorsDtoResponse)args.Item))"></GridCommandButton>
+                                    </div>
+                                </GridCommandColumn>
+                                <GridColumn Field=@nameof(DocumentaryTypologiesBehaviorsDtoResponse.DocumentaryTypologyName)
+                                            Title=@Translation["Name"]
+                                            Width="150px"
+                                            Filterable="false"
+                                            TextAlign="ColumnTextAlign.Center"
+                                            HeaderClass="center-wrap" />
+                                <GridColumn Field=@nameof(DocumentaryTypologiesBehaviorsDtoResponse.ClassCodeName)
+                                            Title=@Translation["ComunicationClass"]
+                                            Width="150px"
+                                            Filterable="false"
+                                            TextAlign="ColumnTextAlign.Center"
+                                            HeaderClass="center-wrap" />
+                                <GridColumn Field=@nameof(DocumentaryTypologiesBehaviorsDtoResponse.CorrespondenceTypeName)
+                                            Title=@Translation["CorrespondenceType"]
+                                            Width="150px"
+                                            Filterable="false"
+                                            TextAlign="ColumnTextAlign.Center"
+                                            HeaderClass="center-wrap" />
+                                <GridColumn Field=@nameof(DocumentaryTypologiesBehaviorsDtoResponse.CreateUser)
+                                            Title=@Translation["UserRecorded"]
+                                            Width="150px"
+                                            Filterable="false"
+                                            TextAlign="ColumnTextAlign.Center"
+                                            HeaderClass="center-wrap" />
+                                <GridColumn Field=@nameof(DocumentaryTypologiesBehaviorsDtoResponse.CreateDate)
+                                            Title=@Translation["DateRecorded"]
+                                            Width="150px"
+                                            Filterable="false"
+                                            TextAlign="ColumnTextAlign.Center"
+                                            HeaderClass="center-wrap" />
+                                <GridColumn Field=@nameof(DocumentaryTypologiesBehaviorsDtoResponse.UpdateUser)
+                                            Title=@Translation["UserUpdated"]
+                                            Width="150px"
+                                            Filterable="false"
+                                            TextAlign="ColumnTextAlign.Center"
+                                            HeaderClass="center-wrap" />
+                                <GridColumn Field=@nameof(DocumentaryTypologiesBehaviorsDtoResponse.UpdateUser)
+                                            Title=@Translation["DateUpdated"]
+                                            Width="150px"
+                                            Filterable="false"
+                                            TextAlign="ColumnTextAlign.Center"
+                                            HeaderClass="center-wrap" />
+                            </GridColumns>
+                            <NoDataTemplate>
+                                <img src="../img/noDataFound.png" width="8%" height="8%" />
+                                <p> @Translation["NoGridInfo"]</p>
+                            </NoDataTemplate>
+                        </TelerikGrid>
+                        @if (dataChargue)
+                        {
+                            <NewPaginationComponent @ref="paginationComponent" T="DocumentaryTypologiesBehaviorsDtoResponse" M="DocumentaryTypologiesBehaviorsFilterDtoRequest" Filter="@filterDtoRequest" Uri="@UriFilterDocumentaryTypologiesBehaviors" PaginationInfo="@paginationInfo" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+                        }
+                    </div>
+                </div>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+    <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose" Height="425px"></NotificationsComponentModal>
+</div>

@@ -1,0 +1,460 @@
+﻿@page "/ActiveDirectoryUser"
+
+
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.Permission.Request
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.VUser.Request
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.VUser.Response
+
+@layout MainLayout;
+
+
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+
+<div class="container-fluid mt-1">
+    <div id="panel-1-user" class="row pb-30 d-flex @Panel1Class">
+        <div class="row titulo">
+            <div class="col-md-8">
+                <h3>@(Translation["Administration"] + " - " + Translation["ActiveDirectoryUser"])</h3>
+            </div>
+            <!-- Parte 2: Botón azul alineado a la derecha -->
+   
+        </div>
+        <div class="row mt-2">
+            <div class="col-lg-12">
+                <h6 class="titulo-azul"> @Translation["SearchByFilters"]:</h6>
+            </div>
+
+
+           
+            <div class="col-lg-9">
+                <InputModalComponent LabelText=@Translation["User"] InputMaxLength="100" Placeholder=@Translation["User"] FieldType="InputModalTypeEnum.Name" @bind-InputValue="@userLoginFilter"> </InputModalComponent>
+            </div>
+
+
+            <div class="col-lg-3">
+                <div class="from-group from-group--margin-top justify-content-end">
+                    <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="CleanFilter"></ButtonComponent>
+                    <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Search"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="SearchButtom"></ButtonComponent>
+                </div>
+            </div>
+
+
+
+        </div>
+  
+
+    </div>
+    <div id="panel-1-user" class="row  d-flex @Panel2Class">
+        @* <EditForm Model="@_createUsersDtoRequest" OnValidSubmit="HandleValidSubmit"> *@
+        <div class="row justify-content-end text-center">
+            <div class="text-md-end">
+                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnVisible="@createFormUser" BtnOnClick="ResetForm"></ButtonComponent>
+                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10 me-4" BtnType="button" BtnIcon="fa-solid fa-floppy-disk" BtnVisible="@createFormUser" BtnOnClick="HandleValidSubmit" BtnDisabled="saveIsDisable"></ButtonComponent>
+                <button class="svg-button" @onclick="CloseCreateView">
+                    <img src="../img/vector.svg" />
+                </button>
+            </div>
+        </div>
+        <div class="row">
+            <TelerikTabStrip PersistTabContent="true" @bind-ActiveTabIndex="@currentTab">
+                <TabStripTab Title=@Translation["GeneralData"]>
+                    <div class="row mb-4">
+                        <div class="card shadow-sm bg-white rounded-3">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-2">
+
+
+
+
+                                        <DragAndDropImageComponent @ref="bannerDADComponent" Width="100%" Height="100%" AllowedExtensions="@AllowedExtensions" MaxFileSizeMB="@FileSize"
+                                                                   MaxFileCount="1" TypeOfFiles="TypeOfFilesEnum.Picture" FileInfos="bannerFileInfoData" OnFileListChanged="HandleUserProfilePicture"></DragAndDropImageComponent>
+
+
+
+                                    </div>
+
+                                    <div class="col-md-8">
+
+
+                                        <div class="row">
+
+                                            <div class="mb-2 col-md-6">
+                                                <label class="mb-2">@Translation["DocumentType"] <span class="red">*</span></label>
+                                                <TelerikDropDownList Data="@lstDocumentType"
+                                                                     @bind-Value="@_createUsersDtoRequest.IdentificationType"
+                                                                     Id="GR_TipoDoc"
+                                                                     DefaultText="@IdentificationText"
+                                                                     TextField="Value"
+                                                                     ValueField="Code"
+                                                                     Filterable="true"
+                                                                     FilterOperator="StringFilterOperator.Contains"
+                                                                     Enabled=!editFormUser
+                                                                     OnChange="EnableSaveButton">
+                                                </TelerikDropDownList>
+                                            </div>
+
+                                            <div class="mb-2 col-md-6">
+                                                <InputModalComponent LabelText=@Translation["DocumentNumber"] Placeholder=@Translation["DocumentNumber"] MethodValueChanged=EnableSaveButton InputMaxLength="20" IsDisabled=editFormUser IsRequired="true" @bind-InputValue="@_createUsersDtoRequest.Identification" FieldType="InputModalTypeEnum.NumbersOnly"></InputModalComponent>
+                                            </div>
+
+
+                                            <div class="mb-2 col-md-6">
+                                                <label>@Translation["Profile"] <span class="red">*</span> </label>
+                                                <TelerikDropDownList Data="@porfileDropDownList"
+                                                                     ValueField="@nameof(ProfilesDtoResponse.ProfileId)"
+                                                                     @bind-Value="profileIdSelected"
+                                                                     TextField="@nameof(ProfilesDtoResponse.Profile1)"
+                                                                     Enabled="true"
+                                                                     Filterable="true"
+                                                                     DefaultText=@Translation["SelectAnOption"]
+                                                                     Class="mt-2"
+                                                                     OnChange="EnableSaveButton">
+                                                </TelerikDropDownList>
+
+
+                                            </div>
+
+
+                                            <div class="mb-2 col-md-6">
+                                                <InputModalComponent LabelText=@Translation["User"] MethodValueChanged=EnableSaveButton Placeholder=@Translation["User"] InputMaxLength="100" IsRequired="true" @bind-InputValue="@_createUsersDtoRequest.UserName" FieldType="InputModalTypeEnum.Name" IsDisabled="true"></InputModalComponent>
+                                            </div>
+
+                                            
+
+                                            <div class="mb-2 col-md-6">
+                                                <InputModalComponent LabelText=@Translation["SecondPassword"] MethodValueChanged=EnableSaveButton Placeholder=@Translation["SecondPassword"] InputMaxLength="20" IsRequired="true" @bind-InputValue="@_createUsersDtoRequest.SeccondPassword" FieldType="InputModalTypeEnum.Name" InputType="password" IsDisabled="@editFormUser"></InputModalComponent>
+                                                @if (editFormUser)
+                                                {
+                                                    <label class="titulo-azul cursor-pointer-class" @onclick="(()=>ShowChangePaswwordModal(true))">@Translation["ChangeSecondPassword"]</label>
+                                                }
+
+                                            </div>
+
+                                        </div>
+
+
+
+
+
+
+
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+
+
+                        <div class="mb-2 col-lg-3">
+                            <InputModalComponent LabelText=@Translation["FirstName"] MethodValueChanged=EnableSaveButton InputMaxLength="50" Placeholder=@Translation["FirstName"] FieldType="InputModalTypeEnum.Name" @bind-InputValue="@_createUsersDtoRequest.FirstName" InputType="text" IsRequired="true" IsDisabled="true"></InputModalComponent>
+                        </div>
+                        <div class="mb-2 col-lg-3">
+                            <InputModalComponent LabelText=@Translation["MiddleName"] InputMaxLength="50" MethodValueChanged=EnableSaveButton Placeholder=@Translation["MiddleName"] FieldType="InputModalTypeEnum.Name" @bind-InputValue="@_createUsersDtoRequest.MiddleName" InputType="text"></InputModalComponent>
+                        </div>
+                        <div class="mb-2 col-lg-3">
+                            <InputModalComponent LabelText=@Translation["Surnames"] MethodValueChanged=EnableSaveButton InputMaxLength="50" Placeholder=@Translation["Surnames"] FieldType="InputModalTypeEnum.Name" IsRequired="true" @bind-InputValue="@_createUsersDtoRequest.LastName" InputType="text" IsDisabled="true"></InputModalComponent>
+                        </div>
+                        <div class="mb-2 col-lg-3">
+
+                            <label class="mb-2">@Translation["BirthDate"]  <span class="red">*</span></label>
+                            <TelerikDatePicker @bind-Value="@birthDate"
+                                               Format="dd/MM/yyyy"
+                                               ShowWeekNumbers="false"
+                                               OnChange="@CheckAge"
+                                               Class="DisabledInput">
+                                               
+                            </TelerikDatePicker>
+
+                        </div>
+
+
+                        <div class="mb-2 col-lg-3">
+                            <InputModalComponent LabelText=@Translation["Email"] Placeholder=@Translation["Email"] MethodValueChanged=EnableSaveButton InputMaxLength="150" FieldType="InputModalTypeEnum.Email" IsRequired="true" @bind-InputValue="@_createUsersDtoRequest.Email" InputType="email" IsDisabled="true"></InputModalComponent>
+                        </div>
+
+                        <div class="mb-2 col-lg-3">
+
+
+
+                            <InputModalComponent @bind-InputValue="_createUsersDtoRequest.CellPhoneNumber" InputMaxLength="10" IsRequired="false" LabelText=@Translation["CellPhone"] IsVisible="true" Placeholder=@Translation["CellPhone"] IsDisabled="true" InputType="number" FieldType="InputModalTypeEnum.Filing" InputMaxNumberValue="9999999999" />
+
+
+
+
+                        </div>
+
+                        <div class="mb-2 col-lg-3">
+
+
+
+                            <InputModalComponent @bind-InputValue="_createUsersDtoRequest.PhoneNumber" InputMaxLength="10" IsRequired="false" LabelText=@Translation["Phone"] IsVisible="true" Placeholder=@Translation["Phone"] IsDisabled="true" InputType="number" FieldType="InputModalTypeEnum.Filing" InputMaxNumberValue="9999999999" />
+
+
+                        </div>
+
+
+
+                        <div class="mb-2 col-lg-3">
+                            <label class="mb-2">@Translation["Position"]: <span class="red">*</span></label>
+                            <TelerikDropDownList Data="@lstCharguesTypes"
+                                                 @bind-Value="@_createUsersDtoRequest.ChargeCode"
+                                                 Id="GR_TipoDoc"
+                                                 DefaultText="@CharguesTypeText"
+                                                 TextField="Value"
+                                                 ValueField="Code"
+                                                 Filterable="true"
+                                                 OnChange="EnableSaveButton">
+                            </TelerikDropDownList>
+                        </div>
+
+
+                        <div class="mb-2 col-lg-3">
+                            <label class="mb-2">@Translation["ContractType"]: <span class="red">*</span></label>
+                            <TelerikDropDownList Data="@lstContracTypes"
+                                                 @bind-Value="@_createUsersDtoRequest.ContractType"
+                                                 Id="GR_TipoDoc"
+                                                 DefaultText="@ContracTypeText"
+                                                 TextField="Value"
+                                                 ValueField="Code"
+                                                 Filterable="true"
+                                                 OnChange="EnableSaveButton">
+                            </TelerikDropDownList>
+                        </div>
+
+
+
+
+                        <div class="mb-2 col-lg-3">
+
+
+
+
+                            <InputModalComponent @bind-InputValue="_createUsersDtoRequest.ContractNumber" InputMaxLength="10" IsRequired="true" LabelText=@Translation["ContractNumber"] IsVisible="true" Placeholder=@Translation["ContractNumber"] InputType="number" FieldType="InputModalTypeEnum.Filing" InputMaxNumberValue="9999999999" />
+
+                        </div>
+
+
+
+
+                        <div class="mb-2 col-lg-3">
+
+
+                            <label class="mb-2">@Translation["StartDate"] <span class="red">*</span></label>
+                            <TelerikDatePicker @bind-Value="@starContractDate"
+                                               Format="dd/MM/yyyy"
+                                               ShowWeekNumbers="false"
+                                               Min="@MinDatePicker"
+                                               Max="@maxValueTo"
+                                               OnChange="@updateMinValue"
+                                               Class="DisabledInput">
+                            </TelerikDatePicker>
+                        </div>
+                        <div class="mb-2 col-lg-3">
+
+                            <label class="mb-2">@Translation["EndDate"] <span class="red">*</span> </label>
+                            <TelerikDatePicker @bind-Value="@endContractDate"
+                                               Format="dd/MM/yyyy"
+                                               ShowWeekNumbers="false"
+                                               Min="@minValueTo"
+                                               OnChange="@updateMaxValue"
+                                               Class="DisabledInput">
+                            </TelerikDatePicker>
+                        </div>
+
+                        <div class="mb-2 col-lg-3">
+                            <label class="mb-2">@Translation["Branch"]: <span class="red">*</span></label>
+                            <TelerikDropDownList Data="@lstBranchOffices"
+                                                 @bind-Value="@_createUsersDtoRequest.BranchOfficeId"
+                                                 DefaultText="@BranchOfficesText"
+                                                 TextField="NameOffice"
+                                                 ValueField="BranchOfficeId"
+                                                 Filterable="true"
+                                                 FilterOperator="StringFilterOperator.Contains"
+                                                 OnChange=" EnableSaveButton">
+                            </TelerikDropDownList>
+                        </div>
+                        <div class="mb-2 col-lg-3">
+                            <label class="mb-2">@Translation["AdministrativeUnit"]: <span class="red">*</span></label>
+                            <TelerikDropDownList Data="@lstAdministrativeUnit"
+                                                 ValueField="AdministrativeUnitId"
+                                                 Value="@administrativeUnitId"
+                                                 TextField="Name"
+                                                 ValueChanged="(int newValue) => GetProducOffice(newValue)"
+                                                 Filterable="true"
+                                                 DefaultText="@AdministrativeUnitText">
+                            </TelerikDropDownList>
+                        </div>
+                        <div class="mb-2 col-lg-3">
+                            <label class="mb-2">@Translation["ProductionOffice"]: <span class="red">*</span></label>
+                            <TelerikDropDownList Data="@lstProductionOffices"
+                                                 ValueField="ProductionOfficeId"
+                                                 @bind-Value="@_createUsersDtoRequest.ProductionOfficeId"
+                                                 TextField="Name"
+                                                 Enabled="isEnableProOfficeDrop"
+                                                 Filterable="true"
+                                                 DefaultText="@ProductionOfficesText"
+                                                 OnChange=" EnableSaveButton">
+                            </TelerikDropDownList>
+                        </div>
+                        <div class="mb-2  mt-4 col-lg-3">
+
+
+
+                            <div class="from-group mt-3 d-flex align-items-center justify-content-start">
+
+
+                                <div class="px-2">
+                                    <TelerikSwitch @bind-Value="@activeState" />
+                                </div>
+                                <div class="px-2">
+                                    @(activeState ? Translation["Enabled"] : Translation["Disabled"])
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                    </div>
+                    <div class="row">
+                        <div class="from-group from-group--margin-top justify-content-center">
+                            <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnVisible="@editFormUser" BtnOnClick="ResetForm"></ButtonComponent>
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnIcon="fa-solid fa-floppy-disk" BtnVisible="@editFormUser" BtnOnClick="HandleValidSubmit" BtnDisabled="saveIsDisable"></ButtonComponent>
+                        </div>
+                    </div>
+                </TabStripTab>
+
+
+                <TabStripTab Title="Firmas">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h3 class="fw-bold mb-2">@Translation["MechanicalSignature"]</h3>
+                            <DragAndDropTemplateComponent IdInputElement="inputFileFMC" AllowedExtensions="@AllowedExtensions" FileInfos="@lstSignaturesMC" MaxFileSizeMB="@FileSize" MaxFileCount="1" OnFileListChanged="HandleFileFMC"></DragAndDropTemplateComponent>
+                            <span class="red-noti mt-2">@AlertMessage</span>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-white rounded-3 h-100">
+                                <div class="card-body">
+                                    @if (!string.IsNullOrEmpty(SourceMechanicalSignature))
+                                    {
+                                        <img src="@SourceMechanicalSignature" alt="Descripción alternativa" class="signature-image" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h3 class="fw-bold mb-2">@Translation["RubricSignature"]</h3>
+                            <DragAndDropTemplateComponent IdInputElement="inputFileFRB" AllowedExtensions="@AllowedExtensions" FileInfos="@lstSignaturesRB" MaxFileSizeMB="@FileSize" MaxFileCount="1" OnFileListChanged="HandleFileFRB"></DragAndDropTemplateComponent>
+                            <span class="red-noti mt-2">@AlertMessage</span>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-white rounded-3 h-100">
+                                <div class="card-body">
+                                    @if (!string.IsNullOrEmpty(SourceSignatureHeading))
+                                    {
+                                        <img src="@SourceSignatureHeading" alt="Descripción alternativa" class="signature-image" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    @* <div class="row mb-4">
+                    <div class="col-md-6">
+                    <h3 class="fw-bold mb-2">Firma Digital P12</h3>
+                    <DragAndDropTemplateComponent IdInputElement="inputFileFDP12" AllowedExtensions="@AllowedExtensions" FileInfos="@lstSignaturesDP12" MaxFileSizeMB="@FileSize" MaxFileCount="1" OnFileListChanged="HandleFileFDP12"></DragAndDropTemplateComponent>
+                    <span class="red-noti mt-2">@AlertMessage</span>
+                    </div>
+                    <div class="col-md-6">
+                    <div class="card bg-white rounded-3 h-100">
+                    <div class="card-body">
+                    @if (!string.IsNullOrEmpty(SourceDigitalSignature))
+                    {
+                    <img src="@SourceDigitalSignature" alt="Descripción alternativa" class="signature-image"/>
+                    }
+                    </div>
+                    </div>
+                    </div>
+
+                    </div> *@
+                </TabStripTab>
+                <TabStripTab Title=@Translation["AdditionalMechanicalSignatures"]>
+                    <div class="row mb-4">
+                        <h2 class="fw-bold mb-2">@Translation["AdditionalMechanicalSignatures"]</h2>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h3 class="fw-bold mb-2">@Translation["MechanicalSignature"] 1</h3>
+                            <DragAndDropTemplateComponent IdInputElement="inputFileMCA1" AllowedExtensions="@AllowedExtensions" FileInfos="@lstSignaturesAMC1" MaxFileSizeMB="@FileSize" MaxFileCount="1" OnFileListChanged="MechanicalSignatureAdditional1"></DragAndDropTemplateComponent>
+                            <span class="red-noti mt-2">@AlertMessage</span>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-white rounded-3 h-100">
+                                <div class="card-body">
+                                    @if (!string.IsNullOrEmpty(SourceMechanicalSignatureAdditional1))
+                                    {
+                                        <img src="@SourceMechanicalSignatureAdditional1" alt="Descripción alternativa" class="signature-image" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h3 class="fw-bold mb-2">@Translation["MechanicalSignature"] 2</h3>
+                            <DragAndDropTemplateComponent IdInputElement="inputFileMCA2" AllowedExtensions="@AllowedExtensions" FileInfos="@lstSignaturesAMC2" MaxFileSizeMB="@FileSize" MaxFileCount="1" OnFileListChanged="MechanicalSignatureAdditional2"></DragAndDropTemplateComponent>
+                            <span class="red-noti mt-2">@AlertMessage</span>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-white rounded-3 h-100">
+                                <div class="card-body">
+                                    @if (!string.IsNullOrEmpty(SourceMechanicalSignatureAdditional2))
+                                    {
+                                        <img src="@SourceMechanicalSignatureAdditional2" alt="Descripción alternativa" class="signature-image" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h3 class="fw-bold mb-2">@Translation["MechanicalSignature"] 3</h3>
+                            <DragAndDropTemplateComponent IdInputElement="inputFileMCA3" AllowedExtensions="@AllowedExtensions" FileInfos="@lstSignaturesAMC3" MaxFileCount="1" MaxFileSizeMB="@FileSize" OnFileListChanged="MechanicalSignatureAdditional3"></DragAndDropTemplateComponent>
+                            <span class="red-noti mt-2">@AlertMessage</span>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-white rounded-3 h-100">
+                                <div class="card-body">
+                                    @if (!string.IsNullOrEmpty(SourceMechanicalSignatureAdditional3))
+                                    {
+                                        <img src="@SourceMechanicalSignatureAdditional3" alt="Descripción alternativa" class="signature-image" />
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </TabStripTab>
+
+            </TelerikTabStrip>
+
+
+        </div>
+        @* </EditForm> *@
+
+    </div>
+
+
+</div>
+
+

@@ -1,0 +1,83 @@
+﻿@page "/OverrideTrayManager"
+@using Control.Endeavour.FrontEnd.Models.Models.Documents.OverrideTray.Response
+@using Control.Endeavour.FrontEnd.Models.Models.Documents.OverrideTray.Request
+@layout MainLayout
+
+<OverrideTrayManagerModal @ref="ModalManager" OnChangeData="HandleRefreshGridDataAsync"></OverrideTrayManagerModal>
+
+
+<div class="container-fluid mt-5">
+    <div class="row">
+        <div class="col-8">
+            <h1>@(Translation["Administration"] + " - " + Translation["CancellationManager"])</h1>
+        </div>
+        <div class="col-4 text-end mt-5">
+            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers=" ml-10" BtnType="button" BtnText=@Translation["Create"] BtnOnClick="ShowModal" BtnIcon="fa-solid fa-plus" BtnDisabled="crear"></ButtonComponent>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+
+    <TelerikGrid Data="ManagerList" PageSize="10"
+                 Resizable="true"
+                 SelectionMode="GridSelectionMode.None">
+@*         <GridToolBarTemplate>
+            <GridCommandButton Command="ExcelExport" Icon="@SvgIcon.FileExcel">@Translation["ExportToExcel"]</GridCommandButton>
+            <label class="k-checkbox-label"><TelerikCheckBox @bind-Value="@ExportAllPages" /> @Translation["ExportAllPages"]</label>
+        </GridToolBarTemplate>
+        <GridExport>
+            <GridExcelExport FileName="telerik-grid-export" AllPages="@ExportAllPages" OnBeforeExport="@OnBeforeExcelExport" />
+        </GridExport> *@
+        <GridColumns>
+            <GridCommandColumn Width="80px" Title=@Translation["Edit"] HeaderClass="center-wrap" Visible="true">
+                <GridCommandButton Title=@Translation["Edit"] Icon="@SvgIcon.Pencil" OnClick="@((args)=> ShowModalEdit((OverrideTrayManagerDtoResponse)args.Item))"></GridCommandButton>
+            </GridCommandColumn>
+            <GridCommandColumn Width="80px" Title=@Translation["Delete"] HeaderClass="center-wrap" Visible="true">
+                <div class="d-flex justify-content-around">
+                    <GridCommandButton Title=@Translation["Delete"] Icon="@SvgIcon.Trash" OnClick="@((args)=> ShowModalDelete((OverrideTrayManagerDtoResponse)args.Item))"></GridCommandButton>
+                </div>
+            </GridCommandColumn>
+            <GridColumn Field="NameUser"
+                        Title=@Translation["User"]
+                        Width="150px"
+                        TextAlign="ColumnTextAlign.Center"
+                        HeaderClass="center-wrap" />
+            <GridColumn Field="ChargeName"
+                        Title=@Translation["Position"]
+                        Width="150px"
+                        TextAlign="ColumnTextAlign.Center"
+                        HeaderClass="center-wrap" />
+            <GridColumn Field="ActiveState"
+                        Title=@Translation["Status"]
+                        Width="150px"
+                        TextAlign="ColumnTextAlign.Center"
+                        HeaderClass="center-wrap">
+
+                <Template>
+                    @{
+                        OverrideTrayManagerDtoResponse rowData = (OverrideTrayManagerDtoResponse)context;
+                        if (rowData != null)
+                        {
+                            bool activeState = (rowData.ActiveState);
+                            string active = activeState ? Translation["Enabled"] : Translation["Disabled"];
+                            @active
+                        }
+                    }
+                </Template>
+            </GridColumn>
+            <GridColumn Field="NameTypeCode"
+                        Title=@Translation["RequestType"]
+                        Width="150px"
+                        TextAlign="ColumnTextAlign.Center"
+                        HeaderClass="center-wrap" />
+        </GridColumns>
+        <NoDataTemplate>
+            <img src="../img/noDataFound.png" width="8%" height="8%" />
+            <p> @Translation["NoGridInfo"]</p>
+        </NoDataTemplate>
+    </TelerikGrid>
+    <NewPaginationComponent @ref="paginationComponetPost" T="OverrideTrayManagerDtoResponse" M="OverrideTrayManagerDtoRequest" Uri="@UriFilterRecords" Filter="@filtro" PaginationInfo="@paginationInfo" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+    <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+    <NotificationsComponentModal @ref="notificationModalSucces" ></NotificationsComponentModal>
+</div>

@@ -1,0 +1,79 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+	<BlazorWebAssemblyLoadAllGlobalizationData>true</BlazorWebAssemblyLoadAllGlobalizationData>  
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="StateContainers\**" />
+    <Content Remove="StateContainers\**" />
+    <EmbeddedResource Remove="StateContainers\**" />
+    <None Remove="StateContainers\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Components\Modals\Records\IndexDocumentaryTypologyModal.razor.cs~RF10def1d7.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CurrieTechnologies.Razor.SweetAlert2" Version="5.5.0" />
+    <PackageReference Include="DevExpress.Blazor" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Blazor.RichEdit" Version="23.2.5" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.25" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Authentication" Version="6.0.26" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.25" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.2" />
+    <PackageReference Include="NETStandardBarcode" Version="1.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="OpenAI" Version="1.11.0" />
+    <PackageReference Include="Telerik.ReportViewer.BlazorNative" Version="18.1.24.514" />
+    <PackageReference Include="Telerik.UI.for.Blazor" Version="5.0.1" />
+    <PackageReference Include="Toolbelt.Blazor.SpeechSynthesis" Version="10.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Control.Endeavour.FrontEnd.Models\Control.Endeavour.FrontEnd.Models.csproj" />
+    <ProjectReference Include="..\Control.Endeavour.FrontEnd.Services\Control.Endeavour.FrontEnd.Services.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Components\Modals\Parametrization\" />
+    <Folder Include="Pages\Parametrization\" />
+    <Folder Include="Properties\PublishProfiles\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\img\alerts\IconoModalAdvertencia.svg" />
+    <None Include="wwwroot\img\alerts\IconoModalError.svg" />
+    <None Include="wwwroot\img\alerts\IconoModalExitoso.svg" />
+    <None Include="wwwroot\img\alerts\IconoModalInformacion.svg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Resources\Translation.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Translation.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\Translation.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Translation.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Translation.es.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Translation.es.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

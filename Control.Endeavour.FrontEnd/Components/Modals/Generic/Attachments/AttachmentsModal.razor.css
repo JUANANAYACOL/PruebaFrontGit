@@ -1,0 +1,59 @@
+﻿.my-modal .botones-container button {
+    margin-left: 10px;
+    margin-bottom: 6px;
+    justify-content: center;
+    align-items: center;
+}
+
+.custom-table-container-att {
+    border: 1px;
+    border-radius: 10px;
+    overflow: auto;
+    max-height: 300px;
+}
+
+.my-modal .botones {
+    width: 48%;
+    height: 33px;
+    flex-shrink: 0;
+    border-radius: 5px;
+    border-width: 2px;
+    border-style: solid;
+    text-align: center;
+    font-family: Roboto;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+}
+
+
+
+    .my-modal .botones.guardar {
+        background: #2196F3;
+        color: #fff;
+        border: 1px solid #2196F3;
+    }
+
+    .my-modal .botones.limpiar {
+        border: 1px solid #2196F3;
+        background: #fff;
+        color: #2C2C2C;
+    }
+
+.attachment-pt {
+    padding: 10px 20px 10px;
+}
+
+.table-content {
+    justify-content: space-evenly !important;
+}
+
+.delete-button {
+    cursor: pointer;
+    font-size: 25px;
+    color: #41BAEA;
+}
+
+.span-gray {
+    color: gray;
+}

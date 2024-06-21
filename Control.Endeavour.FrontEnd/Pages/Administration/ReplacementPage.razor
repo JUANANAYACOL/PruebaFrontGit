@@ -1,0 +1,141 @@
+﻿@page "/Replacement"
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.Replacement.Request;
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.VReplacement.Response;
+@layout MainLayout;
+
+<ReplacementModal @ref="repalcementModal" OnStatusChanged="HandleReplacementModalStatusChangedAsync" OnStatusChangedUpdate="HandleReplacementModalStatusChangedAsync"></ReplacementModal>
+<GenericSearchModal OnStatusUserChanged="HandleGenericSearchStatusChanged" @ref="genericSearchModal"
+                    ConfigurationInUse="1"
+                    multipleSelection=false
+                    showCopiesColumn=false
+                    Title=@(Translation["Administration"] + " - " + Translation["Replacements"] + " - " + Translation["UserFinder"])></GenericSearchModal>
+<div class="container-fluid mt-5">
+    <!-- Parte 1: Título y Contenido alineado a la izquierda -->
+    <div class="row titulo">
+        <div class="col-lg-10">
+            <h1>@(Translation["Administration"] + " - " + Translation["Replacements"]) </h1>
+
+        </div>
+        <!-- Parte 2: Botón azul alineado a la derecha -->
+        <div class="col-lg-2 text-end">
+            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers=" ml-10  btn-block" BtnType="button" BtnText=@Translation["Create"] BtnOnClick="ShowModal" BtnIcon="fa-solid fa-plus"></ButtonComponent>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col-lg-12">
+            <h6 class="titulo-azul"> @Translation["SearchByFilters"]:</h6>
+        </div>
+
+        <div class="col-lg-3">
+
+            <InputModalComponent @ref="UserInput" @bind-InputValue="UserFullName" MethodValueChanged="replaceNumbers" IsRequired=" false" InputMaxLength="100" FieldType="InputModalTypeEnum.NotEmpty" LabelText=@($"{Translation["Name"]}:") Placeholder="@Translation["Name"]" />
+
+        </div>
+
+        <div class="col-lg-3">
+            <InputModalComponent @ref="ReplacemetInput" @bind-InputValue="ReplacementFullName" MethodValueChanged="replaceNumbers" InputMaxLength="100" IsRequired=" false" FieldType="InputModalTypeEnum.NotEmpty" LabelText=@($"{Translation["Replacement"]}:") Placeholder="@Translation["Replacement"]" />
+
+
+        </div>
+
+
+
+
+        <div class="col-lg-3">
+            <label class="mb-2">@Translation["Since"]: </label>
+            <TelerikDatePicker @bind-Value="@from"
+                               Format="dd/MM/yyyy"
+                               ShowWeekNumbers="false"
+                               Min="minValueFrom"
+                               Max="@maxValueTo" 
+                               OnChange="@updateMinValue"
+                               Class="mb-2 DisabledInput">
+            </TelerikDatePicker>
+        </div>
+        <div class="col-lg-3">
+            <label class="mb-2">@Translation["To"]:  </label>
+            <TelerikDatePicker @bind-Value="@to"
+                               Format="dd/MM/yyyy"
+                               ShowWeekNumbers="false"
+                               Min="@minValueTo"
+                               Class="DisabledInput"
+                               OnChange="@updateMaxValue">
+            </TelerikDatePicker>
+
+        </div>
+
+        <div class="col-lg-12">
+            <div class="from-group from-group--margin-top justify-content-end">
+
+                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="OnClickReset"></ButtonComponent>
+                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Search"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="GetReplacements"></ButtonComponent>
+            </div>
+        </div>
+
+
+    </div>
+
+    <!-- Parte 3: Grilla -->
+    <div class="row mt-4">
+        <div class="col">
+            <TelerikGrid Data="ReplacementList" PageSize="10"
+                         Sortable="true"
+                         FilterMode="GridFilterMode.FilterMenu"
+                         Resizable="true"
+                         Reorderable="false"
+                         EditMode="GridEditMode.Popup"
+                         SelectionMode="GridSelectionMode.None">
+
+
+             @*    <GridToolBarTemplate>
+                    <GridCommandButton Command="ExcelExport" Icon="@SvgIcon.FileExcel">@Translation["ExportToExcel"]</GridCommandButton>
+                    <label class="k-checkbox-label"><TelerikCheckBox @bind-Value="@ExportAllPages" /> @Translation["ExportAllPages"]</label>
+                </GridToolBarTemplate>
+                <GridExport>
+                    <GridExcelExport FileName="telerik-grid-export" AllPages="@ExportAllPages" OnBeforeExport="@OnBeforeExcelExport" />
+                </GridExport>
+ *@
+
+
+                <GridColumns>
+                    <GridCommandColumn Width="80px" Title=@Translation["Edit"] HeaderClass="center-wrap" Visible="true">
+
+                                                <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                        <GridCommandButton Title=@Translation["Edit"] Icon="@SvgIcon.Pencil" OnClick="@((args)=> ShowModalEdit((VReplacementDtoResponse)args.Item))"></GridCommandButton>
+</div>
+                    </GridCommandColumn>
+
+                    <GridCommandColumn Width="80px" Title=@Translation["Delete"] HeaderClass="center-wrap" Visible="true">
+                        <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                            <GridCommandButton Title=@Translation["Delete"] Icon="@SvgIcon.Trash" OnClick="@((args) => HandleRecordToDelete( ( VReplacementDtoResponse)args.Item ))"></GridCommandButton>
+
+                        </div>
+                    </GridCommandColumn>
+
+
+                    <GridColumn Field=@nameof(VReplacementDtoResponse.UserFullName) TextAlign="ColumnTextAlign.Center" Title=@Translation["Name"] Width="100px" Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(VReplacementDtoResponse.ReplacementFullName) TextAlign="ColumnTextAlign.Center" Title=@Translation["Replacement"] Width="100px" Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(VReplacementDtoResponse.StartDate) TextAlign="ColumnTextAlign.Center" Title=@Translation["StartDate"] Width="100px" Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(VReplacementDtoResponse.EndDate) TextAlign="ColumnTextAlign.Center" Title=@Translation["EndDate"] Width="100px" Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(VReplacementDtoResponse.Reason) TextAlign="ColumnTextAlign.Center" Title=@Translation["Reason"] Width="100px" Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(VReplacementDtoResponse.CreateUser) TextAlign="ColumnTextAlign.Center" Title=@Translation["UserRecorded"] Width="100px" Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(VReplacementDtoResponse.CreateDate) TextAlign="ColumnTextAlign.Center" Title=@Translation["DateRecorded"] Width="100px" Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(VReplacementDtoResponse.UpdateUser) TextAlign="ColumnTextAlign.Center" Title=@Translation["UserUpdated"] Width="100px" Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(VReplacementDtoResponse.UpdateDate) TextAlign="ColumnTextAlign.Center" Title=@Translation["DateUpdated"] Width="100px" Filterable="false" HeaderClass="center-wrap" />
+                </GridColumns>
+                <NoDataTemplate>
+                    <img src="../img/noDataFound.png" width="8%" height="8%" />
+                    <p> @Translation["NoGridInfo"]</p>
+                </NoDataTemplate>
+            </TelerikGrid>
+        </div>
+    </div>
+    @if (dataChargue)
+    {
+        <!-- Parte 4: Botones en la izquierda, centro y derecha -->
+        <NewPaginationComponent @ref="paginationComponent" Filter="@replacementFilterDtoRequest" T="VReplacementDtoResponse" M="ReplacementFilterDtoRequest" Uri="@UriFilterReplacement" PaginationInfo="@paginationInfo" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+    }
+</div>
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiCloseAsync"></NotificationsComponentModal>

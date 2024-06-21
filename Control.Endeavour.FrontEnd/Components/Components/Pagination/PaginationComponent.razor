@@ -1,0 +1,57 @@
+﻿@typeparam T
+@typeparam M
+<!-- Parte 4: Botones en la izquierda, centro y derecha -->
+@if (Valid)
+{
+    <div class="row mt-4">
+        <div class="col-lg-2">
+            <TelerikDropDownList Data="@dropdownOptions"
+                                 ValueField="PageNumber"
+                                 TextField="PageName"
+                                 Value="@selectedPage"
+                                 ValueChanged="@( (int newValue) => OnPageSelectedGetAsync(newValue) )">
+            </TelerikDropDownList>
+        </div>
+        <div class="col-lg-8 text-lg-end text-center">
+
+            <!-- Botón izquierdo -->
+            <img src="@GetLeftButtonImage()" @onclick="GoToPreviousPageGet" class="clickable-image img-fluid" />
+            @selectedPage / @totalPages
+            <!-- Botón derecho -->
+            <img src="@GetRightButtonImage()" @onclick="GoToNextPageGet" class="clickable-image img-fluid" />
+        </div>
+        <div class="col-lg-4 text-lg-end text-center d-none">
+            <a href="tu_url">
+                <img src="../img/botonExcel.svg" alt="Texto Alternativo">
+            </a>
+        </div>
+    </div>
+    <NotificationsComponentModal @ref="notificationModal"></NotificationsComponentModal>
+}
+else
+{
+    <div class="row mt-4">
+        <div class="col-lg-2">
+            <TelerikDropDownList Data="@dropdownOptions"
+                                 ValueField="PageNumber"
+                                 TextField="PageName"
+                                 Value="@selectedPage"
+                                 ValueChanged="@( (int newValue) => OnPageSelectedAsync(newValue) )">
+            </TelerikDropDownList>
+        </div>
+        <div class="col-lg-8 text-lg-end text-center">
+
+            <!-- Botón izquierdo -->
+            <img src="@GetLeftButtonImage()" @onclick="GoToPreviousPage" class="clickable-image img-fluid" />
+            @selectedPage / @totalPages
+            <!-- Botón derecho -->
+            <img src="@GetRightButtonImage()" @onclick="GoToNextPage" class="clickable-image img-fluid" />
+        </div>
+        <div class="col-lg-4 text-lg-end text-center d-none">
+            <a href="tu_url">
+                <img src="../img/botonExcel.svg" alt="Texto Alternativo">
+            </a>
+        </div>
+    </div>
+    <NotificationsComponentModal @ref="notificationModal"></NotificationsComponentModal>
+}

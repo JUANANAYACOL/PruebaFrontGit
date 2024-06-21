@@ -1,0 +1,113 @@
+﻿@page "/Ccd"
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.AdministracionTRD.Request;
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.AdministracionTRD.Response;
+
+<div class="container-fluid mt-5">
+
+
+    <!-- Parte 1: Título y Contenido alineado a la izquierda -->
+    <div class="row titulo">
+        <div class="col-lg-8">
+            <h1>@(Translation["Report"] + ": " + Translation["Ccd"])</h1>
+
+        </div>
+    </div>
+
+
+    <div class="row mb-2 mt-2 m-0 text-end justify-content-md-end">
+        <div class="col-lg-12 mb-1 mt-3">
+            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="mt-1 ml-10" BtnType="button" BtnIcon="@tableIcon" BtnText="@Translation[tableText]" BtnOnClick="ShowTable"></ButtonComponent>
+            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="mt-1 ml-10" BtnType="button" BtnIcon="@docIcon" BtnText="@Translation[docText]" BtnOnClick="ShowDocument"></ButtonComponent>
+        </div>
+    </div>
+
+
+    <div class="row m-0">
+
+        <div class="@displayTable mt-2">
+
+            <div class="col-lg-12">
+                <h6 class="titulo-azul"> @Translation["CcdInformationMessage"]</h6>
+            </div>
+
+            <div class="col-lg-12 mt-1">
+                <label for="input2" class="mb-2">@Translation["DocumentaryVersions"]<span class="red">*</span></label>
+                <TelerikDropDownList Data="@documentalVersionsList"
+                                     Id="DocTypeJ"
+                                     DefaultText="@Translation["SelectAType"]"
+                                     TextField="Code"
+                                     ValueField="DocumentalVersionId"
+                                     Value="@IdDocumental"
+                                     ValueChanged="@( (int newValue) => GetAdministrativeUnits(newValue) )"
+                                     OnChange="EnableSaveButton"
+                                     Filterable="true"
+                                     FilterOperator="StringFilterOperator.Contains">
+                </TelerikDropDownList>
+            </div>
+
+            <div class="col-lg-12 mt-1">
+                <label for="input2" class="mb-2">@Translation["AdministrativeUnits"]</label>
+                <TelerikDropDownList Data="@administrativeUnitsList"
+                                     DefaultText="@Translation["SelectAType"]"
+                                     TextField="Name"
+                                     ValueField="AdministrativeUnitId"
+                                     Value="@idAdUnit"
+                                     ValueChanged="@( (int newValue) => GetProductionOffices(newValue) )"
+                                     OnChange="EnableSaveButton"
+                                     Filterable="true"
+                                     Enabled="@administrativeUnitEnable"
+                                     FilterOperator="StringFilterOperator.Contains">
+                </TelerikDropDownList>
+            </div>
+
+            <div class="col-lg-12 mt-1">
+                <label for="input2" class="mb-2">@Translation["ProductionOffices"]</label>
+                <TelerikDropDownList Data="@productionOfficesList"
+                                     DefaultText="@Translation["SelectAType"]"
+                                     TextField="Name"
+                                     ValueField="ProductionOfficeId"
+                                     @bind-Value="IdproOffice"
+                                     OnChange="EnableSaveButton"
+                                     Filterable="true"
+                                     Enabled="@productionOfficeEnable"
+                                     FilterOperator="StringFilterOperator.Contains">
+                </TelerikDropDownList>
+            </div>
+
+            <div class="col-lg-12 mt-3">
+                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="btn-block" BtnType="button" BtnText="@(Translation["GenerateReport"])" BtnOnClick="GenerateReport" BtnDisabled="saveIsDisable" BtnIcon="fa-solid fa-plus"></ButtonComponent>
+            
+                @if (ccdReport!=null && !string.IsNullOrEmpty(Convert.ToBase64String(ccdReport)))
+                {
+                    <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Download"] BtnIcon="fa fa-download" BtnOnClick="DownloadFile"></ButtonComponent>
+                }
+            </div>
+
+
+        </div>
+
+        <div class="@displayDocument mb-2">
+
+            <TelerikPdfViewer @ref="@PdfViewerRef"
+                              Width="100%"
+                              Height="100vh"
+                              Data="@SelectedPDF">
+
+                <PdfViewerToolBar>
+                    <PdfViewerToolBarPagerTool />
+                    <PdfViewerToolBarSeparator />
+                    <PdfViewerToolBarZoomTool />
+                    <PdfViewerToolBarSelectionTool />
+                    <PdfViewerToolBarSpacer />
+                    <PdfViewerToolBarSearchTool />
+                    <PdfViewerToolBarDownloadTool />
+                    <PdfViewerToolBarPrintTool />
+                </PdfViewerToolBar>
+            </TelerikPdfViewer>
+        </div>
+
+    </div>
+
+</div>
+
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>

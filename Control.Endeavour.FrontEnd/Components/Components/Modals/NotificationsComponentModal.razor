@@ -1,0 +1,51 @@
+﻿<div id="Modal-Notificaciones d-none">
+    <TelerikWindow Class="@NotificationModal" Modal=true Width="@Width" Height="@Height" Centered="true" Visible="Visible" Draggable="false">
+
+        <WindowContent>
+            <div class="container-modal">
+
+                <!-- Espacio para la imagen, que varía según el tipo de modal -->
+                <div>
+                    <img class="container-modal__icon" src="@GetIconPath(Type)" />
+                </div>
+
+                @if (!String.IsNullOrEmpty(Title))
+                {
+                    <!-- Contenedor del título -->
+                    <div class="container-modal__title @ClassColor">
+                        @Title
+                    </div>
+                }
+
+                <!-- Contenedor del texto -->
+                <div class="container-modal__text">
+                    @if (Body == null)
+                    {
+                        <div class="message-modal">
+                            @Message
+                        </div>
+                    }
+                    else
+                    {
+                        @Body
+                    }
+                </div>
+
+                <!-- Botones al lado del texto y centrados horizontalmente -->
+                <div class="container-modal__buttons @ButtonClassMargin">
+                    <button @onclick="() => CloseModal(true)" class="btnStyle btnStyle--primary btnStyle--h50 btnStyle--w150">
+                        @Translation[ButtonTextAceptar]
+                    </button>
+                    @if ((Type == Information || Type == Warning) && !string.IsNullOrEmpty(ButtonTextCancel))
+                    {
+                        <button @onclick="() => CloseModal(false)" class="btnStyle btnStyle--error btnStyle--h50 btnStyle--w150 ms-3">
+                            @Translation[ButtonTextCancel]
+                        </button>
+                    }
+                </div>
+            </div>
+            <!-- Imagen en la esquina inferior derecha -->
+            <img src="../img/maskGroup.svg" class="container-modal__image" />
+        </WindowContent>
+    </TelerikWindow>
+</div>

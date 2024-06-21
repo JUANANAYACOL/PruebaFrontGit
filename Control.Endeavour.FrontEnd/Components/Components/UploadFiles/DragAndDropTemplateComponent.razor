@@ -1,0 +1,70 @@
+﻿@using Control.Endeavour.FrontEnd.Models.Enums.Components.UploadFiles
+
+@implements IAsyncDisposable
+
+<div @ref="dropContainer" class="@containerClass" @ondragenter="OnDragEnter" @ondragover="OnDragEnter" @ondragleave="OnDragLeave">
+
+    <!-- Spinner de carga -->
+    @if (isLoading)
+    {
+        <div class="dADTemplate__spinnerContainer">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">@Translation["Loading"]</span>
+            </div>
+        </div>
+    }
+
+    <!-- Área de carga de archivos, oculta durante la carga -->
+    @if (!isLoading)
+    {
+        @if (TypeOfFiles == TypeOfFilesEnum.Files)
+        {
+            <div class="@hoverClass h-100">
+                <div class="row">
+                    <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["UploadFile"] BtnIcon="fa-solid fa-upload" BtnOnClick="TriggerFileInputClick"></ButtonComponent>
+                    <span class="col-md-8 text-end">@Translation["DragFile"]</span>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="card-img-overlay d-flex justify-content-end">
+
+                @if (FileInfos.Count > 0)
+                {
+                    <a class="btn btn-light dADTemplate__btnProfilePicture" @onclick="() => ChangeProfilePicture(FileInfos[0])">
+                        <i class="fas fa-camera fa-2x"></i>
+                    </a>
+                }
+                else
+                {
+                    <a class="btn btn-light dADTemplate__btnProfilePicture" @onclick="TriggerFileInputClick">
+                        <i class="fas fa-camera fa-2x"></i>
+                    </a>
+                }
+
+            </div>
+        }
+    }
+    <InputFile @ref="inputFile" class="dADTemplate__input" id="@IdInputElement" multiple OnChange="OnChange" />
+
+</div>
+<!-- Tabla de archivos subidos, oculta durante la carga -->
+@if (!isLoading && FileInfos.Count > 0 && TypeOfFiles == TypeOfFilesEnum.Files && VisibleFiles)
+{
+    <div class="table-responsive dADTemplate__customTableContainer mt-1">
+        @foreach (var fileInfo in FileInfos)
+        {
+            <div class="row p-2">
+                <div class="col-md-3">
+                    <img src="../img/deleteIcon.svg" alt="Delete Icon" class="dADTemplate__deleteIcon" @onclick="() => DeleteFileModalOpen(fileInfo)" />
+                </div>
+                <div class="col-md-9 text-end align-items-center">
+                    <i class="@fileInfo.IconPath dADTemplate__iconFontSize"></i>
+                    <span>@fileInfo.Name@fileInfo.Extension</span>
+                </div>
+            </div>
+        }
+    </div>
+}
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>

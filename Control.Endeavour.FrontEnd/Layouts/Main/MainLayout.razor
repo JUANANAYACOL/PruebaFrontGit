@@ -1,0 +1,766 @@
+@inherits LayoutComponentBase
+
+
+
+@if (ValidAccess)
+{
+
+    <TelerikRootComponent>
+
+       <InactivityComponent @ref=inactivityComponent /> 
+        
+        <SpinnerLoaderComponent></SpinnerLoaderComponent>
+
+        <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+
+        <div class="container-main-layout">
+
+            <div class="container-main-header">
+                <nav class="navbar navbar-expand-lg navbar-light">
+                    <div class="container-fluid d-flex justify-content-betwee">
+
+                        <button class="btnStyle btnStyle--transparent btnStyle--pl12" title="@Translation["MainMenu"]" type="button" @onmouseover="() => OnMouseOver(ref IconMenu, 0)" @onmouseout="() => OnMouseOut(ref IconMenu)" @onclick="ToggleNewMenu">
+                            <img src="@IconMenu" alt="Menu lateral" class="dots-icon ms-1 me-4" />
+                        </button>
+
+                        <a class="navbar-brand" href="../Home" title=@Translation["Home"]>
+                            <img src="../img/logocontrol.svg" alt="Logo-ControlDoc" class="img-fluid" />
+                        </a>
+
+                        <!-- Botón de hamburguesa para pantallas pequeñas -->
+                        <button class="navbar-toggler" @onclick="ToggleNavbar" title=@Translation["MoreOptions"]>
+                            <i class="fas fa-solid fa-bars navbar-toggler__menuIcon"></i>
+                        </button>
+
+                        <!-- Menú colapsable -->
+                        <div class="@navbarCollapseCss justify-content-end" id="navbarNav">
+                            <ul class="navbar-nav align-items-center">
+                                <!-- Opciones del menú -->
+                                <li class="nav-item user-responsive" href="/UserProfile">
+                                    <UserComponent UserImage="@SourceUserPicture" UserName="@userDataToShow.UserName"></UserComponent>
+                                </li>
+                                <li class="nav-item" id="opciones">
+                                    <div class="dropdown">
+                                        <button class="btnStyle btnStyle--transparent" type="button" @onclick="ToggleDropdown" title=@Translation["MoreOptions"]>
+                                            <img src="../img/iconotrespuntos.svg" alt="Más opciones" class="ms-1 me-1" />
+                                        </button>
+                                        <ul class="@DropdownMenuCss">
+                                            <li>
+                                                <div class="row modo-dark">
+                                                    <div class="col-md-7 d-flex align-items-center">
+                                                        <label class="mb-0">@Translation["LightDarkMode"]</label>
+                                                    </div>
+                                                    <div class="col-md-5 d-flex justify-content-end">
+                                                        <button class="switch-darkmode" id="switch" @onclick="ToggleTheme">
+                                                            <span><i class="fas fa-sun"></i></span>
+                                                            <span><i class="fas fa-moon"></i></span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="pt-1 pb-1"><a class="dropdown-item" href="/UserProfile">@Translation["Profile"]</a></li>
+                                            <li class="pt-1 pb-1"><a class="dropdown-item" >@Translation["Settings"]</a></li>
+                                            <li class="pt-1 pb-1"><div class="dropdown-divider"></div></li>
+                                            <li class="pt-1 pb-1"><a class="dropdown-item" href="" onclick="@SignOff" @onclick:preventDefault>@Translation["LogOut"]</a></li>
+                                        </ul>
+                                    </div>
+                                </li>
+                                <li class="nav-item">
+                                    @* <DropDownListLanguageComponent /> *@
+                                    <DDLLangComponent />
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </nav>
+            </div>
+
+            <div class="container-main-sidebar">
+                <ul class="container-main-sidebar__ul pt-4">
+                    <li class="@((activeIndex == 0) ? "active" : "")">
+                        <a class="nav-link" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Inicio" @onclick="() => OnNavitigionMenu(ref subDefault, HomePage)"
+                           @onmouseover="() => OnMouseOverWithSubItem(ref HomeImage, ref HomeImage, 0)" @onmouseout="() => OnMouseOut(ref HomeImage)">
+                            <div class="container-panel">
+                                <div class="container-panel__line-active"></div>
+                                <div class="container-panel__flex-container">
+                                    <img src="@HomeImage" alt="Inicio" class="fs-1" />
+                                    <span>@Translation["Home"]</span>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+
+
+                    <!---->
+                    @if (ShortCutsToDeploy.Contains(FilingPage) || ShortCutsToDeploy.Contains(FilingInternalPage) || ShortCutsToDeploy.Contains(FilingSentPage) || ShortCutsToDeploy.Contains(MassiveFiling))
+                    {
+
+
+                        <li class="@((activeIndex == 1) ? "active" : "")">
+
+                            <!--Menú de Radicación-->
+
+                            <div id="imageBox" class=" @subNavFiling">
+
+                                <span @onclick="() => OnCloseImageBox(ref FilingImage, ref subNavFiling)"><i class="fas fa-times-circle"></i></span>
+
+                                <div class=" row  p-3 d-flex justify-content-start">
+
+
+
+
+                                    @if (ShortCutsToDeploy.Contains(FilingPage))
+                                    {
+
+                                        <div class="iconBox cursor-pointer text-center" @onclick="() => OnNavitigionMenu(ref subNavFiling, FilingPage)" @onmouseover="() => OnMouseOver(ref FilingReceived, 0)" @onmouseout="() => OnMouseOut(ref FilingReceived)">
+                                            <img src="@FilingReceived" alt="Radicacion VR" class="fs-1 fix-icon-size mb-1" />
+                                            <span>@Translation["WindowSubmissionReceived"]</span>
+                                        </div>
+                                    }
+                                    @if (ShortCutsToDeploy.Contains(FilingInternalPage))
+                                    {
+                                        <div class="iconBox cursor-pointer text-center" @onclick="() => OnNavitigionMenu(ref subNavFiling, FilingInternalPage)" @onmouseover="() => OnMouseOver(ref FilingInternal, 0)" @onmouseout="() => OnMouseOut(ref FilingInternal)">
+                                            <img src="@FilingInternal" alt="Radicacion VI" class="fi fix-icon-size mb-1" />
+                                            <span>@Translation["WindowSubmissionInternally"]</span>
+                                        </div>
+
+                                    }
+                                    @if (ShortCutsToDeploy.Contains(FilingSentPage))
+                                    {
+
+                                        <div class=" iconBox cursor-pointer text-center" @onclick="() => OnNavitigionMenu(ref subNavFiling, FilingSentPage)" @onmouseover="() => OnMouseOver(ref Filingsent, 0)" @onmouseout="() => OnMouseOut(ref Filingsent)">
+                                            <img src="@Filingsent" alt="Radicacion VE" class="fs-1 fix-icon-size mb-1" />
+                                            <span>@Translation["WindowSubmissionSent"]</span>
+                                        </div>
+
+                                    }
+
+
+
+                                    <div class=" iconBox cursor-pointer text-center d-none " @onmouseover="() => OnMouseOver(ref FilingUnofficial, 0)" @onmouseout="() => OnMouseOut(ref FilingUnofficial)">
+                                        <img src="@FilingUnofficial" alt="Radicacion VNO" class="fs-1 fix-icon-size mb-1" />
+                                        <span>@Translation["NonOfficialWindowFiling"]</span>
+                                    </div>
+
+                                    <div class=" iconBox cursor-pointer text-center d-none" @onmouseover="() => OnMouseOver(ref FilingFaster, 0)" @onmouseout="() => OnMouseOut(ref FilingFaster)">
+                                        <img src="@FilingFaster" alt="Radicacion VR" class="fs-1 fix-icon-size mb-1" />
+                                        <span>@Translation["QuickWindowSubmission"]</span>
+                                    </div>
+
+                                    @if (ShortCutsToDeploy.Contains(MassiveFiling))
+                                    {
+                                        <div class="  iconBox cursor-pointer text-center" @onclick="() => OnNavitigionMenu(ref subNavFiling, MassiveFiling)" @onmouseover="() => OnMouseOver(ref MassiveRadiation, 0)" @onmouseout="() => OnMouseOut(ref MassiveRadiation)">
+                                            <img src="@MassiveRadiation" alt="Radicacion M" class="fs-1 fix-icon-size mb-1" />
+                                            <span>@Translation["BatchSubmission"]</span>
+                                        </div>
+                                    }
+
+
+
+
+
+
+                                </div>
+
+                            </div>
+
+                            <a class="nav-link" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title=@Translation["Submission"]
+                               @onmouseover="() => OnMouseOverWithSubItem(ref FilingImage, ref subNavFiling, 1)" @onmouseout="() => OnMouseOutWithSubItem(ref FilingImage, ref subNavFiling)">
+                                <div class="container-panel">
+                                    <div class="container-panel__line-active"></div>
+                                    <div class="container-panel__flex-container">
+                                        <img src="@FilingImage" alt=@Translation["Submission"] class="fs-1" />
+                                        <span>@Translation["Submission"]</span>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+
+                    }
+
+                    @{
+                        if (ShortCutsToDeploy.Contains(ManagementTrayPage))
+                        {
+
+
+                            <li class="@((activeIndex == 2) ? "active" : "")">
+
+                                <!--Menú de Gestión-->
+
+                                <div id="imageBox" class=" @subNavManagement">
+
+                                    <span @onclick="() => OnCloseImageBox(ref ManagementImage, ref subNavManagement)"><i class="fas fa-times-circle"></i></span>
+
+                                    <div class="row  p-3 d-flex justify-content-start">
+
+
+                                        @if (ShortCutsToDeploy.Contains(ManagementTrayPage))
+                                        {
+                                            <div class="iconBox cursor-pointer text-center" @onclick="() => OnNavitigionMenu(ref subNavManagement, ManagementTrayPage)" @onmouseover="() => OnMouseOver(ref ManagementTray, 0)" @onmouseout="() => OnMouseOut(ref ManagementTray)">
+                                                <img src="@ManagementTray" alt="Bandeja Gestion" class="fs-1 fix-icon-size mb-1" />
+                                                <span>@Translation["ManagementTray"]</span>
+                                            </div>
+
+                                        }
+
+
+                                        <div class="iconBox cursor-pointer text-center" @onmouseover="() => OnMouseOver(ref ManagementBoard, 0)" @onmouseout="() => OnMouseOut(ref ManagementBoard)">
+                                            <img src="@ManagementBoard" alt="Tablero Control" class="fi fix-icon-size mb-1" />
+                                            <span>@Translation["Dashboard"]</span>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <a class="nav-link" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Home"
+                                   @onmouseover="() => OnMouseOverWithSubItem(ref ManagementImage, ref subNavManagement, 2)" @onmouseout="() => OnMouseOutWithSubItem(ref ManagementImage, ref subNavManagement)">
+                                    <div class="container-panel">
+                                        <div class="container-panel__line-active"></div>
+                                        <div class="container-panel__flex-container">
+                                            <img src="@ManagementImage" alt="@Translation["Management"]" class="fs-1" />
+                                            <span>@Translation["Management"]</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        }
+
+
+
+                    }
+
+
+
+                    @{
+                        if (ShortCutsToDeploy.Contains(CreateDocumentaryTaskPage) || ShortCutsToDeploy.Contains(DocumentaryTaskTrayPage))
+                        {
+
+                            <li class="@((activeIndex == 3) ? "active" : "")">
+
+                                <!--Menú de Documentales-->
+
+                                <div id="imageBox" class=" @subNavDocumentaryTasks">
+
+                                    <span @onclick="() => OnCloseImageBox(ref DocumentaryTasksImage, ref subNavDocumentaryTasks)"><i class="fas fa-times-circle"></i></span>
+
+                                    <div class=" row p-3 d-flex justify-content-start">
+                                        @if (ShortCutsToDeploy.Contains(CreateDocumentaryTaskPage))
+
+                                        {
+                                            <div class="iconBox cursor-pointer text-center" @onclick="() => OnNavitigionMenu(ref subNavDocumentaryTasks, CreateDocumentaryTaskPage)" @onmouseover="() => OnMouseOver(ref DocumentaryTasksEditor, 0)" @onmouseout="() => OnMouseOut(ref DocumentaryTasksEditor)">
+                                                <img src="@DocumentaryTasksEditor" alt="Editor Texto" class="fs-1 fix-icon-size mb-1" />
+                                                <span>@Translation["TextEditor"]</span>
+                                            </div>
+                                        }
+
+
+                                        <div class="iconBox cursor-pointer text-center" @onmouseover="() => OnMouseOver(ref DocumentaryTasksSpreadsheet, 0)" @onmouseout="() => OnMouseOut(ref DocumentaryTasksSpreadsheet)">
+                                            <img src="@DocumentaryTasksSpreadsheet" alt="Hoja Calculo" class="fi fix-icon-size mb-1" />
+                                            <span>@Translation["Spreadsheet"]</span>
+                                        </div>
+
+                                        @if (ShortCutsToDeploy.Contains(DocumentaryTaskTrayPage))
+
+                                        {
+                                            <div class="iconBox cursor-pointer text-center" @onclick="() => OnNavitigionMenu(ref subNavDocumentaryTasks, DocumentaryTaskTrayPage)" @onmouseover="() => OnMouseOver(ref DocumentaryTasksTray, 0)" @onmouseout="() => OnMouseOut(ref DocumentaryTasksTray)">
+                                                <img src="@DocumentaryTasksTray" alt="Bandeja Tarea" class="fi fix-icon-size mb-1" />
+                                                <span>@Translation["TaskTray"]</span>
+                                            </div>
+
+                                        }
+
+
+
+                                    </div>
+
+                                </div>
+
+                                <a class="nav-link" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Home"
+                                   @onmouseover="() => OnMouseOverWithSubItem(ref DocumentaryTasksImage, ref subNavDocumentaryTasks, 3)" @onmouseout="() => OnMouseOutWithSubItem(ref DocumentaryTasksImage, ref subNavDocumentaryTasks)">
+                                    <div class="container-panel">
+                                        <div class="container-panel__line-active"></div>
+                                        <div class="container-panel__flex-container">
+                                            <img src="@DocumentaryTasksImage" alt="TareasDocumentales" class="fs-1" />
+                                            <span>@Translation["DocumentaryTasks_1"]</span>
+                                            <span class="mt-0">@Translation["DocumentaryTasks_2"]</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+
+                        }
+                    }
+
+
+                    @{
+                        if (ShortCutsToDeploy.Contains(RecordConsultPage))
+                        {
+
+                            <li class="@((activeIndex == 4) ? "active" : "")">
+
+                                <!--Menú de Expedientes-->
+
+                                <div id="imageBox" class=" @subNavRecord">
+
+                                    <span @onclick="() => OnCloseImageBox(ref RecordImage, ref subNavRecord)"><i class="fas fa-times-circle"></i></span>
+
+                                    <div class=" row  p-3 d-flex justify-content-start">
+
+                                        @if (ShortCutsToDeploy.Contains(RecordConsultPage))
+                                        {
+                                            <div class="iconBox cursor-pointer text-center" @onclick="() => OnNavitigionMenu(ref subNavRecord, RecordConsultPage)" @onmouseover="() => OnMouseOver(ref RecordConsult, 0)" @onmouseout="() => OnMouseOut(ref RecordConsult)">
+                                                <img src="@RecordConsult" alt="Consultar Expediente" class="fs-1 fix-icon-size mb-1" />
+                                                <span>@Translation["ExpedientInquiry"]</span>
+                                            </div>
+
+                                        }
+
+                                        <div class="iconBox cursor-pointer text-center" @onmouseover="() => OnMouseOver(ref RecordAdministration, 0)" @onmouseout="() => OnMouseOut(ref RecordAdministration)">
+                                            <img src="@RecordAdministration" alt="Administración Expedientes" class="fi fix-icon-size mb-1" />
+                                            <span>@Translation["RecordsManagement"]</span>
+                                        </div>
+                                        <div class="iconBox cursor-pointer text-center" @onclick="() => OnNavitigionMenu(ref subNavRecord, RecordClosingOpeningPage)" @onmouseover="() => OnMouseOver(ref RecordClosingOpening, 0)" @onmouseout="() => OnMouseOut(ref RecordClosingOpening)">
+                                            <img src="@RecordClosingOpening" alt="Cierre y apertura de expedientes" class="fi fix-icon-size mb-1" /> <!--Agregar Texto a traducción-->
+                                            <span>@Translation["ClosingOpening"]</span>
+                                        </div>
+
+
+
+                                        <div class="iconBox cursor-pointer text-center" @onmouseover="() => OnMouseOver(ref RecordRequest, 0)" @onmouseout="() => OnMouseOut(ref RecordRequest)">
+                                            <img src="@RecordRequest" alt="Solicitud prestamo" class="fi fix-icon-size mb-1" />
+                                            <span>@Translation["LoanApplication"]</span>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <a class="nav-link" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Home"
+                                   @onmouseover="() => OnMouseOverWithSubItem(ref RecordImage, ref subNavRecord, 4)" @onmouseout="() => OnMouseOutWithSubItem(ref RecordImage, ref subNavRecord)">
+                                    <div class="container-panel">
+                                        <div class="container-panel__line-active"></div>
+                                        <div class="container-panel__flex-container">
+                                            <img src="@RecordImage" alt=@Translation["Files"] class="fs-1" />
+                                            <span>@Translation["Files"]</span>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        }
+                    }
+
+
+
+
+
+                    <li class="@((activeIndex == 5) ? "active" : "")">
+
+                        <!--Menú de Buscadores-->
+
+                        <div id="imageBox" class=" @subNavSearchers">
+
+                            <span @onclick="() => OnCloseImageBox(ref SearchersImage, ref subNavSearchers)"><i class="fas fa-times-circle"></i></span>
+
+                            <div class=" row p-3 d-flex justify-content-start">
+
+                                <div class="iconBox cursor-pointer text-center" @onclick="() => OnNavitigionMenu(ref subNavSearchers, DocumentSearchEnginePage)" @onmouseover="() => OnMouseOver(ref SearchersConsult, 0)" @onmouseout="() => OnMouseOut(ref SearchersConsult)">
+                                    <img src="@SearchersConsult" alt="Consulta Documentos" class="fs-1 fix-icon-size mb-1" />
+                                    <span>@Translation["DocumentInquiry"]</span>
+                                </div>
+
+                                <div class="iconBox cursor-pointer text-center" @onclick="OpenSearchEngine" @onmouseover="() => OnMouseOver(ref SearchersSearch, 0)" @onmouseout="() => OnMouseOut(ref SearchersSearch)">
+                                    <img src="@SearchersSearch" alt="Busqueda Rapida" class="fi fix-icon-size mb-1" />
+                                    <span>@Translation["QuickSearch"]</span>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <a class="nav-link" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Dashboard"
+                           @onmouseover="() => OnMouseOverWithSubItem(ref SearchersImage, ref subNavSearchers, 5)" @onmouseout="() => OnMouseOutWithSubItem(ref SearchersImage, ref subNavSearchers)">
+                            <div class="container-panel">
+                                <div class="container-panel__line-active"></div>
+                                <div class="container-panel__flex-container">
+                                    <img src="@SearchersImage" alt=@Translation["Seekers"] class="fs-1" />
+                                    <span>@Translation["Seekers"]</span>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+
+
+
+
+                    <!---->
+
+
+                    <li class="@((activeIndex == 6) ? "active" : "")">
+                        <a class="nav-link" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Orders"
+                           @onmouseover="() => OnMouseOverWithSubItem(ref BpmImage, ref BpmImage, 6)" @onmouseout="() => OnMouseOut(ref BpmImage)">
+                            <div class="container-panel">
+                                <div class="container-panel__line-active"></div>
+                                <div class="container-panel__flex-container">
+                                    <img src="@BpmImage" alt=@Translation["GMP"] class="fs-1 bpm" />
+                                    <span>@Translation["GMP"]</span>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+
+
+                    <li class="@((activeIndex == 7) ? "active" : "")">
+                        <a class="nav-link" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Customers"
+                           @onmouseover="() => OnMouseOverWithSubItem(ref EnvironmentalImpactImage, ref EnvironmentalImpactImage, 7)" @onmouseout="() => OnMouseOut(ref EnvironmentalImpactImage)">
+                            <div class="container-panel">
+                                <div class="container-panel__line-active"></div>
+                                <div class="container-panel__flex-container">
+                                    <img src="@EnvironmentalImpactImage" alt="ImpactoAmbiental" class="fs-1 impactoAmbiental" />
+                                    <span>@Translation["EnviromentalImpact_1"]</span>
+                                    <span class="mt-0">@Translation["EnviromentalImpact_2"]</span>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+
+
+
+
+
+
+
+
+                    <li class="@((activeIndex == 8) ? "active" : "")">
+                        <a class="nav-link" title="" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-original-title="Icon-only"
+                           @onmouseover="() => OnMouseOverWithSubItem(ref LogoutImage, ref LogoutImage, 8)" @onmouseout="() => OnMouseOut(ref LogoutImage)" onclick="@SignOff">
+                            <div class="container-panel">
+                                <div class="container-panel__line-active"></div>
+                                <div class="container-panel__flex-container">
+                                    <img src="@LogoutImage" alt="CerrarSesion" class="fs-1" />
+                                    <span>@Translation["LogOut_1"]</span>
+                                    <span>@Translation["LogOut_2"]</span>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="container-main-body">
+
+                <!-- Contenido de SubMenu Vertical-->
+                <div id="SubMenu" class="style-submenu submenu @(showNewMenu ? "show-submenu" : "")" @onmouseover="() => OnMouseOverWithSubItem(ref _default, ref _default, 0)">
+
+                    <!-- Contenido específico del submenu -->
+                    <div class="col-md-12 p-0">
+                        <!-- Contenedor principal con estilos de Bootstrap-->
+                        <div class="rounded-right p-3 d-flex flex-column overflow-auto main-container-menu">
+
+                            <ul class="list-unstyled options menu-text-left pl-1">
+
+                                <!-- Se recorre una lista de tipo Menu, que contiene los menus que hay en BD -->
+                                @foreach (var menuModels in MenusModels)
+                                {
+                                    <li>
+                                        <div class="option-header">
+                                            <button @onclick="() => ToggleSubMenu(menuModels.MenuId, 1,string.Empty)" class="btn text-left w-100 @((IsExpanded(menuModels.MenuId, 1) ? "main-button" : "")) menu-option my-1">
+
+                                                <!--Informacion del menu (el contenedor de los subniveles)-->
+                                                <div class="d-flex align-items-center justify-content-between">
+
+                                                    <!--Aqui se encuentra el nombre del menu-->
+                                                    <div class="d-flex align-items-center">
+                                                        <img src="../img/menu/@(menuModels.Icon).svg" class="d-inline-block icon-menu" />
+                                                        <span class="text-wrap text-color d-inline-block ml-2 levels">@Translation[menuModels.Name]</span>
+                                                    </div>
+
+                                                    <!--Aqui se encuentra el svg/boton de despliegue es una flecha que dependiendo si un
+                                                        menu esta desplegado estara mirando hacia arriba y si un menu no esta desplegado
+                                                        estara mirando hacia abajo-->
+
+                                                    <div class="ms-4">
+                                                        <i class="ml-auto">
+                                                            <!--HasSubMenuItems ayuda a revisar si el menu tiene opciones/subniveles-->
+                                                            @if (HasSubMenuItems(menuModels))
+                                                            {
+                                                                <i>
+                                                                    <!--Una vez revisado si tiene opciones se revisa si el menu esta expandido
+                                                                        para colocar el svg/boton de despliegue dependiendo de su estado-->
+                                                                    @if (IsExpanded(menuModels.MenuId, 1))
+                                                                    {
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-up" viewBox="0 0 16 16">
+                                                                            <path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z" />
+                                                                        </svg>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
+                                                                            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+                                                                        </svg>
+                                                                    }
+                                                                </i>
+                                                            }
+                                                        </i>
+                                                    </div>
+                                                </div>
+                                            </button>
+                                        </div>
+
+                                        <!--Desde aca se empezaran a ver observar o manejar la parte de visualizar los niveles del menu, dependiendo si
+                                                este tiene niveles/opciones-->
+                                        <div class="collapse @(IsExpanded(menuModels.MenuId, 1) ? "show" : "collapse") text-dark">
+
+                                            <!--HasSubMenuItems ayuda a revisar si el menu tiene opciones/subniveles-->
+                                            @if (HasSubMenuItems(menuModels))
+                                            {
+                                                <ul class="list-unstyled sub-options pl-2">
+
+                                                    <!-- Se recorre una coleccion de MenuItems1s, la cual son opciones de nivel 1 pertenecientes a un menu -->
+                                                    @foreach (var menuItem1 in menuModels.MenuItems1s)
+                                                    {
+                                                        <li>
+                                                            <div class="sub-option-header">
+
+                                                                <!--Este boton se utiliza para desplegar los niveles de la opcion de nivel 1 seleccionado, tiene el
+                                                                    ToggleSubMenu (Abre la opcion seleccionada y cierra otra opcion de su mismo nivel que pudiera estar
+                                                                    abierta anteriormente), IsExpanded(Se revisa si ya anteriormente esta expandida)-->
+
+                                                                <button @onclick="() => ToggleSubMenu(menuItem1.MenuItem1Id, 2,menuItem1.View?.Name)" class="btn text-left w-100 @((IsExpanded(menuItem1.MenuItem1Id, 2) ? menuItem1.MenuItems2s.Count > 0 ?"btn-selected": "" : "btn-notselected")) sub-option @(menuItem1.MenuItems2s.Count > 0 ? HasSubMenuItems(menuItem1) ? "btn-selected-with-options" : "btn-without-options" : "") ">
+
+                                                                    <div class="d-flex align-items-center justify-content-between">
+
+                                                                        <!--Aqui se encuentra el nombre de la opcion de nivel 1-->
+                                                                        <div class="d-flex align-items-center">
+                                                                            <span class="text-wrap text-color-sub d-inline-block ml-2 levels">
+                                                                                <span class="item-icon">
+                                                                                    @(menuItem1.MenuItems2s.Count > 0 ? "" : "●")
+                                                                                </span> @Translation[menuItem1.Name.Trim()]
+                                                                            </span>
+                                                                        </div>
+
+                                                                        <!--Aqui se encuentra el svg/boton de despliegue es una flecha que dependiendo si el
+                                                                            nivel esta desplegado estara mirando hacia arriba y si no esta desplegado
+                                                                            estara mirando hacia abajo-->
+                                                                        <div>
+                                                                            <i class="ml-auto">
+
+                                                                                <!--HasSubMenuItems ayuda a revisar si el nivel 1 tiene opciones/subniveles-->
+                                                                                @if (HasSubMenuItems(menuItem1))
+                                                                                {
+                                                                                    <i>
+                                                                                        <!--Una vez revisado si tiene opciones se revisa si la opcion de nivel 1
+                                                                                            esta expandido para colocar el svg/boton de despliegue dependiendo
+                                                                                            de su estado-->
+                                                                                        @if (menuItem1.MenuItems2s.Count > 0)
+                                                                                        {
+                                                                                            @if (IsExpanded(menuItem1.MenuItem1Id, 2))
+                                                                                            {
+                                                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-up" viewBox="0 0 16 16">
+                                                                                                    <path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z" />
+                                                                                                </svg>
+                                                                                            }
+                                                                                            else
+                                                                                            {
+                                                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
+                                                                                                    <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+                                                                                                </svg>
+                                                                                            }
+                                                                                        }
+
+                                                                                    </i>
+                                                                                }
+                                                                            </i>
+                                                                        </div>
+                                                                    </div>
+                                                                </button>
+                                                            </div>
+
+                                                            <!--Se revisa si la opcion de nivel 1 esta desplegada-->
+
+                                                            <div class="@(IsExpanded(menuItem1.MenuItem1Id, 2) ? "show" : "collapse") text-dark">
+
+                                                                <!--HasSubMenuItems ayuda a revisar si el nivel 1 tiene opciones/subniveles-->
+                                                                @if (HasSubMenuItems(menuItem1))
+                                                                {
+                                                                    <ul class="list-unstyled sub-options pl-3">
+
+                                                                        <!--Se recorre una coleccion de MenuItems2s, la cual son opciones de nivel 2
+                                                                                pertenecientes a la opcion de nivel 1-->
+                                                                        @foreach (var menuItem2 in menuItem1.MenuItems2s)
+                                                                        {
+
+                                                                            <li>
+                                                                                <div class="sub-option-header sub-nivel3">
+
+                                                                                    <!--
+                                                                                        Este boton se utiliza para desplegar los niveles de la opcion de nivel 2 seleccionado, tiene el
+                                                                                        ToggleSubMenu (Abre la opcion seleccionada y cierra otra opcion de su mismo nivel que pudiera estar
+                                                                                        abierta anteriormente), IsExpanded(Se revisa si ya anteriormente esta expandida)
+                                                                                    -->
+                                                                                    <button @onclick="() => ToggleSubMenu(menuItem2.MenuItem2Id, 3, menuItem2.View.Name, menuItem2.View.ViewParameters)" class="btn text-left w-100 @((IsExpanded(menuItem2.MenuItem2Id, 3) ? "btn-selected" : "")) sub-option @(HasSubMenuItems(menuItem2) ? "btn-selected-with-options" : "btn-without-options")">
+
+                                                                                        <!--
+                                                                                            Informacion de la opcion de nivel 2
+                                                                                        -->
+                                                                                        <div class="d-flex align-items-center justify-content-between">
+
+                                                                                            <!--
+                                                                                                Aqui se encuentra el nombre de la opcion de nivel 2
+                                                                                            -->
+                                                                                            <div class="d-flex align-items-center">
+                                                                                                <span class="text-wrap text-color-sub d-inline-block ml-2 levels">@Translation[menuItem2.Name]</span>
+                                                                                            </div>
+
+                                                                                            <!--
+                                                                                                Aqui se encuentra el svg/boton de despliegue es una flecha que dependiendo si el
+                                                                                                nivel esta desplegado estara mirando hacia arriba y si no esta desplegado
+                                                                                                estara mirando hacia abajo
+                                                                                            -->
+                                                                                            <div>
+                                                                                                <i class="ml-auto">
+
+                                                                                                    <!--
+                                                                                                       HasSubMenuItems ayuda a revisar si el nivel 2 tiene opciones/subniveles
+                                                                                                    -->
+                                                                                                    @if (HasSubMenuItems(menuItem2))
+                                                                                                    {
+                                                                                                        <i>
+
+                                                                                                            <!--
+                                                                                                                Una vez revisado si tiene opciones se revisa si la opcion de nivel 2
+                                                                                                                esta expandido para colocar el svg/boton de despliegue dependiendo
+                                                                                                                de su estado
+                                                                                                            -->
+                                                                                                            @if (IsExpanded(menuItem2.MenuItem2Id, 3))
+                                                                                                            {
+                                                                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-up" viewBox="0 0 16 16">
+                                                                                                                    <path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z" />
+                                                                                                                </svg>
+                                                                                                            }
+                                                                                                            else
+                                                                                                            {
+                                                                                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
+                                                                                                                    <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+                                                                                                                </svg>
+                                                                                                            }
+                                                                                                        </i>
+                                                                                                    }
+                                                                                                </i>
+                                                                                            </div>
+                                                                                        </div>
+
+                                                                                    </button>
+                                                                                </div>
+
+                                                                                <!--
+                                                                                    Se revisa si la opcion de nivel 2 esta desplegada
+                                                                                -->
+                                                                                <div class="@(IsExpanded(menuItem2.MenuItem2Id, 3) ? "show" : "collapse") text-dark">
+
+                                                                                    <!--
+                                                                                       HasSubMenuItems ayuda a revisar si el nivel 2 tiene opciones/subniveles
+                                                                                    -->
+                                                                                    @if (HasSubMenuItems(menuItem2))
+                                                                                    {
+                                                                                        <ul class="list-unstyled sub-options pl-4">
+
+                                                                                            <!--
+                                                                                                Se recorre una coleccion de MenuItems3s, la cual son opciones de nivel 3
+                                                                                                pertenecientes a la opcion de nivel 2
+                                                                                            -->
+                                                                                            @foreach (var menuItem3 in menuItem2.MenuItems3s)
+                                                                                            {
+                                                                                                <li>
+                                                                                                    <div class="sub-option-header">
+
+                                                                                                        <!--
+                                                                                                            Este boton se utiliza para seleccionar una opcion de nivel 3, hay que recordar que actualmente
+                                                                                                            se maneja que los menus pueden tener 3 niveles tiene el ToggleSubMenu (Abre la opcion seleccionada
+                                                                                                            y cierra otra opcion de su mismo nivel que pudiera estar seleccionada anteriormente),
+                                                                                                            IsExpanded(Se revisa si ya anteriormente esta expandida) pero aqui por ahora lo estamos usando para
+                                                                                                            que se denote el boton como seleccionado, esto sera asi hasta que se manejen los hijos
+                                                                                                        -->
+                                                                                                        <button class="btn text-left w-100 sub-option btn-without-options @(IsExpanded(menuItem3.MenuItem3Id, 4) ? "btn-selected" : "")" @onclick="() => ToggleSubMenu(menuItem3.MenuItem3Id, 4,menuItem3.View.Name)">
+
+                                                                                                            <!--
+                                                                                                                Informacion de la opcion de nivel 3
+                                                                                                            -->
+                                                                                                            <div class="d-flex align-items-center justify-content-between">
+
+                                                                                                                <!--
+                                                                                                                    Aqui se encuentra el nombre de la opcion de nivel 3
+                                                                                                                -->
+                                                                                                                <div class="d-flex align-items-center">
+                                                                                                                    <span class="text-wrap text-color-sub d-inline-block ml-2 levels">@Translation[menuItem3.Name]</span>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                        </button>
+                                                                                                    </div>
+                                                                                                </li>
+                                                                                            }
+                                                                                        </ul>
+                                                                                    }
+                                                                                </div>
+                                                                            </li>
+
+                                                                        }
+
+                                                                    </ul>
+                                                                }
+
+                                                            </div>
+
+                                                        </li>
+                                                    }
+
+                                                </ul>
+                                            }
+
+                                        </div>
+
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+
+                <TelerikRootComponent>
+                    <div class="container-main-body__card" @onclick="() => OnMouseOverWithSubItem(ref body_container, ref body_container, 0)">
+                        <!-- Contenido dinámico -->
+                        <CascadingValue Value="this.PermissionsList">
+                            <CascadingValue Value="this.userDataToShow">
+                                <Control.Endeavour.FrontEnd.Components.Modals.SearchEngine.SearchEngineModal @ref="searchEngineModal"></Control.Endeavour.FrontEnd.Components.Modals.SearchEngine.SearchEngineModal>
+                                @Body
+
+                            </CascadingValue>
+
+                        </CascadingValue>
+                    </div>
+                </TelerikRootComponent>
+            </div>
+
+            <div class="container-main-footer">
+                <p class="container-main-footer__footer-text m-0">
+                    @* <a> <strong>V-@version</strong> <span> <p> @Translation["TerminosyCondiciones")</span> </a> *@@* <a> <strong>V-@version</strong> <span> <p> @Translation["TerminosyCondiciones")</span> </a> *@
+                    <a> <strong>V-@version</strong></a>
+                    <a @onclick="@((args)=> OpenPdfTermsCondition("Terms&Conditions"))">
+
+                        | <u> <span class="cursor-pointer-class">@Translation["Terms&Conditions"]</span> </u>
+                    </a>
+
+                    <a @onclick="@((args)=> OpenPdfTermsCondition("PrivacyPolicy"))">
+                        | <u>  <span class="cursor-pointer-class">@Translation["PrivacyPolicy"]</span> </u>
+                    </a>
+                    <span>@Translation["Copyright"]</span>
+                </p>
+            </div>
+
+        </div>
+
+    </TelerikRootComponent>
+
+}

@@ -1,0 +1,40 @@
+﻿@using Control.Endeavour.FrontEnd.Models.Enums.Components.UploadFiles
+
+@implements IAsyncDisposable
+
+<div class="card upload-image" style="width: @Width; height: @Height;">
+
+    <!-- Spinner de carga -->
+    @if (isLoading)
+    {
+        <div class="spinner-container">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">@Translation["Loading"]</span>
+            </div>
+        </div>
+    }
+
+    @if (FileInfos.Count > 0)
+    {
+        <img src="@PictureSrc" class="upload-image__img" alt="Imagen">
+    }
+    <div @ref="dropContainer" class="@containerClass upload-image__container">
+        <!-- Área de carga de archivos, oculta durante la carga -->
+        @if (!isLoading)
+        {
+            @if (FileInfos.Count == 0)
+            {
+                <div class="upload-image__div card-img-overlay d-flex p-2" @onclick="TriggerFileInputClick">
+                    <i class="fa fa-image fa-2x upload-image__icon"></i>
+                    <span class="mt-1 upload-image__span">@Translation["DragImage"]"</span>
+                </div>
+            }
+            else
+            {
+                <div class="upload-image__div card-img-overlay d-flex p-2" @onclick="() => ChangePicture(FileInfos[0])"></div>
+            }
+        }
+        <InputFile @ref="inputFile" id="@IdInputElement" multiple OnChange="OnChange" style="display: none;" />
+    </div>
+    <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+</div>

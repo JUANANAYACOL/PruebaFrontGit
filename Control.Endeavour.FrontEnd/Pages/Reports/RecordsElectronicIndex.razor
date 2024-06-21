@@ -1,0 +1,284 @@
+﻿@page "/RecordsElectronicIndex"
+@* @page "/" *@
+@using Control.Endeavour.FrontEnd.Models.Models.Records.Response
+@using Control.Endeavour.FrontEnd.Models.Models.Records.Request
+@layout MainLayout
+
+<div class="container-fluid mt-1">
+    <div class="row titulo">
+        <div class="col-md-4">
+            <h3>@(Translation["Reports"] + " - " + Translation["RecordsElectronicIndex"])</h3>
+        </div>
+        <div class="col-md-8 text-end">
+
+            <button class="svg-button @ButtonCreateRecordClass" title="Cerrar" @onclick="CloseCreateView">
+                <img src="../img/vector.svg" />
+            </button>
+        </div>
+    </div>
+</div>
+<div id="panel_consult_records" class="@PanelConsultRecordClass">
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <InputModalComponent @bind-InputValue="@recordFilter.RecordId" LabelText="@(Translation["RecordNumber"]+":")" IsVisible="true" Placeholder="" InputType="number" />
+        </div>
+        <div class="col-md-3 d-flex flex-column justify-content-between ">
+            <label class="titulo-azul">
+                @Translation["InquiryLevel"]
+            </label>
+        </div>
+
+        <div class="col-md-3 d-flex flex-column justify-content-between ">
+            <label class="titulo-azul">
+                @Translation["ViewClosedRecords"]
+            </label>
+            <div class="k-form k-form-md k-form-vertical">
+                <div class="k-form-field">
+
+                    <div class="k-form-field-wrap">
+                        <TelerikRadioGroup Data="@optionsRecordClosed"
+                                           Value="@ResponseRecordClosed"
+                                           Layout="@RadioGroupLayout.Horizontal"
+                                           ValueChanged="@( (string newValue) => OnValueChangedRecordClosed(newValue) )">
+                        </TelerikRadioGroup>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <h6 class="titulo-azul"> @Translation["FilterDRT"]</h6>
+        </div>
+        <div class="col-md-3">
+            <label class="selectorBlock--labelDropDown">@Translation["DocumentaryVersion"]:</label>
+            <TelerikDropDownList Data="@docVersionList"
+                                 ValueField="DocumentalVersionId"
+                                 Value="@idDocVersion"
+                                 TextField="Code"
+                                 ValueChanged="@( (int newValue) => GetAdministrativeUnits(newValue, "consult") )"
+                                 Filterable="true"
+                                 DefaultText=@Translation["SelectAnOption"]>
+            </TelerikDropDownList>
+        </div>
+        <div class="col-md-3">
+            <label for="input2" class="selectorBlock--labelDropDown">@Translation["AdministrativeUnits"]:</label>
+            <TelerikDropDownList Data="@adminUnitList"
+                                 ValueField="AdministrativeUnitId"
+                                 Value="@recordFilter.AdministrativeUnitId"
+                                 TextField="Name"
+                                 ValueChanged="@( (int? newValue) => GetProducOffice(newValue.Value,"consult") )"
+                                 Filterable="true"
+                                 Enabled="isEnableAdminUnit"
+                                 DefaultText="@Translation["AdministrativeUnits"]">
+            </TelerikDropDownList>
+        </div>
+        <div class="col-md-3">
+            <label class="selectorBlock--labelDropDown">@Translation["ProductionOffices"]:</label>
+            <TelerikDropDownList Data="@proOfficesList"
+                                 ValueField="ProductionOfficeId"
+                                 Value="@recordFilter.ProductionOfficeId"
+                                 TextField="Name"
+                                 ValueChanged="@( (int? newValue) => GetSeries(newValue.Value,"consult") )"
+                                 Enabled="@isEnableProOffice"
+                                 Filterable="true"
+                                 DefaultText="@Translation["ProductionOffices"]">
+            </TelerikDropDownList>
+        </div>
+        <div class="col-md-3">
+            <label class="selectorBlock--labelDropDown">@Translation["DocumentarySeries"]:</label>
+            <TelerikDropDownList Data="@seriesList"
+                                 ValueField="SeriesId"
+                                 Value="@recordFilter.SeriesId"
+                                 TextField="Name"
+                                 ValueChanged="@( (int? newValue) => GetSubSeries(newValue.Value,"consult") )"
+                                 Enabled="@isEnableSerie"
+                                 Filterable="true"
+                                 DefaultText="@Translation["DocumentarySeries"]">
+            </TelerikDropDownList>
+        </div>
+        <div class="col-md-3 mt-3">
+            <label class="selectorBlock--labelDropDown">@Translation["DocumentarySubSeries"]:</label>
+            <TelerikDropDownList Data="@subSeriesList"
+                                 ValueField="SubSeriesId"
+                                 Value="@recordFilter.SubSeriesId"
+                                 TextField="Name"
+                                 Enabled="@isEnableSubSerie"
+                                 ValueChanged="@( (int? newValue) => SelectedSubSeries(newValue.Value,"consult") )"
+                                 Filterable="true"
+                                 DefaultText="@Translation["DocumentarySubSeries"]">
+            </TelerikDropDownList>
+        </div>
+        <div class="col-md-3 mt-3 @DocumentFilterClass">
+            <label class="selectorBlock--labelDropDown">@Translation["DocumentaryTypologies"]:</label>
+            <TelerikDropDownList Data="@subSeriesList"
+                                 ValueField="SubSeriesId"
+                                 @bind-Value="@recordFilter.SubSeriesId"
+                                 TextField="Name"
+                                 Enabled="@isEnableSubSerie"
+                                 Filterable="true"
+                                 DefaultText="@Translation["DocumentaryTypologies"]">
+            </TelerikDropDownList>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <h6 class="titulo-azul"> @Translation["FilterRecords"]</h6>
+        </div>
+        <div class="col-md-3 ">
+            <label for="input2" class="selectorBlock--labelDropDown">@Translation["RecordType"]:</label>
+            <TelerikDropDownList Data="@recordTypeList"
+                                 ValueField="Code"
+                                 TextField="Value"
+                                 @bind-Value="@recordFilter.RecordFileType"
+                                 Filterable="true"
+                                 DefaultText="@Translation["RecordType"]">
+            </TelerikDropDownList>
+        </div>
+        <div class="col-md-3 ">
+            <label for="input2" class="selectorBlock--labelDropDown">@Translation["FileRecordType"]:</label>
+            <TelerikDropDownList Data="@recordFileTypeList"
+                                 ValueField="Code"
+                                 @bind-Value="@recordFilter.RecordFileType"
+                                 TextField="Value"
+                                 Filterable="true"
+                                 DefaultText="@Translation["FileRecordType"]">
+            </TelerikDropDownList>
+        </div>
+
+        <div class="col-md-6 d-flex align-items-end justify-content-end">
+            <div class="text-md-end">
+                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnClassModifiers="mx-4" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="HandleCleanFilter"></ButtonComponent>
+                <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Search"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="HandleSearchFilter"></ButtonComponent>
+            </div>
+        </div>
+
+
+    </div>
+
+    <div class="row mt-4">
+        <TelerikGrid Data="@recordsInfoList" PageSize="10">
+            <GridColumns>
+                <GridCommandColumn Width="80px" Title="@Translation["WatchReport"]" HeaderClass="center-wrap" Visible="true">
+
+                    @{
+                        <div class="d-flex justify-content-around command-button-container">
+                            <GridCommandButton Title="@Translation["WatchReport"]" Icon="@SvgIcon.InfoCircle" Size="24px"
+                                               OnClick="@((args)=> OpenReport((VRecordsDtoResponse) args.Item))"></GridCommandButton>
+                        </div>
+                    }
+                </GridCommandColumn>
+                <GridColumn Field="RecordNumber"
+                            Title="@Translation["RecordNumber"]"
+                            Width="150px"
+                            TextAlign="ColumnTextAlign.Center"
+                            HeaderClass="center-wrap" />
+
+                <GridColumn Field="RecordFileTypeName"
+                            Title="@Translation["FileRecordType"]"
+                            Width="150px"
+                            TextAlign="ColumnTextAlign.Center"
+                            HeaderClass="center-wrap" />
+                <GridColumn Field="Volumes"
+                            Title="@Translation["VolumeCount"]"
+                            Width="150px"
+                            TextAlign="ColumnTextAlign.Center"
+                            HeaderClass="center-wrap" />
+                <GridColumn Width="350px">
+                    <HeaderTemplate>
+                        <label> @Translation["RecordMetadata"]</label>
+                    </HeaderTemplate>
+                    <Template>
+                        @{
+                            var data = (VRecordsDtoResponse)context;
+                            <div>
+                                @if (!string.IsNullOrEmpty(data?.MetaData) && data.MetaData.Contains(":"))
+                                {
+                                    var metaDataEntries = data.MetaData.Split(new[] { "\n, " }, StringSplitOptions.RemoveEmptyEntries);
+                                    bool hasContent = false;
+
+                                    foreach (var entry in metaDataEntries)
+                                    {
+                                        var keyValue = entry.Split(new[] { ':' }, 2);
+                                        if (keyValue.Length == 2)
+                                        {
+                                            var key = keyValue[0].Trim();
+                                            var value = keyValue[1].Trim();
+
+                                            // Asegura que la primera letra esté en mayúscula
+                                            key = char.ToUpper(key[0]) + key.Substring(1).ToLower();
+                                            value = char.ToUpper(value[0]) + value.Substring(1).ToLower();
+
+                                            <div>
+                                                <label><b>@key:</b> @value</label><br />
+                                            </div>
+                                            hasContent = true;
+                                        }
+                                    }
+
+                                    if (!hasContent)
+                                    {
+                                        <div>No Aplica</div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div>No Aplica</div>
+                                }
+                            </div>
+                        }
+                    </Template>
+                </GridColumn>
+                <GridColumn Width="350px">
+                    <HeaderTemplate>
+                        <label> @Translation["DRTInformation"]</label>
+                    </HeaderTemplate>
+                    <Template>
+                        @{
+                            var data = (VRecordsDtoResponse)context;
+                            <div>
+                                <div class="mb-1">
+                                    <label><b>@Translation["AdministrativeDepartment"]:</b> @(!string.IsNullOrEmpty(data?.NameAdministrativeUnits) ? data.NameAdministrativeUnits : "N/A")</label>
+                                </div>
+                                <div class="mb-1">
+                                    <label><b>@Translation["ProductionOffice"]:</b> @(!string.IsNullOrEmpty(data?.NameProductionOffices) ? data.NameProductionOffices : "N/A")</label>
+                                </div>
+                                <div class="mb-1">
+                                    <label><b>@Translation["Serie"]:</b> @(!string.IsNullOrEmpty(data?.NameSeries) ? data.NameSeries : "N/A")</label>
+                                </div>
+                                <div class="mb-1">
+                                    <label><b>@Translation["SubSerie"]:</b> @(!string.IsNullOrEmpty(data?.NameSubSeies) ? data.NameSubSeies : "N/A")</label>
+                                </div>
+                            </div>
+                        }
+                    </Template>
+                </GridColumn>
+
+
+            </GridColumns>
+        </TelerikGrid>
+        <NewPaginationComponent @ref="paginationComponent" Filter="@recordFilter" T="VRecordsDtoResponse" M="RecordFilterDtoRequest" Uri="@UriFilterRecords" PaginationInfo="@paginationInfo" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+    </div>
+</div>
+
+<div id="panel_create_records" class="@PanelReportsClass">
+    <div class="container">
+        @* Rutas de los ejemplos de telerik
+        ServiceUrl="https://demos.telerik.com/reporting/api/reports"
+        http://25.56.160.203:7000/reports/reports
+        https://localhost:44318/api/reports
+        *@
+        <ReportViewer ServiceType="@ReportViewerServiceType.REST"
+                      ServiceUrl="http://25.56.160.203:7000/reports/reports"
+                      @bind-ReportSource="@ReportSource"
+                      @bind-ScaleMode="@ScaleMode"
+                      @bind-ViewMode="@ViewMode"
+                      @bind-ParametersAreaVisible="@ParametersAreaVisible"
+                      @bind-DocumentMapVisible="@DocumentMapVisible"
+                      @bind-Scale="@Scale">
+        </ReportViewer>
+    </div>
+</div>
+

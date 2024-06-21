@@ -1,0 +1,187 @@
+﻿@using Control.Endeavour.FrontEnd.Models.Models.Administration.ThirdUser.Request
+<div class="my-modal">
+    <TelerikRootComponent>
+        <GenericModalComponent Title="@Translation["ThirdPpartyOf"]" IsVisible=ModalStatus Width="80%" OnModalClosed="HandleModalClosed">
+            <ChildContent>
+
+                <div class="container-fluid">
+
+
+                    <div class="row">
+
+                        <div class="col-lg-3 mt-1">
+
+                            <label for="input2" class="mb-2">@Translation["IdType"]<span class="red">*</span></label>
+                            <TelerikDropDownList Data="@IdentificationTypeList"
+                                                 @bind-Value="@identificationTypeCode"
+                                                 DefaultText=@Translation["SelectAnOption"]
+                                                 TextField="Value"
+                                                 ValueField="Code"
+                                                 Filterable="true"
+                                                 FilterOperator="StringFilterOperator.Contains"
+                                                 OnChange="EnableSaveButton">
+                            </TelerikDropDownList>
+
+                        </div>
+                        <div class="col-lg-3 mt-1">
+
+                            <InputModalComponent @ref=IdentificationNumberInput @bind-InputValue="IdentificationNumber" MethodValueChanged="EnableSaveButton" InputType="number" InputMaxLength="10" IsRequired="true" LabelText=@Translation["Identification"] Placeholder=@Translation["Identification"] FieldType="InputModalTypeEnum.Filing" InputMaxNumberValue="9999999999" />
+
+
+                        </div>
+
+                        <div class="col-lg-3 mt-1">
+                            <InputModalComponent @ref=NamesInput @bind-InputValue="Names" MethodValueChanged="EnableSaveButton" InputMaxLength="100" IsRequired="true" LabelText=@Translation["NamesSurnames"] Placeholder=@Translation["NamesSurnames"] FieldType="InputModalTypeEnum.NumbersOnly" />
+
+
+                        </div>
+                        <div class="col-lg-3 mt-1">
+                            <InputModalComponent @ref=ChargueInput @bind-InputValue="Chargue" InputMaxLength="50" IsRequired="false" LabelText=@Translation["Position"] Placeholder=@Translation["Position"] FieldType="InputModalTypeEnum.NumbersOnly" />
+
+                        </div>
+                        <div class="col-lg-3 mt-1">
+
+                            <InputModalComponent @ref=OfficeInput @bind-InputValue="Office" InputMaxLength="100" IsRequired="false" LabelText=@Translation["Office"] Placeholder=@Translation["Office"] FieldType="InputModalTypeEnum.NumbersOnly" />
+
+
+                        </div>
+
+                        <div class="col-lg-3 mt-1">
+                            <InputModalComponent @ref=EmailInput @bind-InputValue="Email" MethodValueChanged="EnableSaveButton" InputMaxLength="150" IsRequired="true" LabelText=@Translation["Email"] Placeholder=@Translation["Email"] FieldType="InputModalTypeEnum.NumbersOnly" />
+
+
+                        </div>
+                        <div class="col-lg-3 mt-1">
+
+                            <InputModalComponent @ref="CellphoneInput" @bind-InputValue="Cellphone" InputMaxLength="10" IsRequired="false" LabelText=@(Translation["CellPhone"]) IsVisible="true" Placeholder=@(Translation["CellPhone"]) InputType="number" FieldType="InputModalTypeEnum.Filing" InputMaxNumberValue="9999999999" />
+
+
+                        </div>
+                        <div class="col-lg-3 mt-2">
+
+
+                            <div class="from-group mt-4 d-flex align-items-end justify-content-start">
+
+
+                                <div class="px-2">
+                                    <TelerikSwitch @bind-Value="@activeState" />
+                                </div>
+                                <div class="px-2">
+                                    @(activeState ? Translation["Enabled"] : Translation["Disabled"])
+                                </div>
+
+                            </div>
+
+
+                        </div>
+
+
+
+                        <div class="col-lg-12">
+                            <div class="from-group from-group--margin-top justify-content-center">
+                                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="ResetFormAsync"></ButtonComponent>
+                                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnIcon="fa-solid fa-floppy-disk" BtnOnClick="HandleValidSubmit" BtnDisabled="saveIsDisable"></ButtonComponent>
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-12 mt-3">
+                            <TelerikGrid Data="@ThirdUserList" PageSize="10"
+                                         Sortable="true"
+                                         FilterMode="GridFilterMode.FilterMenu"
+                                         Resizable="true"
+                                         Reorderable="false"
+                                         EditMode="GridEditMode.Popup"
+                                         SelectionMode="GridSelectionMode.None">
+
+@* 
+                                <GridToolBarTemplate>
+                                    <GridCommandButton Command="ExcelExport" Icon="@SvgIcon.FileExcel">@Translation["ExportToExcel"]</GridCommandButton>
+                                    <label class="k-checkbox-label"><TelerikCheckBox @bind-Value="@ExportAllPages" /> @Translation["ExportAllPages"]</label>
+                                </GridToolBarTemplate>
+                                <GridExport>
+                                    <GridExcelExport FileName="telerik-grid-export" AllPages="@ExportAllPages" OnBeforeExport="@OnBeforeExcelExport" />
+                                </GridExport>
+ *@
+
+
+                                <GridColumns>
+
+
+                                    <GridCommandColumn Width="90px" Title=@Translation["Edit"] HeaderClass="center-wrap" Visible="true">
+                                        <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                                            <GridCommandButton Title=@Translation["Edit"] Icon="@SvgIcon.Pencil" OnClick="@((args) => HandleThirdUserUpdate(((ThirdUserDtoRequest)args.Item)))"></GridCommandButton>
+                                        </div>
+                                    </GridCommandColumn>
+
+
+                                    <GridCommandColumn Width="90px" Title=@Translation["Delete"] HeaderClass="center-wrap" Visible="true">
+
+                                        <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+
+
+                                            <GridCommandButton Title=@Translation["Delete"] Icon="@SvgIcon.Trash" OnClick="@((args) => HandleToDelete(((ThirdUserDtoRequest)args.Item).ThirdUserId))"></GridCommandButton>
+
+                                        </div>
+                                    </GridCommandColumn>
+
+
+
+
+
+                                    <GridColumn Field=@nameof(ThirdUserDtoRequest.IdentificationTypeName) TextAlign="ColumnTextAlign.Center" Title=@Translation["IdType"] HeaderClass="center-wrap" Width="250px" Filterable="false" />
+                                    <GridColumn Field=@nameof(ThirdUserDtoRequest.IdentificationNumber) TextAlign="ColumnTextAlign.Center" Title=@Translation["Identification"] HeaderClass="center-wrap" Width="250px" Filterable="false" />
+                                    <GridColumn Field=@nameof(ThirdUserDtoRequest.Names) TextAlign="ColumnTextAlign.Center" Title=@Translation["NamesSurnames"] Width="250px" HeaderClass="center-wrap" Filterable="false" />
+                                    <GridColumn Field=@nameof(ThirdUserDtoRequest.ActiveState) TextAlign="ColumnTextAlign.Center" Title=@Translation["ActiveState"] Width="250px" HeaderClass="center-wrap" Filterable="false">
+
+
+                                        <Template>
+                                            @{
+                                                ThirdUserDtoRequest rowData = (ThirdUserDtoRequest)context;
+                                                if (rowData != null)
+                                                {
+                                                    bool activeState = (bool)( rowData.ActiveState );
+                                                    string active = activeState ? Translation["Enabled"] : Translation["Disabled"];
+                                                    @active
+                                                }
+                                            }
+                                        </Template>
+
+
+                                    </GridColumn>
+                                    <GridColumn Field=@nameof(ThirdUserDtoRequest.Charge) TextAlign="ColumnTextAlign.Center" Title=@Translation["Position" ] HeaderClass="center-wrap" Width="250px" Filterable="false" />
+                                    <GridColumn Field=@nameof(ThirdUserDtoRequest.Area) TextAlign="ColumnTextAlign.Center" Title=@Translation["Office"] HeaderClass="center-wrap" Width="250px" Filterable="false" />
+                                    <GridColumn Field=@nameof(ThirdUserDtoRequest.Email) TextAlign="ColumnTextAlign.Center" Title=@Translation["Email"] HeaderClass="center-wrap" Width="250px" Filterable="false" />
+                                    <GridColumn Field=@nameof(ThirdUserDtoRequest.CellPhone) TextAlign="ColumnTextAlign.Center" Title=@Translation["CellPhone"] HeaderClass="center-wrap" Width="250px" Filterable="false" />
+                                    <GridColumn Field=@nameof(ThirdUserDtoRequest.CreateUser) TextAlign="ColumnTextAlign.Center" Title=@Translation["UserRecorded"] HeaderClass="center-wrap" Width="100px" Filterable="false" />
+                                    <GridColumn Field=@nameof(ThirdUserDtoRequest.CreateDate) TextAlign="ColumnTextAlign.Center" Title=@Translation["DateRecorded"] HeaderClass="center-wrap" Width="100px" Filterable="false" />
+                                    <GridColumn Field=@nameof(ThirdUserDtoRequest.UpdateUser) TextAlign="ColumnTextAlign.Center" Title=@Translation["UserUpdated"] HeaderClass="center-wrap" Width="100px" Filterable="false" />
+                                    <GridColumn Field=@nameof(ThirdUserDtoRequest.UpdateDate) TextAlign="ColumnTextAlign.Center" Title=@Translation["DateUpdated"] HeaderClass="center-wrap" Width="100px" Filterable="false" />
+
+
+
+
+                                </GridColumns>
+                                <NoDataTemplate>
+                                    <img src="../img/noDataFound.png" width="8%" height="8%" />
+                                    <p> @Translation["NoGridInfo"]</p>
+                                </NoDataTemplate>
+                            </TelerikGrid>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+                @if (dataChargue)
+                {
+                    <!-- Parte 4: Botones en la izquierda, centro y derecha -->
+                    <NewPaginationComponent @ref="paginationComponent" Filter="@filterDtoRequest" T="ThirdUserDtoRequest" M="ThirdUserFilterDtoRequest" Uri="@UriFilterThirdUser" PaginationInfo="@paginationInfo" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+                }
+
+                <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>

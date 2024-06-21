@@ -1,0 +1,418 @@
+﻿@using Control.Endeavour.FrontEnd.Models.Models.GenericDtos.Attachments.Request
+@using Control.Endeavour.FrontEnd.Models.Models.Records.Response
+<div class="my-modal">
+    <TelerikRootComponent>
+        <GenericModalComponent Title=@Translation["Attachments"] IsVisible="@modalStatus" Width="65%" OnModalClosed="HandleModalClosed">
+            <ChildContent>
+                <div class="row @panelGridClass">
+                    <TelerikTabStrip PersistTabContent="true" ActiveTabIndex="ActiveTabIndex" ActiveTabIndexChanged="TabChangedHandler">
+                        
+                        <TabStripTab Title=@Translation["Attachments"] Visible="@isTaskAttachment">
+                            <div class="col-2">
+                                <div class="d-flex flex-column">
+                                    <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["AddAttachment"] BtnIcon="fa-solid fa-plus" BtnDisabled="SeenAttachments" BtnOnClick="ShowAttachmentModal"></ButtonComponent>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col">
+                                    <TelerikGrid Data="@AttachmentsList" PageSize="@AttachmentsList.Count()"
+                                                 Resizable="true"
+                                                 ScrollMode="@GridScrollMode.Scrollable"
+                                                 Height="460px"
+                                                 RowHeight="60"
+                                                 SelectionMode="GridSelectionMode.None">
+                                        <GridColumns>
+                                            <GridCommandColumn Width="110px" Title=@Translation["Delete"] HeaderClass="center-wrap" Visible="!SeenAttachments">
+                                                @{
+                                                    <div class="d-flex justify-content-around">
+                                                        <GridCommandButton Title=@Translation["Delete"] Icon="@SvgIcon.Trash" OnClick="@((args)=> DeleteAttachments((AttachmentsDtoResponse)args.Item))"></GridCommandButton>
+                                                    </div>
+                                                }
+                                            </GridCommandColumn>
+                                            <GridCommandColumn Width="110px" Title=@Translation["View"] HeaderClass="center-wrap" Visible="true">
+                                                @{
+                                                    var item = (AttachmentsDtoResponse)context;
+
+                                                    @if (item.TaskId > 0)
+                                                    {
+                                                        <div class="d-flex justify-content-around">
+                                                            <GridCommandButton Title=@Translation["View"] Icon="@SvgIcon.Search" OnClick="@((args)=> HandleViewAttachment((AttachmentsDtoResponse)args.Item))"></GridCommandButton>
+                                                        </div>
+                                                    }
+                                                }
+                                            </GridCommandColumn>
+@*                                             <GridCommandColumn Width="70px" Title=@Translation["Upload"] HeaderClass="center-wrap" Visible="true">
+                                                @{
+                                                    <div class="d-flex justify-content-around">
+                                                        <GridCommandButton Title=@Translation["Upload"] Icon="@SvgIcon.SortAsc"></GridCommandButton>
+                                                    </div>
+                                                }
+                                            </GridCommandColumn>
+                                            <GridCommandColumn Width="110px" Title=@Translation["Editor_AlignJustify"] HeaderClass="center-wrap" Visible="true">
+                                                @{
+                                                    <div class="d-flex justify-content-around">
+                                                        <GridCommandButton Title=@Translation["Editor_AlignJustify"] Icon="@SvgIcon.Pencil"></GridCommandButton>
+                                                    </div>
+                                                }
+                                            </GridCommandColumn>
+                                            <GridCommandColumn Width="115px" Title=@Translation["Restore"] HeaderClass="center-wrap" Visible="true">
+                                                @{
+                                                    <div class="d-flex justify-content-around">
+                                                        <GridCommandButton Title=@Translation["Restore"] Icon="@SvgIcon.Undo"></GridCommandButton>
+                                                    </div>
+                                                }
+                                            </GridCommandColumn>
+                                            <GridCommandColumn Width="70px" Title=@Translation["Sign"] HeaderClass="center-wrap" Visible="true">
+                                                @{
+                                                    <div class="d-flex justify-content-around">
+                                                        <GridCommandButton Title=@Translation["Sign"] Icon="@SvgIcon.Signature"></GridCommandButton>
+                                                    </div>
+                                                }
+                                            </GridCommandColumn> *@
+                                            <GridColumn Width="350px">
+                                                <HeaderTemplate>
+                                                    <label>@Translation["Detail"]</label>
+                                                </HeaderTemplate>
+                                                <Template>
+                                                    @{
+                                                        var fileInfo = (AttachmentsDtoResponse)context;
+                                                        <AttachmentCardComponent ArchiveName="@fileInfo?.ArchiveName"
+                                                                                 ArchiveExt="@fileInfo?.ExibitCodeName"
+                                                                                 AttDescription="@fileInfo?.AttDescription"
+                                                                                 CreateUser="@fileInfo?.CreateUser"
+                                                                                 CreateDate="@fileInfo?.CreateDate">
+                                                        </AttachmentCardComponent>
+                                                    }
+                                                </Template>
+                                            </GridColumn>
+                                        </GridColumns>
+                                    </TelerikGrid>
+                                </div>
+                            </div>                            
+                            <div class="col-12">
+                                <div class="d-flex flex-row justify-content-center mt-4">
+                                    <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Accept"] BtnIcon="fa-solid fa-check" BtnDisabled="SeenAttachments" BtnOnClick="SendAttachments"></ButtonComponent>
+                                </div>
+                            </div>
+                        </TabStripTab>
+                        <TabStripTab Title=@Translation["DeletedAttachments"] Visible="@isTaskAttachment">
+
+                            <div class="row mt-4">
+                                <div class="col">
+                                    <TelerikGrid Data="@AttachmentDeleteList" PageSize="@AttachmentDeleteList.Count()"
+                                                 Resizable="true"
+                                                 ScrollMode="@GridScrollMode.Scrollable"
+                                                 Height="460px"
+                                                 RowHeight="60"
+                                                 SelectionMode="GridSelectionMode.None">
+                                        <GridColumns>
+                                            <GridCommandColumn Width="150px" Title=@Translation["View"] HeaderClass="center-wrap" Visible="true">
+                                                @{
+                                                    <div class="d-flex justify-content-around">
+                                                        <GridCommandButton Title=@Translation["View"] Icon="@SvgIcon.Search" OnClick="@((args)=> HandleViewAttachment((AttachmentsDtoResponse)args.Item))"></GridCommandButton>
+                                                    </div>
+                                                }
+                                            </GridCommandColumn>
+                                            <GridColumn>
+                                                <HeaderTemplate>
+                                                     <label> @Translation["Detail"] </label>
+                                                </HeaderTemplate>
+                                                <Template>
+                                                    @{
+                                                        var fileInfo = (AttachmentsDtoResponse)context;
+                                                        <AttachmentCardComponent ArchiveName="@fileInfo?.ArchiveName"
+                                                                                 ArchiveExt="@fileInfo?.ArchiveExt"
+                                                                                 AttDescription="@fileInfo?.AttDescription"
+                                                                                 CreateUser="@fileInfo?.CreateUser"
+                                                                                 CreateDate="@fileInfo?.CreateDate">
+                                                        </AttachmentCardComponent>
+                                                    }
+                                                </Template>
+                                            </GridColumn>
+                                        </GridColumns>
+                                    </TelerikGrid>
+                                </div>
+                            </div>
+                        </TabStripTab>
+
+                        <TabStripTab Title=@Translation["Attachments"] Visible="@isDocumentAttachment">
+
+                            <div class="col-2">
+                                <div class="d-flex flex-column">
+                                    <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["AddAttachment"] BtnIcon="fa-solid fa-plus"  BtnOnClick="ShowAttachmentModal"></ButtonComponent>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col">
+                                    <TelerikGrid Data="@AttachmentDocumentList" PageSize="@AttachmentDocumentList.Count()"
+                                                 Sortable="true"
+                                                 Reorderable="true"
+                                                 ScrollMode="@GridScrollMode.Scrollable"
+                                                 Height="460px"
+                                                 RowHeight="60"
+                                                 SelectionMode="GridSelectionMode.None">
+                                        <GridColumns>
+                                            <GridCommandColumn Width="110px" Title=@Translation["Delete"] HeaderClass="center-wrap" Visible="false">
+                                                @{
+                                                    <div class="d-flex justify-content-around">
+                                                        <GridCommandButton Title=@Translation["Delete"] Icon="@SvgIcon.Trash" OnClick="@((args)=> DeleteAttachments((AttachmentsDtoResponse)args.Item))"></GridCommandButton>
+                                                    </div>
+                                                }
+                                            </GridCommandColumn>
+                                            <GridCommandColumn Width="60px" Title=@Translation["View"] HeaderClass="center-wrap" Visible="true">
+                                                @{
+                                                    <div class="d-flex justify-content-around">
+                                                        <GridCommandButton Title=@Translation["View"] Icon="@SvgIcon.Search" OnClick="@((args)=> HandleViewAttachmentDocument((AttachmentDocumentDtoResponse)args.Item))"></GridCommandButton>
+                                                    </div>
+                                                }
+                                            </GridCommandColumn>
+                                            <GridCommandColumn Width="70px" Title=@Translation["Upload"] HeaderClass="center-wrap" Visible="false">
+                                                @{
+                                                    <div class="d-flex justify-content-around">
+                                                        <GridCommandButton Title=@Translation["Upload"] Icon="@SvgIcon.SortAsc"></GridCommandButton>
+                                                    </div>
+                                                }
+                                            </GridCommandColumn>
+                                            <GridCommandColumn Width="110px" Title=@Translation["Editor_AlignJustify"] HeaderClass="center-wrap" Visible="false">
+                                                @{
+                                                    <div class="d-flex justify-content-around">
+                                                        <GridCommandButton Title=@Translation["Editor_AlignJustify"] Icon="@SvgIcon.Pencil"  ></GridCommandButton>
+                                                    </div>
+                                                }
+                                            </GridCommandColumn>
+                                            <GridCommandColumn Width="115px" Title=@Translation["Restore"] HeaderClass="center-wrap" Visible="false">
+                                                @{
+                                                    <div class="d-flex justify-content-around">
+                                                        <GridCommandButton Title=@Translation["Restore"] Icon="@SvgIcon.Undo"></GridCommandButton>
+                                                    </div>
+                                                }
+                                            </GridCommandColumn>
+                                            <GridCommandColumn Width="70px" Title=@Translation["Sign"] HeaderClass="center-wrap" Visible="true">
+                                                @{
+                                                    <div class="d-flex justify-content-around">
+                                                        <GridCommandButton Title=@Translation["Sign"] Icon="@SvgIcon.Signature"></GridCommandButton>
+                                                    </div>
+                                                }
+                                            </GridCommandColumn>
+                                            <GridColumn>
+                                                <HeaderTemplate>
+                                                     <label> @Translation["Detail"] </label>
+                                                </HeaderTemplate>
+                                                <Template>
+                                                    @{
+                                                        var fileInfo = (AttachmentDocumentDtoResponse)context;
+                                                        <AttachmentCardComponent ArchiveName="@fileInfo?.ArchiveName"
+                                                                                 ArchiveExt="@fileInfo?.ArchiveExt"
+                                                                                 AttDescription="@fileInfo?.AttDescription"
+                                                                                 CreateUser="@fileInfo?.CreateUser"
+                                                                                 CreateDate="@fileInfo?.CreateDate.ToString()">
+                                                        </AttachmentCardComponent>
+                                                    }
+                                                </Template>
+                                            </GridColumn>
+                                        </GridColumns>
+                                    </TelerikGrid>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="d-flex flex-row justify-content-center mt-4">
+                                    <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Accept"] BtnIcon="fa-solid fa-check" BtnDisabled="SeenAttachments" BtnOnClick="(e) => HandleModalClosed(false)"></ButtonComponent>
+                                </div>
+                            </div>
+                        </TabStripTab>
+                        <TabStripTab Title=@Translation["Documentos"] Visible="@IsDocumentAttachment">
+                            
+                            <div class="row mt-4">
+                                <div class="col">
+                                    <TelerikGrid Data="@AttachmentDocumentTrueList" PageSize="@AttachmentDocumentTrueList.Count()"
+                                                 Sortable="true"
+                                                 Reorderable="true"
+                                                 ScrollMode="@GridScrollMode.Scrollable"
+                                                 Height="460px"
+                                                 RowHeight="60"
+                                                 SelectionMode="GridSelectionMode.None">
+                                        <GridColumns>
+                                            <GridCommandColumn Width="110px" Title=@Translation["Delete"] HeaderClass="center-wrap" Visible="false">
+                                                @{
+                                                    <div class="d-flex justify-content-around">
+                                                        <GridCommandButton Title=@Translation["Delete"] Icon="@SvgIcon.Trash" OnClick="@((args)=> DeleteAttachments((AttachmentsDtoResponse)args.Item))"></GridCommandButton>
+                                                    </div>
+                                                }
+                                            </GridCommandColumn>
+                                            <GridCommandColumn Width="60px" Title=@Translation["View"] HeaderClass="center-wrap" Visible="true">
+                                                @{
+                                                    <div class="d-flex justify-content-around">
+                                                        <GridCommandButton Title=@Translation["View"] Icon="@SvgIcon.Search" OnClick="@((args)=> HandleViewAttachmentDocument((AttachmentDocumentDtoResponse)args.Item))"></GridCommandButton>
+                                                    </div>
+                                                }
+                                            </GridCommandColumn>
+                                            <GridCommandColumn Width="70px" Title=@Translation["Upload"] HeaderClass="center-wrap" Visible="false">
+                                                @{
+                                                    <div class="d-flex justify-content-around">
+                                                        <GridCommandButton Title=@Translation["Upload"] Icon="@SvgIcon.SortAsc"></GridCommandButton>
+                                                    </div>
+                                                }
+                                            </GridCommandColumn>
+                                            <GridCommandColumn Width="110px" Title=@Translation["Editor_AlignJustify"] HeaderClass="center-wrap" Visible="false">
+                                                @{
+                                                    <div class="d-flex justify-content-around">
+                                                        <GridCommandButton Title=@Translation["Editor_AlignJustify"] Icon="@SvgIcon.Pencil"></GridCommandButton>
+                                                    </div>
+                                                }
+                                            </GridCommandColumn>
+                                            <GridCommandColumn Width="115px" Title=@Translation["Restore"] HeaderClass="center-wrap" Visible="false">
+                                                @{
+                                                    <div class="d-flex justify-content-around">
+                                                        <GridCommandButton Title=@Translation["Restore"] Icon="@SvgIcon.Undo"></GridCommandButton>
+                                                    </div>
+                                                }
+                                            </GridCommandColumn>
+                                            <GridCommandColumn Width="70px" Title=@Translation["Sign"] HeaderClass="center-wrap" Visible="false">
+                                                @{
+                                                    <div class="d-flex justify-content-around">
+                                                        <GridCommandButton Title=@Translation["Sign"] Icon="@SvgIcon.Signature"></GridCommandButton>
+                                                    </div>
+                                                }
+                                            </GridCommandColumn>
+                                            <GridColumn>
+                                                <HeaderTemplate>
+                                                     <label> @Translation["Detail"] </label>
+                                                </HeaderTemplate>
+                                                <Template>
+                                                    @{
+                                                        var fileInfo = (AttachmentDocumentDtoResponse)context;
+                                                        <AttachmentCardComponent ArchiveName="@fileInfo?.ArchiveName"
+                                                                                 ArchiveExt="@fileInfo?.ArchiveExt"
+                                                                                 AttDescription="@fileInfo?.AttDescription"
+                                                                                 CreateUser="@fileInfo?.CreateUser"
+                                                                                 CreateDate="@fileInfo?.CreateDate.ToString()">
+                                                        </AttachmentCardComponent>
+                                                    }
+                                                </Template>
+                                            </GridColumn>
+                                        </GridColumns>
+                                    </TelerikGrid>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="d-flex flex-row justify-content-center mt-4">
+                                    <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Accept"] BtnIcon="fa-solid fa-check" BtnDisabled="SeenAttachments" BtnOnClick="(e) => HandleModalClosed(false)"></ButtonComponent>
+                                </div>
+                            </div>
+
+                        </TabStripTab>
+
+                        <!--AttachmentControlPanel-->
+                        <TabStripTab Title=@Translation["Documentos"] Visible="@isControlPanel">
+
+                            <div class="row mt-4">
+                                <div class="col">
+                                    <TelerikGrid Data="@AttachmentDocumentCPList" PageSize="@AttachmentDocumentCPList.Count()"
+                                                 Sortable="true"
+                                                 Reorderable="true"
+                                                 ScrollMode="@GridScrollMode.Scrollable"
+                                                 Height="460px"
+                                                 RowHeight="60"
+                                                 SelectionMode="GridSelectionMode.None">
+                                        <GridColumns>
+                                            <GridCommandColumn Width="60px" Title=@Translation["View"] HeaderClass="center-wrap" Visible="true">
+                                                @{
+                                                    <div class="d-flex justify-content-around">
+                                                        <GridCommandButton Title=@Translation["View"] Icon="@SvgIcon.Search" OnClick="@((args)=> HandleViewDocumentRecords((AttachmentsDtoResponse)args.Item))"></GridCommandButton>
+                                                    </div>
+                                                }
+                                            </GridCommandColumn>
+                                            <GridColumn>
+                                                <HeaderTemplate>
+                                                    <label> @Translation["Detail"] </label>
+                                                </HeaderTemplate>
+                                                <Template>
+                                                    @{
+                                                        var fileInfo = (AttachmentsDtoResponse)context;
+                                                        <AttachmentCardComponent ArchiveName="@fileInfo?.ArchiveName"
+                                                                                 ArchiveExt="@fileInfo?.ArchiveExt"
+                                                                                 AttDescription="@fileInfo?.AttDescription"
+                                                                                 CreateUser="@fileInfo?.CreateUser"
+                                                                                 CreateDate="@fileInfo?.CreateDate.ToString()">
+                                                        </AttachmentCardComponent>
+                                                    }
+                                                </Template>
+                                            </GridColumn>
+                                        </GridColumns>
+                                    </TelerikGrid>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="d-flex flex-row justify-content-center mt-4">
+                                    <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Accept"] BtnIcon="fa-solid fa-check" BtnDisabled="SeenAttachments" BtnOnClick="(e) => HandleModalClosed(false)"></ButtonComponent>
+                                </div>
+                            </div>
+
+                        </TabStripTab>
+                        <TabStripTab Title=@Translation["AttachmentsAnnexes"] Visible="@isControlPanel">
+
+                            <div class="d-flex justify-content-end">
+                                <div class="d-flex flex-column">
+                                    <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["AddAttachment"] BtnIcon="fa-solid fa-plus" BtnOnClick="ShowAttachmentModal"></ButtonComponent>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col">
+                                    <TelerikGrid Data="@AttachmentControlPanelList" PageSize="@AttachmentControlPanelList.Count()"
+                                                 Sortable="true"
+                                                 Reorderable="true"
+                                                 ScrollMode="@GridScrollMode.Scrollable"
+                                                 Height="460px"
+                                                 RowHeight="60"
+                                                 SelectionMode="GridSelectionMode.None">
+                                        <GridColumns>
+                                            <GridCommandColumn Width="90px" Title=@Translation["Delete"] HeaderClass="center-wrap" Visible="true">
+                                                @{
+                                                    <div class="d-flex justify-content-around">
+                                                        <GridCommandButton Title=@Translation["Delete"] Icon="@SvgIcon.Trash" OnClick="@((args)=> DeleteAttachmentsRecords((AttachmentRecordsDtoResponse)args.Item))"></GridCommandButton>
+                                                    </div>
+                                                }
+                                            </GridCommandColumn>
+                                            <GridCommandColumn Width="90px" Title=@Translation["View"] HeaderClass="center-wrap" Visible="true">
+                                                @{
+                                                    <div class="d-flex justify-content-around">
+                                                        <GridCommandButton Title=@Translation["View"] Icon="@SvgIcon.Search" OnClick="@((args)=> HandleViewAttachmentRecords((AttachmentRecordsDtoResponse)args.Item))"></GridCommandButton>
+                                                    </div>
+                                                }
+                                            </GridCommandColumn>
+                                            <GridColumn>
+                                                <HeaderTemplate>
+                                                    <label> @Translation["Detail"] </label>
+                                                </HeaderTemplate>
+                                                <Template>
+                                                    @{
+                                                        var fileInfo = (AttachmentRecordsDtoResponse)context;
+                                                        <AttachmentCardComponent ArchiveName="@fileInfo?.FileName"
+                                                                                 ArchiveExt="@fileInfo?.FileExt"
+                                                                                 AttDescription="@fileInfo?.AttDescription"
+                                                                                 CreateUser="@fileInfo?.CreateUser"
+                                                                                 CreateDate="@fileInfo?.CreateDate.ToString()">
+                                                        </AttachmentCardComponent>
+                                                    }
+                                                </Template>
+                                            </GridColumn>
+                                        </GridColumns>
+                                    </TelerikGrid>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="d-flex flex-row justify-content-center mt-4">
+                                    <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Accept"] BtnIcon="fa-solid fa-check" BtnDisabled="SeenAttachments" BtnOnClick="(e) => HandleModalClosed(false)"></ButtonComponent>
+                                </div>
+                            </div>
+                        </TabStripTab>
+
+                    </TelerikTabStrip>                   
+                </div>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>
+<ViewDocumentModal @ref="viewDocumentModal"></ViewDocumentModal>
+<AttachmentsModal @ref="attachmentsModal" OnStatusChanged="HandleAttachmentChanged"></AttachmentsModal>
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>

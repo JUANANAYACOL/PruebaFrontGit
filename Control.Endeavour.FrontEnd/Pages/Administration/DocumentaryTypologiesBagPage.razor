@@ -1,0 +1,108 @@
+﻿@page "/DocumentaryTypologiesBag"
+
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.DocumentaryTypologiesBag.Request
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.DocumentaryTypologiesBag.Response
+@layout MainLayout
+
+
+<DocumentaryTypologiesBagModal @ref="documentaryTypologiesBagModal" Title="@dtbModalTitle" OnStatusChanged="HandleStatusChanged"> </DocumentaryTypologiesBagModal>
+<DocumentaryTypologiesBagMetaDataModal TitleModal="@metaDataSelectedModalTitle" Title="@( $"{Translation["Bags"]} - {Translation["Edit"]}/{Translation["Create"]} - {Translation["Metadatas"]}")" @ref="documentaryTypologiesBagMetaDataModal" OnStatusChanged="HandleStatusMetaDataChanged"></DocumentaryTypologiesBagMetaDataModal>
+<div class="container-fluid mt-5">
+    <!-- Parte 1: Título y Contenido alineado a la izquierda -->
+    <div class="row titulo">
+        <div class="col-lg-10">
+            <h1>@(Translation["Bags"] + " - " + Translation["DocumentaryTypologiesBag"])</h1>
+
+        </div>
+        <!-- Parte 2: Botón azul alineado a la derecha -->
+        <div class="col-lg-2 text-end">
+            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers=" ml-10  btn-block" BtnType="button" BtnText=@Translation["Create"] BtnOnClick="ShowModal" BtnIcon="fa-solid fa-plus"></ButtonComponent>
+        </div>
+    </div>
+
+
+
+    <div class="row">
+
+        <div class="col-lg-6">
+            <InputModalComponent @ref="DTBInput" @bind-InputValue="DTBName" IsRequired=" false" InputMaxLength="100" FieldType="InputModalTypeEnum.NotEmpty" LabelText=@Translation["Name"] Placeholder="" />
+
+
+        </div>
+
+        <div class="col-lg-6">
+
+            <div class="from-group from-group--margin-top justify-content-end">
+
+                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="OnClickReset"></ButtonComponent>
+                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Search"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="GetDocumentaryTypology"></ButtonComponent>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Parte 3: Grilla -->
+    <div class="row mt-4">
+        <div class="col">
+            <TelerikGrid Data="documentaryTypologiesBagList" PageSize="10"
+                         Sortable="true"
+                         FilterMode="GridFilterMode.FilterMenu"
+                         Resizable="true"
+                         Reorderable="false"
+                         EditMode="GridEditMode.Popup"
+                         SelectionMode="GridSelectionMode.None">
+                <GridColumns>
+                    <GridCommandColumn Width="80px" Title=@Translation["Edit"] HeaderClass="center-wrap" Visible="true">
+
+
+                        <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                        <GridCommandButton Title=@Translation["Edit"] Icon="@SvgIcon.Pencil" OnClick="@((args)=> ShowModalEdit((DocumentaryTypologiesBagDtoResponse)args.Item))"></GridCommandButton>
+                        </div> 
+                    </GridCommandColumn>
+
+                    <GridCommandColumn Width="80px" Title=@Translation["Metadatas"] HeaderClass="center-wrap" Visible="true">
+
+
+                        <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                            <GridCommandButton Title=@Translation["Metadatas"] Icon="@SvgIcon.Print" OnClick="@((args)=> ShowModalMetaData((DocumentaryTypologiesBagDtoResponse)args.Item))"></GridCommandButton>
+                        </div>
+                    </GridCommandColumn>
+
+                     
+                    <GridColumn Field=@nameof(DocumentaryTypologiesBagDtoResponse.TypologyName) HeaderClass="center-wrap" TextAlign="ColumnTextAlign.Center" Title=@Translation["Name"] Width="100px" Filterable="false" />
+                    <GridColumn Field=@nameof(DocumentaryTypologiesBagDtoResponse.TypologyDescription)   HeaderClass="center-wrap" TextAlign="ColumnTextAlign.Center"  Title=@Translation["Description"] Width="100px" Filterable="false" />
+                    <GridColumn Field=@nameof(DocumentaryTypologiesBagDtoResponse.ActiveState)  HeaderClass="center-wrap" TextAlign="ColumnTextAlign.Center"   Title=@Translation["Status"] Width="100px" Filterable="false">
+                        <Template>
+                            @{
+                                DocumentaryTypologiesBagDtoResponse rowData = (DocumentaryTypologiesBagDtoResponse)context;
+                                if (rowData != null)
+                                {
+                                    bool activeState = rowData.ActiveState;
+                                    string active = activeState ? Translation["Enabled"] : Translation["Disabled"];
+                                    @active
+                                }
+                            }
+                        </Template>
+
+                    </GridColumn>
+                    <GridColumn Field=@nameof(DocumentaryTypologiesBagDtoResponse.CreateUser) TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap" Title=@Translation["UserRecorded"] Width="100px" Filterable="false" />
+                    <GridColumn Field=@nameof(DocumentaryTypologiesBagDtoResponse.CreateDate) TextAlign="ColumnTextAlign.Center"   HeaderClass="center-wrap"Title=@Translation["DateRecorded"] Width="100px" Filterable="false" />
+                    <GridColumn Field=@nameof(DocumentaryTypologiesBagDtoResponse.UpdateUser)  TextAlign="ColumnTextAlign.Center"  HeaderClass="center-wrap"  Title=@Translation["UserUpdated"] Width="100px" Filterable="false" />
+                    <GridColumn Field=@nameof(DocumentaryTypologiesBagDtoResponse.UpdateDate) TextAlign="ColumnTextAlign.Center"   HeaderClass="center-wrap"Title=@Translation["DateUpdated"] Width="100px" Filterable="false" />
+                </GridColumns>
+                <NoDataTemplate>
+                    <img src="../img/noDataFound.png" width="8%" height="8%" />
+                    <p> @Translation["NoGridInfo"]</p>
+                </NoDataTemplate>
+            </TelerikGrid>
+        </div>
+    </div>
+    @if (dataChargue)
+    {
+        <!-- Parte 4: Botones en la izquierda, centro y derecha -->
+
+        <NewPaginationComponent @ref="paginationComponent" Filter="@documentaryTypologiesBagFitlerDtoRequest" T="DocumentaryTypologiesBagDtoResponse" M="DocumentaryTypologiesBagFitlerDtoRequest" Uri="@UriFilterDocumentarytypologies" PaginationInfo="@paginationInfo" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+
+    }
+</div>

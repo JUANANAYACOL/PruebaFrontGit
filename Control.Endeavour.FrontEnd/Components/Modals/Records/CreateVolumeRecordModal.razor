@@ -1,0 +1,73 @@
+﻿@using Control.Endeavour.FrontEnd.Models.Models.Records.Response
+
+<div class="my-modal">
+    <TelerikRootComponent>
+
+        <GenericModalComponent Title=@(Translation["Files"] + " - " + Translation["Volumes"]) IsVisible="@modalStatus" OnModalClosed="HandleModalClosedAsync" Width="60%">
+            <ChildContent>
+                <div class="mx-4 my-2">
+                    <div class="row p-2">
+                            <div class="row">
+                                <div class="col-12 col-md">
+                                    <h3 class="mb-0 titulo-azul">@Translation["CreateVolumeFile"]:</h3>
+                                </div>
+                                <div class="col-12 col-md">
+                                    <h3 class="mb-0 titulo-azul">@recordNumber</h3>
+                                </div>
+                            </div>
+                    </div>
+                    <div class="row p-2 ">
+                        <div class="col-lg-11 mb-3 mt-1 @uploadPDF">
+                            <label class="noti-2">@formatMessage:</label>
+                        </div>
+                        <div class="col-lg-11 @uploadPDF">
+                            <DragAndDropTemplateComponent AllowedExtensions="@AllowedExtensions" MaxFileCount="1" MaxFileSizeMB="@FileSize" OnFileListChanged="HandleFile"></DragAndDropTemplateComponent>
+                            <span class="red-noti mt-5">@AlertMessage</span>
+                        </div>
+                        <div class="col-lg-11 mt-2 @ViewPDF">
+
+                            <TelerikPdfViewer @ref="@PdfViewerRef"
+                                              Width="100%"
+                                              Height="50vh"
+                                              Data="@FileData">
+                                <PdfViewerToolBar>
+                                    <PdfViewerToolBarSelectionTool />
+                                    <PdfViewerToolBarSeparator />
+                                    <PdfViewerToolBarSearchTool />
+                                    <PdfViewerToolBarSeparator />
+                                    <PdfViewerToolBarPrintTool />
+                                    <PdfViewerToolBarDownloadTool />
+                                    <PdfViewerToolBarSeparator />
+                                    <PdfViewerToolBarSpacer />
+                                    <PdfViewerToolBarPagerTool />
+                                    <PdfViewerToolBarSpacer />
+                                    <PdfViewerToolBarSeparator />
+                                    <PdfViewerToolBarZoomTool />
+                                </PdfViewerToolBar>
+                            </TelerikPdfViewer>
+
+                            <label class="noti-2 mt-3 @uploadPDF">@Translation["DisplayedPdfCorrectMessage"]:</label>
+                        </div>
+
+                        
+
+                    </div>
+
+                    <div class="row">
+                        <div class="from-group from-group--margin-top justify-content-center">
+                            <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="ResetForm"></ButtonComponent>
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Save"] BtnIcon="fa-solid fa-floppy-disk" BtnOnClick="HandleCreateNewVolume" BtnDisabled="@BtnDisablebStatus"></ButtonComponent>
+                        </div>
+                    </div>
+                </div>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+
+
+
+
+
+

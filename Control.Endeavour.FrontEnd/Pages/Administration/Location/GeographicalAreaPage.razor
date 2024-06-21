@@ -1,0 +1,116 @@
+﻿@page "/GeographicalArea"
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.City.Response
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.City.Request
+@layout MainLayout
+
+<div class="container-fluid mt-5">
+    <!-- Parte 1: Título y Contenido alineado a la izquierda -->
+    <div class="row">
+        <div class="col-8">
+            <h1>@(Translation["Administration"] + " - " + Translation["GeographicalArea"])</h1>
+        </div>
+    </div>
+</div>
+
+<!-- Parte 3: DropdownList Telerik -->
+<div class="row">
+    <div class="row mt-2">
+        <div class="col-4 mb-1">
+            <label for="input2" class="selectorBlock--labelDropDown mb-2">@Translation["Countries"]<span class="red">*</span></label>
+            <TelerikDropDownList Data="@CountriesList"
+                                 Value="@country"
+                                 TextField="Name"
+                                 ValueField="CountryId"
+                                 DefaultText=@Translation["SelectAnOption"]
+                                 ValueChanged="@((int Value) => GetState(Value))"
+                                 Filterable="true"
+                                 FilterOperator="StringFilterOperator.Contains">
+            </TelerikDropDownList>
+        </div>
+        <div class="col-4 mb-1">
+            <label for="input2" class="selectorBlock--labelDropDown mb-2">@Translation["States"]</label>
+            <TelerikDropDownList Data="@StatesList"
+                                 Value="@state"
+                                 TextField="Name"
+                                 ValueField="StateId"
+                                 DefaultText=@Translation["SelectAnOption"]
+                                 ValueChanged="@((int Value) => GetCity(Value))"
+                                 Enabled="@EnabledState"
+                                 Filterable="true"
+                                 FilterOperator="StringFilterOperator.Contains">
+            </TelerikDropDownList>
+        </div>
+        <div class="col-md-4">
+            <div class="row">
+                <!-- Parte Derecha: Dos Botones -->
+                <div class="from-group from-group--margin-top justify-content-center">
+                    <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="ResetFilters"></ButtonComponent>
+                    <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Search"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="GetLocation"></ButtonComponent>
+                </div>
+            </div>
+        </div>
+        <div class="col-4 mt-1">
+            <label for="input2" class="selectorBlock--labelDropDown mb-2">@Translation["Cities"]</label>
+            <TelerikDropDownList Data="@CitiesList"
+                                 Value="@city"
+                                 TextField="Name"
+                                 ValueField="CityId"
+                                 DefaultText=@Translation["SelectAnOption"]
+                                 ValueChanged="@((int Value) => city = Value)"
+                                 Enabled="@EnabledCities"
+                                 Filterable="true"
+                                 FilterOperator="StringFilterOperator.Contains">
+            </TelerikDropDownList>
+        </div>
+        <div class="col-4 mt-1">
+            <InputModalComponent @ref="NameLocation" @bind-InputValue="Location" IsDisabled="false" InputMaxLength="50" LabelText=@Translation["Name"] Placeholder=@Translation["PlaceName"] />
+        </div>
+    </div>
+    <!-- Parte 3: Grilla -->
+    <div class="row mt-4">
+        <div class="col">
+
+            <TelerikGrid Data="LocationList" PageSize="10"
+                         Resizable="true"
+                         SelectionMode="GridSelectionMode.None">
+@*                 <GridToolBarTemplate>
+                    @if (LocationList.Any())
+                    {
+                        <GridCommandButton Command="ExcelExport" Icon="@SvgIcon.FileExcel">@Translation["ExportToExcel"]</GridCommandButton>
+                        <label class="k-checkbox-label"><TelerikCheckBox @bind-Value="@ExportAllPages" /> @Translation["ExportAllPages"]</label>
+                    }
+                </GridToolBarTemplate>
+                <GridExport>
+                    <GridExcelExport FileName="telerik-grid-export" AllPages="@ExportAllPages" OnBeforeExport="@OnBeforeExcelExport" />
+                </GridExport> *@
+                <GridColumns>
+                    <GridColumn Field="Country"
+                                Title=@Translation["Countries"]
+                                Width="150px"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="State"
+                                Title=@Translation["States"]
+                                Width="150px"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="City"
+                                Title=@Translation["Cities"]
+                                Width="150px"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                </GridColumns>
+                <NoDataTemplate>
+                    <img src="../img/noDataFound.png" width="8%" height="8%" />
+                    <p> @Translation["NoGridInfo"]</p>
+                </NoDataTemplate>
+            </TelerikGrid>
+            <NewPaginationComponent @ref="paginationComponetPost" T="LocationDtoResponse" M="LocationDtoRequest" Uri="@UriFilterCities" Filter="@locationFilter" PaginationInfo="@paginationInfo" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+        </div>
+    </div>
+    <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+    <NotificationsComponentModal @ref="notificationModalSucces"></NotificationsComponentModal>
+</div>
+
+
+

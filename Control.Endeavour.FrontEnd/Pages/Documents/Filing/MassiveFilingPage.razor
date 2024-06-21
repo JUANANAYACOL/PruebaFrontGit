@@ -1,0 +1,172 @@
+﻿@page "/MassiveFiling"
+@layout MainLayout
+<!--MassiveFiling-->
+@using Control.Endeavour.FrontEnd.Models.Models.Documents.Filing.Request;
+@using Control.Endeavour.FrontEnd.Models.Models.Documents.Filing.Response;
+
+<NotificationsComponentModal @ref="notificationModal"></NotificationsComponentModal>
+
+<div class="container-fluid mt-1">
+
+    <!-- Parte 1: Título y Contenido alineado a la izquierda -->
+    <div class="row titulo">
+        <div class="col-8">
+            <h3>@Translation["Submission"] - @Translation["BatchFiling"]</h3>
+        </div>
+    </div>
+
+    <div class="row d-flex justify-content-center mt-2">
+
+        <!--Parte 1: Escoger Plantilla para radicación masivo-->
+        <div id="panel-1" class="row pb-30 @panel_1">
+
+            <div class="col-md-1 d-flex justify-content-center align-items-center">
+                <div class="numero"><h2>1</h2></div>
+            </div>
+
+            <!--Descargar Plantilla-->
+            <div class="row col-md-11">
+
+                <div class="col-md-12 mb-2">
+                    <h5 class="mb-0">@Translation["DownloadTemplate"]</h5>
+                    <label class="noti-2">@formatMessage</label>
+                </div>
+
+                <div class="col-md-5">
+                    <label style="margin-bottom:6px;">@Translation["ComunicationClass"]: </label>
+                    <TelerikDropDownList Data="@SystemFieldsCLList"
+                                         Value="@SystemParamCL"
+                                         ValueField="Code"
+                                         TextField="Value"
+                                         Filterable="true"
+                                         DefaultText="@DefaulTextCL"
+                                         ReadOnly="@readOnlyComu"
+                                         ValueChanged="@( (string newValue) => HandleDropdownListChange(newValue) )">
+                    </TelerikDropDownList>
+                </div>
+
+                <div class="col-md-7 d-flex justify-content-start align-items-end">
+                    <div>
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["DownloadTemplate"] BtnIcon="fa-solid fa-download" BtnOnClick="DownloadTemplate" BtnDisabled="@DisableButtons"></ButtonComponent>
+                        <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnClassModifiers="@BtnVisible" BtnType="button" BtnText=@Translation["ChangeCommunicationClass"] BtnIcon="fa-solid fa-arrows-rotate" BtnOnClick="ChangeClass"></ButtonComponent>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="row titulo p-0"></div>
+        
+        <!--Parte 2: Subir Radicados-->
+        <div class="row pb-30 @panel_2">
+
+            <div class="col-lg-1 d-flex justify-content-center align-items-center">
+                <div class="numero"><h2>2</h2></div>
+            </div>
+
+            <!--Subir Plantilla-->
+            <div class="row col-md-11">
+
+                <div class="row">
+                    <h5 class="mb-0">Subir Radicados</h5>
+                    <label class="noti-2">@Translation["AttachExcelMessage"]:</label>
+                    <div class="col-md-12 mt-2">
+                        <DragAndDropTemplateComponent AllowedExtensions="@AllowedExtensions" MaxFileSizeMB="@FileSize" MaxFileCount="1" OnFileListChanged="HandleFileFDP12"></DragAndDropTemplateComponent>
+                        <span class="red-noti mt-2">@AlertMessage</span>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!--Parte 2: Radicar-->
+        <div class="row pb-40 @panel_3">
+
+            <div class="col-lg-1 d-flex justify-content-center align-items-center">
+                <div class="numero"><h2>3</h2></div>
+            </div>
+
+            <div class="row col-lg-11">
+
+                <div class="col-lg-4">
+                    <h5 class="mb-0">@Translation["GenerateFiling"]</h5>
+                    <div class="col-lg-12 mt-2">
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Radicate"] BtnIcon="fa-solid fa-paper-plane" BtnOnClick="HandleFormMassiveFiling"></ButtonComponent>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!--Parte 3: Mostrar radicados-->
+        <div class="row pb-40 @panel_4">
+
+            <div class="col-lg-1 d-flex justify-content-center align-items-center">
+                <div class="numero"><h2>4</h2></div>
+            </div>
+
+            <div class="row col-lg-11">
+
+                <div class="row mb-4">
+                    <h5 class="mb-0">Radicados generados</h5>
+                    <label class="noti-2">@Translation["ExpouseFilingMessage"]:</label>
+                </div>
+
+                <div class="row">
+                    <TelerikGrid Data="@ListFiling" PageSize="3">
+                        <GridColumns>
+
+                            <GridColumn Field="ControlId"
+                                        Title=@Translation["DocumentID"]
+                                        Width="150px"
+                                        Filterable="true"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                            <GridColumn Field="FilingCode"
+                                        Title=@Translation["Filed"]
+                                        Width="150px"
+                                        Filterable="true"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                            <GridColumn Field="@DateTime.Now.Year.ToString()"
+                                        Title="Año"
+                                        Width="150px"
+                                        Filterable="true"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                        </GridColumns>
+                    </TelerikGrid>
+
+                    <!-- Parte 4: Botones en la izquierda, centro y derecha -->
+                    <PaginationComponent @ref="PaginationComponet" T="FilingDtoResponse" M="FilingFilterDtoRequest" Filter="@FilingFilterDtoRequest" ObjectMeta="@Meta" OnPaginationRefresh="HandlePaginationGrid"></PaginationComponent>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Parte 4: Limpiar Vista-->
+        <div id="panel-9" class="row pb-40 @panel_4">
+
+            <div class="col-lg-1 d-flex justify-content-center align-items-center">
+                <div class="numero"><h2>5</h2></div>
+            </div>
+
+            <div class="row col-lg-11">
+
+                <div class="col-lg-12">
+                    <h5 class="mb-0">@Translation["NewBatchFiling"]</h5>
+                    <label class="noti-2">@Translation["CleanFilingRegistry"]</label>
+                    <div class="col-lg-12 mt-2">
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["New"] BtnIcon="fa-solid fa-file-circle-plus" BtnOnClick="(ChangeClass)"></ButtonComponent>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

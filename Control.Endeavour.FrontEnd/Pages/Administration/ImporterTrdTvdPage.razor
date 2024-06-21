@@ -1,0 +1,108 @@
+﻿@page "/ImporterTrdTvd"
+@layout MainLayout;
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.ImporterTrdTvd.Request;
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.ImporterTrdTvd.Response;
+
+<ImporterTrdTvdModal @ref="modalImporterTrdTvd" OnStatusChanged="HandleStatusChangedAsync" OnChangeData="HandleRefreshGridData" OnInfoChange="OpenNewModal"></ImporterTrdTvdModal>
+<ImportResultModal @ref="modalImportResult" OnStatusChanged="HandleStatusChangedAsync" CloseModals="HandleModalClosedAsync"></ImportResultModal>
+
+<div class="container-fluid mt-5">
+
+    <!-- Parte 1: Título y Contenido alineado a la izquierda -->
+    <div class="row titulo">
+        <div class="col-lg-8">
+            <h1>@Translation["DRT/DVTImporter"]</h1>
+        </div>
+        <!-- Parte 2: Botón azul alineado a la derecha -->
+        <div class="col-lg-4 text-end">
+            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10  btn-block" BtnType="button" BtnText=@Translation["DownloadTemplate"] BtnIcon="fa fa-download" BtnOnClick="DownloadTemplate"></ButtonComponent>
+            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="mt-1 ml-10  btn-block" BtnType="button" BtnText=@Translation["Upload"] BtnIcon="fas fa-upload" BtnOnClick="ShowModal"></ButtonComponent>
+        </div>
+    </div>
+
+    <!-- Parte 3: Grilla -->
+    <div class="row mt-4">
+        <div class="col">
+            <TelerikGrid Data="importerHistoryList" PageSize="10"
+                         Sortable="true"
+                         FilterMode="GridFilterMode.FilterMenu"
+                         Resizable="true"
+                         Reorderable="true"
+                         EditMode="GridEditMode.Popup"
+                         SelectionMode="GridSelectionMode.None">
+                <GridToolBarTemplate>
+                    <GridCommandButton Command="ExcelExport" Icon="@SvgIcon.FileExcel" Enabled="importerHistoryList.Count>0">@Translation["ExportToExcel"]</GridCommandButton>
+                    <label class="k-checkbox-label"><TelerikCheckBox @bind-Value="@ExportAllPages" Enabled="importerHistoryList.Count>0" /> @Translation["ExportAllPages"]</label>
+                </GridToolBarTemplate>
+                <GridExport>
+                    <GridExcelExport FileName="telerik-grid-export" AllPages="@ExportAllPages" OnBeforeExport="@OnBeforeExcelExport" />
+                </GridExport>
+                <GridColumns>
+                    <GridCommandColumn Width="80px" Title=@Translation["File"] HeaderClass="center-wrap" Visible="true">
+                        <GridCommandButton Title=@Translation["Download"] Icon="@SvgIcon.Download" OnClick="((args)=>DownloadFile((ImporterHistoryDtoResponse) args.Item))"></GridCommandButton>
+                    </GridCommandColumn>
+                    <GridColumn Field=@nameof(ImporterHistoryDtoResponse.DocumentalVersionName) Title=@Translation["DocumentaryVersion"] Width="180px" TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap" Filterable="false" />
+                    <GridColumn Field=@nameof(ImporterHistoryDtoResponse.RecordsImported) Width="300px" TextAlign="ColumnTextAlign.Left" HeaderClass="left-wrap">
+                        <HeaderTemplate>
+                            <label> @Translation["RecordsCreated"]</label>
+                        </HeaderTemplate>
+                        <Template>
+                            @{
+                                var docTypologySelected = (ImporterHistoryDtoResponse)context;
+
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="row">
+                                            <label> <b>@Translation["CreatedUnits"]:</b> @docTypologySelected?.AdministrativeUnitsCount</label>
+                                        </div>
+                                        <div class="row">
+                                            <label><b>@Translation["CreatedOffices"]:</b> @docTypologySelected?.ProductionOfficesCount</label>
+                                        </div>
+                                        <div class="row">
+                                            <label><b>@Translation["CreatedSeries"]:</b> @docTypologySelected?.SeriesCount</label>
+                                        </div>
+                                        <div class="row">
+                                            <label><b>@Translation["CreatedSubSeries"]:</b> @docTypologySelected?.SubSeriesCount</label>
+                                        </div>
+                                        <div class="row">
+                                            <label><b>@Translation["CreatedWithholdings"]:</b> @docTypologySelected?.RetentionsCount</label>
+                                        </div>
+                                        <div class="row">
+                                            <label><b>@Translation["CreatedTypologies"]:</b> @docTypologySelected?.DocumentaryTypologiesBagCount</label>
+                                        </div>
+                                        <div class="row">
+                                            <label><b>@Translation["CreatedDRT"]:</b> @docTypologySelected?.TRDCount</label>
+                                        </div>
+                                        <div class="row">
+                                            <label><b>@Translation["CreatedDRTB"]:</b> @docTypologySelected?.TRDCCount</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field=@nameof(ImporterHistoryDtoResponse.DescriptionHistory) Title=@Translation["Description"] Width="150px" Filterable="false" />
+                    <GridColumn Field=@nameof(ImporterHistoryDtoResponse.CreateUser) Title=@Translation["UserRecorded"] Width="180px" TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap" Filterable="false" />
+                    <GridColumn Field=@nameof(ImporterHistoryDtoResponse.CreateDate) Title=@Translation["DateRecorded"] Width="170px" TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap" Filterable="false" />
+
+                </GridColumns>
+                <NoDataTemplate>
+                    <img src="../img/noDataFound.png" width="8%" height="8%" />
+                    <p> @Translation["NoGridInfo"]</p>
+                </NoDataTemplate>
+            </TelerikGrid>
+
+        </div>
+    </div>
+
+    <!-- Parte 4: Botones en la izquierda, centro y derecha -->
+    @if (dataChargue)
+    {
+        <NewPaginationComponent @ref="PaginationComponet" T="ImporterHistoryDtoResponse" M="ImporterHistoryDtoRequest" Uri="@UriFilterImporterHistory" Filter="@FilterDtoRequest" PaginationInfo="@paginationInfo" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+    }
+</div>
+
+<NotificationsComponentModal @ref="notificationModal"></NotificationsComponentModal>
+
+
+

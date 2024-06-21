@@ -1,0 +1,23 @@
+﻿ <div class="my-modal">
+    <TelerikRootComponent>
+        <GenericModalComponent Title=@(Translation["DocumentSearch"]) IsVisible="modalStatus" OnModalClosed="HandleModalClosed" Width="50%">
+            <ChildContent>
+                <div class="p-5">
+                    <div class="col-lg-12 mt-1" @onkeypress="HandleKeyPressAsync">
+                        <InputModalComponent @bind-InputValue="ControlId" IsDisabled="false" Placeholder="@Translation["ControlID"]" MethodValueChanged="@((string Value) => UpdateControlId(Value))" />
+                    </div>
+                    <div class="col-lg-12 mt-2 text-center">
+                        <label class="titulo-azul">
+                            @Translation["EnterTheDocumentMessage"]
+                        </label>
+                    </div>
+                </div>
+                
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>
+<GeneralInformationModal @ref="generalInformation" OnModalClosed="CloseSearchModal"></GeneralInformationModal>
+
+
+<NotificationsComponentModal @ref="notificationModal"></NotificationsComponentModal> 

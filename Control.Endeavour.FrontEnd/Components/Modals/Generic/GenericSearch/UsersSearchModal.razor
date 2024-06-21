@@ -1,0 +1,140 @@
+﻿@using Control.Endeavour.FrontEnd.Models.Models.Administration.VUser.Request
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.VUser.Response
+
+<NotificationsComponentModal @ref="NotificationModal"></NotificationsComponentModal>
+<div class="my-modal">
+    <div class="row mt-1 p-3">
+        <div class="col-lg-4 mt-1">
+            <InputModalComponent InputMaxLength="80" @bind-InputValue="@UserFilterDtoRequest.FirstName" IsRequired="false" LabelText="@(Translation["SearchByName"]+":")" Placeholder=@Translation["Name"] />
+        </div>
+        <div class="col-lg-4 mt-1">
+            <InputModalComponent InputMaxLength="80" @bind-InputValue="@UserFilterDtoRequest.LastName" IsRequired="false" LabelText="@(Translation["SearchByLastName"]+":")" Placeholder="@Translation["LastName"]" />
+        </div>
+        <div class="col-lg-4 mt-1">
+            <label class="mb-2">@Translation["Position"]:</label>
+            <TelerikDropDownList Data="@lstCharguesTypes"
+                                 ValueField="Code"
+                                 @bind-Value="@UserFilterDtoRequest.ChargeCode"
+                                 TextField="Value"
+                                 Filterable="true"
+                                 DefaultText="@Translation["Position"]"></TelerikDropDownList>
+        </div>
+        <div class="col-lg-4 mt-1">
+            <label class="mb-2">@Translation["AdministrativeUnit"]:</label>
+            <TelerikDropDownList Data="@administrativeUnitList"
+                                 ValueField="AdministrativeUnitId"
+                                 Value="@UserFilterDtoRequest.AdministrativeUnitId"
+                                 ValueChanged="@((int newValue) => GetProducOffice(newValue))"
+                                 TextField="Name"
+                                 Filterable="true"
+                                 DefaultText="@Translation["AdministrativeUnit"]"></TelerikDropDownList>
+        </div>
+
+        <div class="col-lg-4 mt-1">
+            <label class="mb-2">@Translation["ProductionOffice"]:</label>
+            <TelerikDropDownList Data="@productionOfficeList"
+                                 ValueField="ProductionOfficeId"
+                                 @bind-Value="@UserFilterDtoRequest.ProductionOfficeId"
+                                 TextField="Name"
+                                 Filterable="true"
+                                 Enabled="isEnableProductionOffice"
+                                 DefaultText="@Translation["ProductionOffice"]"></TelerikDropDownList>
+        </div>
+        <div class="col-lg-4 d-flex align-items-end justify-content-end mt-3">
+            <div class="text-md-end">
+                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText="@Translation["Clear"]" BtnIcon="fa-solid fa-eraser" BtnOnClick="CleanFilter"></ButtonComponent>
+                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText="@Translation["Search"]" BtnOnClick="SearchByFilter" BtnIcon="fa-solid fa-magnifying-glass"></ButtonComponent>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row mt-1 p-3">
+        <TelerikGrid Data="@UserListData" Sortable="true">
+            <GridColumns>
+                <GridColumn Width="80px" TextAlign="ColumnTextAlign.Center">
+                    <HeaderTemplate>
+                        <label title="@Translation["Grid_Select"]"> @Translation["SelectAbv"]</label>
+                    </HeaderTemplate>
+                    <Template>
+                        @{
+                            var user = (VUserDtoResponse)context;
+                            <TelerikCheckBox Value="@user.Selected"
+                                             ValueChanged="@( (bool value) => OnCheckBoxChangedAsync(value, user,"SelectedRecord") )" />
+                        }
+                    </Template>
+                </GridColumn>
+                <GridColumn Width="80px" Visible="@AllowCopiesSelection" Title="@Translation["Copies"]" TextAlign="ColumnTextAlign.Center">
+                    <HeaderTemplate>
+                        <label> @Translation["Copies"]</label>
+                    </HeaderTemplate>
+                    <Template>
+                        @{
+                            var user = (VUserDtoResponse)context;
+                            <TelerikCheckBox Value="@user.Copy"
+                                             ValueChanged="@( (bool value) => OnCheckBoxChangedAsync(value, user, "SelectedCopies") )" />
+                        }
+                    </Template>
+                </GridColumn>
+
+
+                <GridColumn TextAlign="ColumnTextAlign.Left">
+                    <HeaderTemplate>
+                        <label>@Translation["Users"]</label>
+                    </HeaderTemplate>
+
+                    <Template>
+                        @{
+                            var user = (VUserDtoResponse)context;
+
+
+                            <div class="row">
+
+                                <div class="col-md-2 d-flex justify-content-center align-items-center p-4">
+                                    <div class="ratio ratio-1x1 rounded-circle overflow-hidden img-cover">
+                                        @if (user.UserProfile != null)
+                                        {
+                                            <img src="data:@user.UserProfile.FileExt;base64,@Convert.ToBase64String(user.UserProfile.DataFile)" class="img-fluid" alt="ProfilePicture">
+                                        }
+                                        else
+                                        {
+                                            <img src="../img/userCardImage.svg" class="img-fluid" alt="Default Image">
+                                        }
+                                    </div>
+                                </div>
+                                <div class="col-md-10">
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <label><b>@Translation["Name"]:</b> @user?.FullName</label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <label><b>@Translation["AdministrativeUnit"]:</b> @user?.AdministrativeUnitName</label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <label><b>@Translation["ProductionOffice"]:</b> @user?.ProductionOfficeName</label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <label><b>@Translation["Position"]:</b> @user?.Charge</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </Template>
+                </GridColumn>
+            </GridColumns>
+
+            <NoDataTemplate>
+                <img src="../img/noDataFound.png" width="8%" height="8%" />
+                <p> @Translation["NoGridInfo"]</p>
+            </NoDataTemplate>
+        </TelerikGrid>
+        <NewPaginationComponent @ref="paginationComponetPost" Filter="UserFilterDtoRequest" T="VUserDtoResponse" M="VUserDtoRequest" PaginationInfo="@paginationInfo" Uri="@UriFilterVUser" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+    </div>
+</div>

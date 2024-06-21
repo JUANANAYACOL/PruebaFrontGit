@@ -1,0 +1,53 @@
+﻿.contenedor-modal {
+    position: relative;
+    width : auto;
+    background-color: white;
+    border-radius: 10px;
+    padding: 10px 10px 30px 10px !important;
+    z-index:1000;
+}
+
+.imagen-inferior-derecha {
+    position: absolute; 
+    bottom: 0; 
+    right: 0; 
+    width: 110px;
+    height: auto;
+    background-size: cover;
+    padding: 0px;
+    z-index: 0;
+}
+
+body.dark .contenedor-modal {
+    background-color: #2d2d2d;
+}
+
+
+
+.svg-button {
+    border: none;
+    padding: 0;
+    margin: 0;
+    background: none;
+}
+
+
+.t-window-action-close::before {
+    content: url('../icons/Close.png') !important; 
+}
+
+
+.col-10 strong {
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+.expanded-modal{
+
+    height : 92vh;
+}
+
+.position-container-fluid {
+    position: relative;
+    z-index: 1000;
+}

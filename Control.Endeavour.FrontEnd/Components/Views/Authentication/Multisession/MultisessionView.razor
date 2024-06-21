@@ -1,0 +1,38 @@
+﻿<PageTitle>Multisession</PageTitle>
+
+<EditForm Model="@multisessionDtoRequest" OnValidSubmit="@HandleValidSubmit">
+    <NotificationsComponentModal @ref="NotificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 form-group mb-4 text-center">
+                <LabelComponent KeyName=@Translation["MultisessionText"] For="name-field" FontSize="24px" IsBold="true" IsCentered="true" />
+            </div>
+            <div class="col-12 form-group mb-4">
+                <LabelComponent KeyName=@Translation["EnterEmail"] For="name-field" AdditionalClasses="mb-2" />
+                <InputComponent @ref="emailInput" InputType=InputTypeEnum.Email Placeholder=@Translation["Email"] ErrorMessage=@Translation["EmailRequired"] ShowErrors="@formSubEmail" OnChange="ValidateEmail" />
+            </div>
+        </div>
+        <div class="row button-container mb-4">
+           @*  <div class="col-12 text-center mt-2">
+                <CaptchaComponent @ref="captcha" OnCaptchaEntered="OnCaptchaEntered" />
+            </div> *@
+            <div class="col-12 text-center captcha-styles  mt-2">
+                @*  <CaptchaComponent @ref="Captcha" OnCaptchaEntered="OnCaptchaEntered" /> *@
+                <div class="mt-3 ">
+                    <ReCaptchaGoogleComponent @ref="reCaptchaGoogle" SiteKey="@siteKey" OnSuccess="OnSuccess" OnExpired="OnExpired" /> 
+                </div>
+            </div>
+        </div>
+        <div class="row button-container">
+            <div class="col-12 text-center mt-2">
+                <button class="btnStyle btnStyle--ligthInLine btnStyle--h50 w-50" type="submit" disabled="@formSubmitted">@Translation["Send"]</button>
+            </div>
+        </div>
+        <div class="col-12 text-center mt-5 mb-5">
+            <a href="/" class="btn rounded-pill text-white border border-white position-relative" style="background-color: transparent;" onclick="@(() => ReturnLoginAsync())">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+        </div>
+    </div>
+</EditForm>

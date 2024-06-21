@@ -1,0 +1,471 @@
+﻿@page "/FilingSent"
+
+@layout MainLayout
+<!--Filing/{FilingClass}-->
+
+<GenericDocTypologySearchModal @ref="DocTypologySearchModal" title="@titleView" OnStatusChanged="HandleTRDSelectedChanged"></GenericDocTypologySearchModal>
+<AttachmentsModal @ref="ModalAttachments" Type="Filing" OnStatusChanged="HandleAttachments"></AttachmentsModal>
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+<MetaDataRelationModal @ref="metaDataRelationModal" OnMetaDataSelected="HandleMetaDataSelected" OnMetaDataUpdated="HandleMetaDataUpdated"></MetaDataRelationModal>
+<MetaDataValueModal @ref="metaDataValueModal" OnModalClose="MetaDataValueClose" OnStatusChanged="HandleMetaDataRelationSelected" ConfigurationToUse="HandleSerachModalToUse"></MetaDataValueModal>
+<LabelModal @ref="LabelModal" OnModalClosed="HandleModalClosed"></LabelModal>
+<UploadPDFModal @ref="UploadPDFModal" OnChangeData="HandleUploadPDFModal" NewFilig="@NewFilig"></UploadPDFModal>
+<DocumentRelationModal @ref="docRelationModal" IsGestionDocumentRelated="true" OnValiteDocument="HandleValidateDocumentAsync" OnDocumentAssociated="HandleDocumentAssociated"></DocumentRelationModal>
+<ValidateDocumentGeneralInfoModal @ref="validateDocumentInfo"></ValidateDocumentGeneralInfoModal>
+<GenericUserSearchModal @ref="genericUserSearch" Title="@titleView" IsVisible="UserModalStatus"
+                        OnSelectedUserData="HandleSelectedUserData"
+                        TypeOfSearch="3"
+                        OnModalClosed="HandleModalUserClosed" Width="90%"
+                        AllowMultipleSelection="@true">
+</GenericUserSearchModal>
+
+<div class="container-fluid mt-1">
+    <!-- Parte 1: Título y Contenido alineado a la izquierda -->
+    <div class="row titulo">
+        <div class="col-8">
+            <h3>@titleView</h3>
+        </div>
+        <!-- Parte 2: Botón azul alineado a la derecha -->
+        <div class="col-4 text-end">
+            @* <button class="btn btn-primary btn-lg btn-block" @onclick="mostrarModal">Crear</button> *@
+        </div>
+    </div>
+
+    <!-- Parte 3: GR = Gestión de Radicación-->
+    <div class="row mt-2 d-flex justify-content-center">
+
+        <!-- Parte 4: GR - Paso 1-->
+        <div id="panel-1" class="row pb-30 justify-content-center @panel_1">
+            <!--@panel_1-->
+
+            <div class="col-lg-1 d-flex justify-content-center align-items-center">
+                <div class="numero"><h2>1</h2></div>
+            </div>
+
+            <div class="row col-lg-11">
+
+                <div class="col-lg-8">
+                    <label class="mb-2">@Translation["CommunicationReceptionWay"]: <span class="red">*</span></label>
+
+                    <TelerikDropDownList Data="@lstReceptionCode"
+                                         Value="@ReceptionCode"
+                                         Id="GR_ReceptionCode"
+                                         DefaultText=@Translation["SelectAnOption"]
+                                         TextField="Value"
+                                         ValueField="Code"
+                                         Filterable="true"
+                                         ValueChanged="@((string Value) => ActivarPanelAsync(Value,"TIPODOCUMENTO", 1))"
+                                         FilterOperator="StringFilterOperator.Contains">
+                    </TelerikDropDownList>
+                </div>
+                <div class="col-lg-4">
+                    <label class="mb-2">@Translation["Priority"]: </label>
+                    <TelerikDropDownList Data="@lstPriorityCode"
+                                         Value="@PriorityCode"
+                                         Id="GR_PriorityCode"
+                                         DefaultText=@Translation["SelectAnOption"]
+                                         TextField="Value"
+                                         ValueField="Code"
+                                         Filterable="true"
+                                         FilterOperator="StringFilterOperator.Contains">
+                    </TelerikDropDownList>
+                </div>
+                <div class="col-lg-8 mt-2">
+                    <div class="cuadro-info">
+                        <InputModalComponent @bind-InputValue="TRDSelected.TypologyName" IsDisabled="true" IsVisible="true" LabelText=@Translation["AutomaticAssignmentProcedureManagers"] Placeholder=@Translation["TypologyNotFound"] MethodValueChanged="@((string Value) => ActivarPanelAsync(Value,"TRAMITEGESTOR", 1))" />
+                    </div>
+                </div>
+                <div class="col-lg-4 d-flex flex-column-reverse">
+                    <div>
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["SearchInDRT"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="showModal" BtnDisabled="@DisableButtons"></ButtonComponent>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Parte 5: GR - Paso 2-->
+        <div id="panel-2" class="row mt-2 pb-30 @panel_2">
+            <!--@panel_2-->
+
+            <div class="col-lg-1 d-flex justify-content-center align-items-center">
+                <div class="numero"><h2>2</h2></div>
+            </div>
+
+            <div class="row col-lg-11">
+
+                <div class="col-lg-4">
+                    <label class="mb-2">@Translation["Country"]: <span class="red">*</span></label>
+                    <TelerikDropDownList Data="@lstCountryId"
+                                         Value="@CountryId"
+                                         Id="GR_Pais"
+                                         TextField="Name"
+                                         ValueField="CountryId"
+                                         DefaultText=@Translation["SelectAnOption"]
+                                         Filterable="true"
+                                         ValueChanged="@((int Value) => ActivarPanelAsync(Value.ToString(),"PAIS", 2))"
+                                         FilterOperator="StringFilterOperator.Contains">
+                    </TelerikDropDownList>
+                </div>
+                <div class="col-lg-4">
+                    <label class="mb-2">@Translation["State"]: <span class="red">*</span></label>
+                    <TelerikDropDownList Data="@lstStateId"
+                                         Value="@StateId"
+                                         Id="GR_Departamento"
+                                         TextField="Name"
+                                         ValueField="StateId"
+                                         DefaultText=@Translation["SelectAnOption"]
+                                         Enabled="@EnabledDepartamento"
+                                         Filterable="true"
+                                         ValueChanged="@((int Value) => ActivarPanelAsync(Value.ToString(),"DEPARTAMENTO", 2))"
+                                         FilterOperator="StringFilterOperator.Contains">
+                    </TelerikDropDownList>
+                </div>
+                <div class="col-lg-4">
+                    <label class="mb-2">@Translation["City"]: <span class="red">*</span></label>
+                    <TelerikDropDownList Data="@lstCityId"
+                                         Value="@CityId"
+                                         Id="GR_Municipio"
+                                         DefaultText=@Translation["SelectAnOption"]
+                                         TextField="Name"
+                                         ValueField="CityId"
+                                         Enabled="@EnabledMunicipio"
+                                         Filterable="true"
+                                         ValueChanged="@((int Value) => ActivarPanelAsync(Value.ToString(),"MUNICIPIO", 2))"
+                                         FilterOperator="StringFilterOperator.Contains">
+                    </TelerikDropDownList>
+                </div>
+                <div class="col-lg-4 mt-2">
+                    <label class="mb-2">@Translation["DocumentDate"]: <span class="red">*</span></label>
+                    <TelerikDatePicker Value="@DueDate"
+                                       ValueChanged="@((DateTime? Value) => ActivarPanelAsync(Value?.ToString() ?? "", "FECHA", 2))"
+                                       Id="GR_FechaDocumento"
+                                       Format="dd MMMM yyyy"
+                                       Min="@Min" Max="@Max">
+                    </TelerikDatePicker>
+                </div>
+                <div class="col-lg-4 mt-2">
+                    <div class="cuadro-info">
+                        <InputModalComponent @bind-InputValue="GuideNumber" LabelText=@(Translation["TrackingNumber"] + " / " + Translation["ZIPCode"]) Placeholder="" InputMaxLength="20" />
+                    </div>
+                </div>
+                <div class="col-lg-4 mt-2">
+                    <div class="cuadro-info">
+                        <InputModalComponent @bind-InputValue="Pages" IsRequired="true" LabelText=@Translation["Pages"] IsVisible="true" Placeholder="" MethodValueChanged="@((string Value) => ActivarPanelAsync(Value,"FOLIOS", 2))" InputType="number" FieldType="InputModalTypeEnum.Filing" InputMaxLength="4" />
+                    </div>
+                </div>
+                <div class="col-lg-4 mt-2">
+                    <div class="cuadro-info">
+                        <InputModalComponent @bind-InputValue="InternalDocument" LabelText=@Translation["InternalDocumentNumber"] IsVisible="true" Placeholder="" InputType="text" InputMaxLength="20" />
+                    </div>
+                </div>
+                <div class="col-lg-4 mt-2">
+                    <label class="mb-2">@Translation["Notification"]: <span class="red">*</span></label>
+                    <TelerikDropDownList Data="@lstNotificacion"
+                                         Value="@ValueNotificacion"
+                                         ValueChanged="@((string Value) => ActivarPanelAsync(Value,"NOTIFICATION", 2))"
+                                         Id="GR_Notificacion"
+                                         DefaultText=@Translation["SelectAnOption"]
+                                         TextField="Value"
+                                         ValueField="Code"
+                                         Filterable="true"
+                                         FilterOperator="StringFilterOperator.Contains">
+                    </TelerikDropDownList>
+                </div>
+                <div class="col-lg-4 mt-2 d-flex justify-content-start align-items-center">
+                    <div class="row w-100">
+                        <div class="col-lg-3" style="width:72px; cursor:pointer;">
+                            <a @onclick="showModalMetadatos"> <img src="../img/metadatosIcon.svg" alt="Icon de Metadatos" class="navbar-logo" width="60" height="60" /> </a>
+                        </div>
+                        <div class="col-lg-9">
+                            <label class="mb-0"> @Translation["Metadatas"]: @*<span class="red">*</span>*@ </label>
+                            <label class="noti-1">@Translation["AtLeastOneMetaData"]</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12 mt-2">
+                    <label class="mb-2">@Translation["Subject"]: <span class="red">*</span> <span style="color:gray">@string.Format(Translation["CharactersOutOf"], contadorcarac, "500")</span> </label>
+                    <textarea @bind="DocDescription" class="w-100 custom-textarea" id="GR_Asunto" placeholder="" required maxlength="500" @oninput="ContarCaracteres"></textarea>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Parte 6: GR - Paso 3-->
+        <div id="panel-3" class="row pb-40 @panel_3">
+            <!--@panel_3-->
+
+            <div class="col-lg-1 d-flex justify-content-center align-items-center">
+                <div class="numero"><h2>3</h2></div>
+            </div>
+
+            <div class="row col-lg-11">
+
+                <div class="row">
+                    <h5 class="mb-0">@Translation["UploadAttachments"]</h5>
+                    <label class="noti-2">@Translation["OptionalUploadAttachmentMessage"]:</label>
+                    <div class="col-lg-4 mt-2">
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Attachments/Annexes"] BtnIcon="fa-solid fa-upload" BtnOnClick="showModalAttachments" BtnDisabled="@DisableButtons"></ButtonComponent>
+                    </div>
+
+                    <div class="col-lg-12 @TablaAdjuntos" id="tableAttachments" style="margin-top:31px;">
+                        <div class="table-responsive custom-table-container">
+                            <table class="table custom-table">
+                                <thead>
+                                    <tr>
+                                        <th>@*<img src="../img/carbonDocumentAdd.svg" alt="Upload file" style="cursor:pointer; width: 25px; height: 25px;" />*@</th>
+                                        <th>@Translation["Detail"]</th>
+                                        <th>@Translation["File"]</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var fileInfo in listAttachment)
+                                    {
+                                        <tr>
+                                            <td class="center-item">
+                                                <img src="../img/deleteIcon.svg" alt="Delete Icon" style="width: 20px; height: 20px; cursor: pointer;" @onclick="() => RemoverFile(fileInfo)" />
+                                            </td>
+                                            <td class="align-items-center" style="word-break: break-word;">
+                                                <span>@fileInfo.AttDescription</span>
+                                            </td>
+                                            <td class="center-item">
+                                                <i class="@fileInfo.IconPath" style="font-size: 20px;"></i>
+                                                <span>@fileInfo.ArchiveName . @fileInfo.ArchiveExt</span>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Parte 7: GR - Paso 4-->
+        <div id="panel-4" class="row pb-40 @panel_4">
+            <!--@panel_4-->
+
+            <div class="col-lg-1 d-flex justify-content-center align-items-center">
+                <div class="numero"><h2>4</h2></div>
+            </div>
+
+            <div class="row col-lg-11">
+
+                <div class="row">
+                    <h5 class="mb-0">@Translation["Sender(s)Recipient(s)"]</h5>
+                    <label class="noti-2">@Translation["AlLeastSenderRecipientMessage"]:</label>
+                    <div class="col-lg-4 mt-2">
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Add"] BtnIcon="fa-solid fa-users" BtnOnClick="showRecipient" BtnDisabled="@DisableButtons"></ButtonComponent>
+
+                    </div>
+
+                    <div class="col-lg-12 @TablaUsers" id="tableUsers" style="margin-top:31px;">
+                        <div class="table-responsive custom-table-container custom-table--users">
+                            <table class="table">
+                                <thead>
+                                    <tr class="text-center">
+                                        <th>@Translation["Sender"]</th>
+                                        <th>@Translation["Recipient"]</th>
+                                        <th>@Translation["Copies"]</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="center-item table-users">
+                                            @foreach (var sender in listSender)
+                                            {
+                                                <div class="row table-users__recipient">
+                                                    <div class="col-lg-2 table-users__recipient__icon">
+                                                        <img src="../img/deleteIcon.svg" alt="Delete Icon" Title=@Translation["DeleteUser"] @onclick="() => RemoveUser(sender)" />
+                                                    </div>
+                                                    <div class="col-lg-10 text-center">
+                                                        <span class="d-block">@sender.UserName</span>
+                                                        <span class="table-users__charge">@(string.IsNullOrEmpty(sender.UserPosition) ? sender.UserEmail : sender.UserPosition) </span>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </td>
+                                        <td class="align-items-center table-users">
+                                            @foreach (var recipient in listRecipient)
+                                            {
+                                                <div class="row table-users__recipient">
+                                                    <div class="col-lg-2 table-users__recipient__icon">
+                                                        <img src="../img/deleteIcon.svg" alt="Delete Icon" Title=@Translation["DeleteUser"] @onclick="() => RemoveUser(recipient)" />
+                                                    </div>
+                                                    <div class="col-lg-10 text-center">
+                                                        <span class="d-block">@recipient.UserName</span>
+                                                        <span class="table-users__charge">@(string.IsNullOrEmpty(recipient.UserPosition) ? recipient.UserEmail : recipient.UserPosition) </span>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </td>
+                                        <td class="center-item table-users table-users--end">
+                                            @foreach (var copy in listCopy)
+                                            {
+                                                <div class="row table-users__recipient">
+                                                    <div class="col-lg-2 table-users__recipient__icon">
+                                                        <img src="../img/deleteIcon.svg" alt="Delete Icon" Title=@Translation["DeleteUser"] @onclick="() => RemoveUser(copy)" />
+                                                    </div>
+                                                    <div class="col-lg-10 text-center">
+                                                        <span class="d-block">@copy.UserName</span>
+                                                        <span class="table-users__charge">@(string.IsNullOrEmpty(copy.UserPosition.Trim()) ? copy.UserEmail : copy.UserPosition)</span>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Parte 8: GR - Paso 5-->
+        <div id="panel-5" class="row pb-40 @panel_5">
+            <!--@panel_5-->
+
+            <div class="col-lg-1 d-flex justify-content-center align-items-center">
+                <div class="numero"><h2>5</h2></div>
+            </div>
+
+            <div class="row col-lg-11">
+
+                <div class="col-lg-4">
+                    <h5 class="mb-0">@Translation["GenerateFiling"]</h5>
+                    <label class="noti-2">@Translation["FilingNumber"]:</label>
+                    <div class="col-lg-12 mt-2">
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Radicate"] BtnIcon="fa-solid fa-paper-plane" BtnOnClick="HandleFormCreate" BtnDisabled="@DisableButtons"></ButtonComponent>
+                    </div>
+                </div>
+                <div class="col-lg-8">
+                    <div class="row d-flex justify-content-end">
+                        <div class="col-lg-4">
+                            <h3 class="mb-0 titulo-azul">@Translation["FilingUpper"]:</h3>
+                            <h5 class="mb-0">@Translation["DocumentID"]:</h5>
+                            @* <label class="noti-2">@Translation["Gantt_Year"]:</label> *@
+                        </div>
+                        <div class="col-lg-8">
+                            <h3 class="mb-0 titulo-azul">@Radicado</h3>
+                            <h5 class="mb-0">@IdDocumento</h5>
+                            @* <label class="noti-2">@Anio</label> *@
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Parte 9: GR - Paso 6-->
+        <div id="panel-6" class="row pb-40 @panel_6">
+            <!--@panel_6-->
+
+            <div class="col-lg-1 d-flex justify-content-center align-items-center">
+                <div class="numero"><h2>6</h2></div>
+            </div>
+
+            <div class="row col-lg-11">
+
+                <div class="col-lg-12">
+                    <h5 class="mb-0">@Translation["GenerateLabel"]</h5>
+                    <label class="noti-2">@Translation["ViewDownloadLabel"]</label>
+                    <div class="col-lg-12 mt-2">
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Label"] BtnIcon="fa-solid fa-barcode" BtnOnClick="showModalLabel"></ButtonComponent>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Parte 10: GR - Paso 7-->
+        <div id="panel-7" class="row pb-40 @panel_7">
+            <!--@panel_7-->
+
+            <div class="col-lg-1 d-flex justify-content-center align-items-center">
+                <div class="numero"><h2>7</h2></div>
+            </div>
+
+            <div class="row col-lg-11">
+
+                <div class="col-lg-12">
+                    <h5 class="mb-0">@Translation["UploadImage"]</h5>
+                    <label class="noti-2">@Translation["UploadPDFToCentral"]</label>
+                    <div class="col-lg-12 mt-2">
+                        <button class="btnStyle btnStyle--primary" type="button" @onclick="showUploadPDFModal">@Translation["UploadFile"]</button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        @*   <div id="panel-8" class="row pb-40 @panel_8">
+
+        <div class="col-lg-1 d-flex justify-content-center align-items-center">
+        <div class="numero"><h2>8</h2></div>
+        </div>
+
+        <div class="row col-lg-11">
+
+        <div class="col-lg-12">
+        <h5 class="mb-0">Enviar confirmación</h5>
+        <label class="noti-2">Enviar radicación por correo electrónico</label>
+        <div class="col-lg-12 mt-2">
+        <button class="btnStyle btnStyle--primary" type="button">Enviar</button>
+        </div>
+        </div>
+
+        </div>
+
+        </div>*@
+
+        <!-- Parte 11: GR - Paso 8-->
+        <div id="panel-9" class="row pb-40 @panel_8">
+            <!--@panel_8-->
+
+            <div class="col-lg-1 d-flex justify-content-center align-items-center">
+                <div class="numero"><h2>8</h2></div>
+            </div>
+
+            <div class="row col-lg-11">
+
+                <div class="col-lg-4">
+                    <h5 class="mb-0">@Translation["LinkDocuments"]</h5>
+                    <label class="noti-2">@Translation["LinkCurrentFilingMessage"]</label>
+                    <div class="col-lg-12 mt-2">
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Links"] BtnIcon="fa-solid fa-link" BtnOnClick="ShowDocRelationModal"></ButtonComponent>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <h5 class="mb-0">@Translation["CreateNewFiling"]</h5>
+                    <label class="noti-2">@Translation["CleanRecordMessage"]</label>
+                    <div class="col-lg-12 mt-2">
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["New"] BtnIcon="fa-solid fa-file-circle-plus" BtnOnClick="(() => SubsequentProcesses(2))"></ButtonComponent>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <h5 class="mb-0">@Translation["KeepData"]</h5>
+                    <label class="noti-2">@Translation["MakeNewFilingMessage"]</label>
+                    <div class="col-lg-12 mt-2">
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Keep"] BtnIcon="fa-solid fa-arrow-up-short-wide" BtnOnClick="(() => SubsequentProcesses(3))"></ButtonComponent>
+                    </div>
+                </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

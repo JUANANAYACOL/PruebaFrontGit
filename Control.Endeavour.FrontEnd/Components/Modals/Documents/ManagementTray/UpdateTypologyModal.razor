@@ -1,0 +1,93 @@
+﻿
+<TelerikRootComponent>
+    <GenericModalComponent Title=@Translation["UpdateTypology"] IsVisible="@modalStatus" Width="80%" OnModalClosed="HandleModalClosed">
+        <ChildContent>
+            <div class="row mx-3">
+                <div class="col-lg-9 mt-2">
+                    <div class="cuadro-info">
+                        <InputModalComponent @bind-InputValue="@selectedTrd" IsDisabled="true" IsRequired="true" IsVisible="true" LabelText=@Translation["AutomaticAssignmentProcedureManagers"] Placeholder=@Translation["TypologyNotFound"] />
+                    </div>
+                </div>
+                <div class="col-lg-3 d-flex flex-column-reverse text-lg-center">
+                    <div class="mt-2">
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["SearchInDRT"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="ShowModal"></ButtonComponent>
+                    </div>
+                </div>
+            </div>
+            <div class="row mx-3 mt-2" >
+                <label class="mb-2">Justificación: <span style="color:gray">@string.Format(Translation["CharactersOutOf"], characterCounter, "200")</span> <span class="red">*</span></label>
+                <textarea @bind="docJustification" style="margin-left:13px;" class="w-100 custom-textarea" id="GR_Asunto" placeholder="" required maxlength="200" @oninput="CountCharacters"></textarea>
+            </div>
+            <div class="row mx-3">
+                <div class="from-group from-group--margin-top justify-content-center">
+                    <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="ResetForm"></ButtonComponent>
+                    <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button"  BtnIcon="fa-solid fa-floppy-disk" BtnOnClick="HandleValidSubmit" BtnDisabled="@disabledButton"></ButtonComponent>
+                </div>
+            </div>
+            <div class="row titulo mx-3 mt-3">
+                <h4>@Translation["Traceability"] - @Translation["DocumentChanges"]</h4>
+            </div>
+            <div class="row mx-3">
+                
+                <TelerikGrid Data="@classificationHistoryList" PageSize="@classificationHistoryList.Count()">
+                    <GridColumns>
+                        <GridColumn Field="AdministrativeUnitName"
+                                    Title=@Translation["AdministrativeUnit"]
+                                    Width="150px"
+                                    Filterable="true"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap"
+                                    />
+                        <GridColumn Field="ProductionOfficeName"
+                                    Title=@Translation["ProductionOffice"]
+                                    Width="150px"
+                                    Filterable="true"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap" />
+                        <GridColumn Field="SeriesName"
+                                    Title=@Translation["Serie"]
+                                    Width="150px"
+                                    Filterable="true"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap" />
+                        <GridColumn Field="SubseriesName"
+                                    Title=@Translation["SubSerie"]
+                                    Width="150px"
+                                    Filterable="true"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap" />
+                        <GridColumn Field="TypologyName"
+                                    Title=@Translation["DocumentaryTypology"]
+                                    Width="150px"
+                                    Filterable="true"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap" />
+                        <GridColumn Field="Justification"
+                                    Title=@Translation["Justification"]
+                                    Width="150px"
+                                    Filterable="true"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap" />
+                        <GridColumn Field="CreateDate"
+                                    Title=@Translation["ModificationDate"]
+                                    Width="150px"
+                                    Filterable="true"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap" />
+                        <GridColumn Field="User"
+                                    Title=@Translation["User"]
+                                    Width="150px"
+                                    Filterable="true"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap" />
+                    </GridColumns>
+                </TelerikGrid>
+            </div>
+            
+        </ChildContent>
+    </GenericModalComponent>
+</TelerikRootComponent>
+
+<GenericDocTypologySearchModal @ref="DocTypologySearchModal" title="Gestión - Actualizar tipología" OnStatusChanged="HandleTRDSelectedChanged"></GenericDocTypologySearchModal>
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiCloseAsync"></NotificationsComponentModal>
+@* <ModalAssociatedDocuments @ref="modalAssociatedDocuments" OnStatusChangedJoinDoc="HandleStatusChangedJOINDOC"></ModalAssociatedDocuments>  *@

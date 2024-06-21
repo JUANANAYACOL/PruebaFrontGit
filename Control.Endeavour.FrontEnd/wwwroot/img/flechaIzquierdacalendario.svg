@@ -1,0 +1,6 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="caret-24px">
+<rect width="32" height="32" rx="5" transform="matrix(0 -1 -1 0 32 32)" fill="#F1F1F1"/>
+<path id="caret (Stroke)" fill-rule="evenodd" clip-rule="evenodd" d="M21.0076 24.9923C21.4415 24.5367 21.4415 23.798 21.0076 23.3424L14.0155 16.0007L21.0076 8.65894C21.4415 8.20333 21.4415 7.46464 21.0076 7.00903C20.5737 6.55341 19.8701 6.55341 19.4362 7.00903L11.6584 15.1757C11.2245 15.6313 11.2245 16.37 11.6584 16.8256L19.4362 24.9923C19.8701 25.4479 20.5737 25.4479 21.0076 24.9923Z" fill="black" fill-opacity="0.87"/>
+</g>
+</svg>

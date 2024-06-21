@@ -1,0 +1,90 @@
+﻿<div class="my-modal">
+    <TelerikRootComponent>
+        <GenericModalComponent Title=@(Translation["Administration"] + " - " + Translation["FormatMasterList"]) Width="60%" IsVisible="modalStatus" OnModalClosed="HandleModalClosed">
+            <ChildContent>
+                <div class="row">
+                    <!-- Parte Izquierda: Input y Label -->
+                    <div class="@paramCol-md-12">
+                        <div class="container mt-2">
+                            <!-- Primera fila -->
+                            <div class="row pt-2">
+                                @if (visible)
+                                {
+                                    <div class="row mb-2">
+                                        <label><b>@Translation["Version"] - @version</b></label>
+                                        <label><b>@Translation["FormatType"] - @value</b></label>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="col-6">
+                                        <div class="align-items-end flex-fill">
+                                            <label for="input2" class="mb-2">@Translation["FormatType"]<span class="red">*</span></label>
+                                            <div class="icuadro-info">
+                                                <TelerikDropDownList Data="@FormatDoc"
+                                                                     Value="@ValueFormatDoc"
+                                                                     ValueField="Code"
+                                                                     TextField="Value"
+                                                                     Filterable="true"
+                                                                     DefaultText="@Translation[textFD]"
+                                                                     ValueChanged="@( (string newValue) => FormatType(newValue) )">
+                                                </TelerikDropDownList>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <InputModalComponent @bind-InputValue="@versionInput" IsRequired="true" MethodValueChanged="ValidateEnableButton" LabelText=@Translation["TemplateVersion"] IsVisible="true" Placeholder=@Translation["TemplateVersion"] InputType="number" FieldType="InputModalTypeEnum.Filing" InputMaxLength="5" />
+                                    </div>
+                                }
+                                <div class="col-md-6 mb-2">
+                                    <InputModalComponent @ref="CodeInput" MethodValueChanged="ValidateEnableButton" @bind-InputValue="@DocTemplateFormResponse.TempCode" InputMaxLength="10" IsRequired="true" LabelText=@Translation["Code"] Placeholder=@Translation["EnterCode"] />
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <InputModalComponent @ref="NameTemplateInput" MethodValueChanged="ValidateEnableButton" @bind-InputValue="@DocTemplateFormResponse.TempName" IsRequired="true" InputMaxLength="50" LabelText=@Translation["Name"] Placeholder=@Translation["EnterName"] />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="mb-2">@Translation["Process"] <span class="red">* </span><span class="span-gray">@string.Format(Translation["CharactersOutOf"], contadorcarac, "100")</span><span class="span-gray"></span></label>
+                                    <textarea @bind="@DocTemplateFormResponse.Process" class="w-100 custom-textarea" id="DT_Asunto" required placeholder=@(string.Format(Translation["EnterProcess", "100"])) maxlength="100" oninput="@ContarCaracteres"></textarea>
+                                </div>
+                                <div class="col-md-6 mt-3">
+                                    <div class="from-group mt-4 d-flex align-items-end justify-content-start">
+                                        <div class="px-2">
+                                            <TelerikSwitch @bind-Value="@activeState" />
+                                        </div>
+                                        <div class="px-2">
+                                            @(activeState ? Translation["Enabled"] : Translation["Disabled"])
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="@paramCol-md-12">
+                        <div class="container mt-2">
+                            @if (visible)
+                            {
+                                <DragAndDropTemplateComponent IdInputElement="OverrideTray" FileInfos="@fileDataList" MaxFileSizeMB="100" MaxFileCount="1"></DragAndDropTemplateComponent>
+                                <span class="red-noti mt-2">@fileInfoSpan</span>
+                            }
+                            else
+                            {
+                                <DragAndDropTemplateComponent OnFileListChanged="HandleFilesList" FileInfos="@fileDataList" MaxFileSizeMB="100" MaxFileCount="1"></DragAndDropTemplateComponent>
+                                <span class="red-noti mt-2">@fileInfoSpan</span>
+                            }
+                        </div>
+                    </div>
+                    <!-- Parte Derecha: Dos Botones -->
+                    <div class="row mb-3">
+                        <div class="from-group from-group--margin-top justify-content-center">
+                            <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="ResetFiltersAsync"></ButtonComponent>
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnIcon="fa-solid fa-floppy-disk" BtnDisabled="enableButton" BtnOnClick="HandleValidSubmit"></ButtonComponent>
+                        </div>
+                    </div>
+                </div>
+                <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>
+
+

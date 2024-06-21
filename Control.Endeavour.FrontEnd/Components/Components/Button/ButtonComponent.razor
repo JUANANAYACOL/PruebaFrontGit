@@ -1,0 +1,45 @@
+﻿@if (BtnVisible)
+{
+    @if (BtnType != "button")
+    {
+        <button class="btnStyle @BtnClassColor btnStyle--HeightAuto @BtnClassModifiers" type="@BtnType" disabled="@BtnDisabled" title="@Translation[BtnTitle]">
+            <span>
+                @if (!String.IsNullOrEmpty(BtnIcon))
+                {
+                    if (String.IsNullOrEmpty(BtnText))
+                    {
+                        <i class="fas @BtnIcon"></i>
+                    }
+                    else
+                    {
+                        <i class="fas @BtnIcon me-2"></i>
+                    }
+                }
+                @Translation[BtnText]
+            </span>
+        </button>
+
+    }
+    else
+    {
+        <button class="btnStyle @BtnClassColor btnStyle--HeightAuto @BtnClassModifiers" type="@BtnType" @onclick="OnClickBtnMethod" disabled="@BtnDisabled" title="@Translation[BtnTitle]">
+            <span>
+                @if (!String.IsNullOrEmpty(BtnIcon))
+                {
+                    if (String.IsNullOrEmpty(BtnText))
+                    {
+                        <i class="fas @BtnIcon"></i>
+                    }
+                    else
+                    {
+                        <i class="fas @BtnIcon me-2"></i>
+                    }
+                }
+                @Translation[BtnText]
+            </span>
+        </button>
+
+    }
+}
+
+

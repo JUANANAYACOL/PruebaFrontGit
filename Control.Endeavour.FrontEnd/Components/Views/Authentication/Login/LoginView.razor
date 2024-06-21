@@ -1,0 +1,44 @@
+﻿<EditForm Model="@FormModel" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <NotificationsComponentModal @ref="NotificationModal"></NotificationsComponentModal>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12 form-group mb-4">
+                @* <LabelComponent KeyName=@Translation["LabelTextUsuario") For="name-field" AdditionalClasses="mb-2" /> *@
+                <LabelComponent KeyName=@Translation["UserName"] For="name-field" AdditionalClasses="mb-2" />
+                @* <InputComponent @ref="NameInput" InputType=InputTypeEnum.Text Placeholder="@Translation["PlaceHolderUsuario")" Length="50" ErrorMessage="El usuario es requerido." ShowErrors="@formSubUser" OnChange="validateFields" /> *@
+                <InputComponent @ref="NameInput" InputType=InputTypeEnum.Text Placeholder="@Translation["EnterUsername"]" Length="50" ErrorMessage="@Translation["UserRequired"]" ShowErrors="@formSubUser" OnChange="validateFields" />
+            </div>
+            <div class="col-12 form-group mb-4">
+			@* <LabelComponent KeyName=@Translation["LabelTextIngresarContraseña") For="password-field" AdditionalClasses="mb-2" />
+                <InputComponent @ref="PasswordInput" InputType=InputTypeEnum.Password Placeholder="@Translation["PlacerHolderIntroducirContraseña")" Length="16" ErrorMessage="La contraseña es requerida." ShowErrors="@formSubPassw" OnChange="validateFields"/> *@
+                <LabelComponent KeyName=@Translation["Password"] For="password-field" AdditionalClasses="mb-2" />
+                <InputComponent @ref="PasswordInput" InputType=InputTypeEnum.Password Placeholder="@Translation["EnterPassword"]" Length="20" ErrorMessage=@Translation["PasswordRequired"] ShowErrors="@formSubPassw" OnChange="validateFields" />
+            </div>
+
+        </div>
+        <div class="row button-container mb-4 ">
+            <div class="col-12 text-center captcha-styles  mt-2">
+                @*  <CaptchaComponent @ref="Captcha" OnCaptchaEntered="OnCaptchaEntered" /> *@  
+                <div class="mt-3 ">
+                    <ReCaptchaGoogleComponent @ref="reCaptchaGoogle" SiteKey="@siteKey" OnSuccess="OnSuccess" OnExpired="OnExpired" />  
+                </div>
+            </div>
+        </div>
+        <div class="row button-container">
+            <div class="col-12 text-center mt-2">
+                @* <ButtonComponent BtnClassColor="btnStyle--ligthInLine" BtnClassModifiers="btnStyle--h50 w-50" BtnType="submit" BtnText="@Translation["ButtonIngresar")"></ButtonComponent> *@
+                <ButtonComponent BtnClassColor="btnStyle--ligthInLine" BtnClassModifiers="btnStyle--h50 w-50" BtnType="submit" BtnText="@Translation["SingIn"]"></ButtonComponent>
+            </div>
+        </div>
+        <div class="row login-prompt mb-2 mt-2">
+            <div class="col-12 text-center containerText">
+                @* <span class="login-text">@Translation["SpanLoginOlvidarContraseña") </span>
+                <a @onclick="CambiarComponente" class="login-link">@Translation["LinkOlvidarContraseña")</a> *@
+                <span class="login-text">@Translation["ForgotPassword"] </span>
+                <a @onclick="CambiarComponente" class="login-link">@Translation["PasswordRecovery"]</a>
+            </div>
+        </div>
+        
+    </div>
+</EditForm>

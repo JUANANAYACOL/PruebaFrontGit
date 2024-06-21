@@ -1,0 +1,114 @@
+﻿
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.SystemConfiguration.Response
+
+@page "/InstructionsAdministation"
+@layout MainLayout;
+
+<InstructionsModal @ref="instructionsModal" OnChangeData="HandleRefreshGridData"></InstructionsModal>
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+<div class="row titulo">
+    <div class="col-8">
+        <h1>@(Translation["Parametrization"] + " - " + Translation["ManagementInstructions"])</h1>
+    </div>
+    <!-- Parte 2: Botón azul alineado a la derecha -->
+    <div class="col-4 text-end">
+        <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers=" ml-10" BtnType="button" BtnText=@Translation["Create"] BtnOnClick="ShowModalCreate" BtnIcon="fa-solid fa-plus"></ButtonComponent>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <h6 class="titulo-azul"> @Translation["SearchByFilters"]:</h6>
+    </div>
+    <div class="col-md-3">
+        <InputModalComponent LabelText=@(Translation["Name"]+":") Placeholder=@Translation["InstructionName"]  @bind-InputValue="instructionsFilter.Name"></InputModalComponent>
+    </div>
+    <div class="col-md-3">
+        <label class="mb-2">@Translation["Class"]:</label>
+        <TelerikDropDownList Data="@classCodeList"
+                             @bind-Value="instructionsFilter.ClassCode"
+                             Id="GR_TipoDoc"
+                             DefaultText=@Translation["SelectAnOption"]
+                             TextField="Value"
+                             ValueField="Code"
+                             Filterable="true">
+        </TelerikDropDownList>
+    </div>
+    <div class="col-md-12 d-flex align-items-end justify-content-end mt-3">
+        <div class="text-md-end">
+            <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="CleanFilter"></ButtonComponent>
+            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Search"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="SearchByFilter"></ButtonComponent>
+        </div>
+    </div>
+</div>
+<div class="row mt-4">
+    <div class="col">
+        <TelerikGrid Data="@instructionsList"
+                     Sortable="true"
+                     SelectionMode="GridSelectionMode.None">
+            <GridColumns>
+
+                    
+                <GridCommandColumn Width="90px" Title=@Translation["Edit"] HeaderClass="center-wrap" Visible="true">
+                    <div class="custom-style-grid">
+                    <GridCommandButton Title=@Translation["Edit"] Icon="@SvgIcon.Pencil" OnClick="@((args)=> ShowModalEdit((InstructionsDtoResponse)args.Item))"></GridCommandButton>
+                    </div>
+                </GridCommandColumn>
+                <GridCommandColumn Width="90px" Title=@Translation["Delete"] HeaderClass="center-wrap" Visible="true">
+
+                    <div class="d-flex custom-style-grid justify-content-around">
+                        <GridCommandButton Title=@Translation["Delete"] Icon="@SvgIcon.Trash" OnClick="@((args)=> ShowModalDelete((InstructionsDtoResponse)args.Item))"></GridCommandButton>
+                    </div>
+                </GridCommandColumn>
+                <GridColumn Field="Name"
+                            Title=@Translation["Name"]
+                            Width="150px"
+                            TextAlign="ColumnTextAlign.Center"
+                            HeaderClass="center-wrap" />
+                <GridColumn Field="ActiveState"
+                            Title=@Translation["Status"]
+                            Width="150px"
+                            Filterable="true"
+                            TextAlign="ColumnTextAlign.Center"
+                            HeaderClass="center-wrap">
+                    <Template>
+                        @{
+                            InstructionsDtoResponse rowData = (InstructionsDtoResponse)context;
+                            if (rowData != null)
+                            {
+                                bool activeState = (bool)rowData.ActiveState!;
+                                string active = activeState ? Translation["Enabled"] : Translation["Disabled"];
+                                @active
+                            }
+                        }
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="ClassCodeName"
+                            Title=@Translation["Class"]
+                            Width="150px"
+                            TextAlign="ColumnTextAlign.Center"
+                            HeaderClass="center-wrap" />
+                <GridColumn Field="CreateUser"
+                            Title=@Translation["UserRecorded"]
+                            Width="200px"
+                            TextAlign="ColumnTextAlign.Center"
+                            Filterable="false" HeaderClass="center-wrap" />
+                <GridColumn Field="CreateDate"
+                            Title=@Translation["DateRecorded"]
+                            Width="200px"
+                            TextAlign="ColumnTextAlign.Center"
+                            Filterable="false" HeaderClass="center-wrap" />
+                <GridColumn Field="UpdateUser"
+                            Title=@Translation["UserUpdated"]
+                            Width="200px"
+                            TextAlign="ColumnTextAlign.Center"
+                            Filterable="false" HeaderClass="center-wrap" />
+                <GridColumn Field="UpdateDate"
+                            Title=@Translation["DateUpdated"]
+                            Width="200px"
+                            TextAlign="ColumnTextAlign.Center"
+                            Filterable="false" HeaderClass="center-wrap" />
+            </GridColumns>
+        </TelerikGrid>
+    </div>
+</div>
+

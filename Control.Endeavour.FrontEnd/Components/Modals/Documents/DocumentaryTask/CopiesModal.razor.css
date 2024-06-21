@@ -1,0 +1,21 @@
+﻿
+.custom-table-container-copy {
+    border: 1px;
+    border-radius: 10px;
+    overflow: auto;
+    max-height: 400px;
+}
+
+.copy-pt {
+    padding: 10px 20px 10px;
+}
+
+.table-content {
+    justify-content: space-evenly !important;
+}
+
+.delete-button {
+    cursor: pointer;
+    font-size: 25px;
+    color: #41BAEA;
+}

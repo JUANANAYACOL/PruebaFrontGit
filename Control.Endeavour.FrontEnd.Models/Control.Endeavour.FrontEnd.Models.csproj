@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\Administration\DocumentaryTypologiesBehaviors\Request\" />
+    <Folder Include="Models\Administration\MetaData\Response\" />
+    <Folder Include="Models\Administration\ProfileUsers\Response\" />
+    <Folder Include="Models\Administration\Signature\Response\" />
+    <Folder Include="Models\Administration\VMetaField\Request\" />
+    <Folder Include="Models\Administration\VReplacement\Request\" />
+    <Folder Include="Models\Authentication\CodeRecovery\Response\" />
+    <Folder Include="Models\Authentication\Login\Response\" />
+    <Folder Include="Models\Authentication\Multisession\Response\" />
+    <Folder Include="Models\Authentication\PasswordRecovery\Response\" />
+    <Folder Include="Models\Components\Language\Request\" />
+    <Folder Include="Models\GenericDtos\Attachments\Response\" />
+    <Folder Include="Models\Parametrization\" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,31 @@
+﻿.custom-table-container-copy {
+    border: 1px;
+    border-radius: 10px;
+    overflow: auto;
+    max-height: 450px;
+}
+
+.copy-pt {
+    padding: 10px 20px 10px;
+}
+
+.table-pt {
+    padding: 75px 0px 0px 0px;
+}
+
+.table-content {
+    justify-content: space-evenly !important;
+}
+
+.action-button {
+    cursor: pointer;
+    font-size: 25px;
+    color: #41BAEA;
+}
+
+.svg-button {
+    border: none;
+    padding: 0;
+    margin: 0;
+    background: none;
+}

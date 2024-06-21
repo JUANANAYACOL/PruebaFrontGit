@@ -1,0 +1,117 @@
+﻿@using Control.Endeavour.FrontEnd.Models.Models.Administration.VUser.Request
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.VUser.Response
+@page "/ManagementTrayPerUser";
+@layout MainLayout;
+
+<div class="row titulo">
+    <div class="col-md-12">
+        <h3>@(Translation["Security"] + " - " + Translation["ManagementTrayPerUser"])</h3>
+    </div>
+</div>
+
+<div class="row mt-2">
+    <div class="col-lg-12">
+        <h6 class="titulo-azul"> @Translation["SearchByFilters"]:</h6>
+    </div>
+    
+    <div class="col-lg-4">
+        <InputModalComponent LabelText=@Translation["Names"] InputMaxLength="100" Placeholder=@Translation["Names"] FieldType="InputModalTypeEnum.Name" @bind-InputValue="@userFilterRequest.FirstName"> </InputModalComponent>
+    </div>
+    <div class="col-lg-4">
+        <InputModalComponent LabelText=@Translation["Surnames"] InputMaxLength="100" Placeholder=@Translation["Surnames"] FieldType="InputModalTypeEnum.Name" @bind-InputValue="@userFilterRequest.LastName"> </InputModalComponent>
+    </div>
+    <div class="col-lg-4">
+        <label class="selectorBlock--labelDropDown mb-2">@Translation["Position"]:</label>
+        <TelerikDropDownList Data="@chargeList"
+                             ValueField="Code"
+                             @bind-Value="@userFilterRequest.ChargeCode"
+                             TextField="Value"
+                             Filterable="true"
+                             DefaultText="@Translation["Position"]">
+        </TelerikDropDownList>
+    </div>
+    <div class="col-lg-12 mt-2">
+        <h6 class="titulo-azul"> @Translation["FilterDRT"]</h6>
+    </div>
+
+    <div class="col-lg-4">
+        <label for="input2" class="selectorBlock--labelDropDown mb-2">@Translation["AdministrativeUnits"]:</label>
+        <TelerikDropDownList Data="@adminUnitList"
+                             ValueField="AdministrativeUnitId"
+                             Value="@userFilterRequest.AdministrativeUnitId"
+                             TextField="Name"
+                             ValueChanged="@( (int? newValue) => GetProducOffice(newValue.Value))"
+                             Filterable="true"
+                             DefaultText="@Translation["AdministrativeUnits"]">
+        </TelerikDropDownList>
+    </div>
+    <div class="col-lg-4">
+        <label class="selectorBlock--labelDropDown mb-2">@Translation["ProductionOffices"]:</label>
+        <TelerikDropDownList Data="@proOfficesList"
+                             ValueField="ProductionOfficeId"
+                             @bind-Value="@userFilterRequest.ProductionOfficeId"
+                             TextField="Name"
+                             Enabled="@isEnableProOffice"
+                             Filterable="true"
+                             DefaultText="@Translation["ProductionOffices"]">
+        </TelerikDropDownList>
+    </div>
+    <div class="col-md-4 d-flex align-items-end justify-content-end">
+        <div class="text-md-end">
+            <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnClassModifiers="mx-4" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="CleanFilter"></ButtonComponent>
+            <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Search"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="SearchByFilter"></ButtonComponent>
+        </div>
+    </div>
+    
+    
+</div>
+
+<div class="row mt-3">
+    <TelerikGrid Data="@userListData" PageSize="10"
+                 SelectionMode="GridSelectionMode.None">
+        <GridColumns>
+
+
+
+            <GridCommandColumn Width="80px" Title=@Translation["Edit"] HeaderClass="center-wrap" Visible="true">
+                <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                    <GridCommandButton Icon="@SvgIcon.Eye" Title=@Translation["ManagementTrayPerUser"] OnClick="@((args)=> ShowUserManagamentTray((VUserDtoResponse)args.Item))"> </GridCommandButton>
+
+                </div>
+            </GridCommandColumn> 
+
+            <GridColumn Field="@nameof(VUserDtoResponse.UserName)"
+                        Title=@Translation["User"]
+                        Width="150px"
+                        TextAlign="ColumnTextAlign.Center"
+                        HeaderClass="center-wrap" />
+
+            <GridColumn Field="@nameof(VUserDtoResponse.FirstName)"
+                        Title=@Translation["Name"]
+                        Width="150px"
+                        TextAlign="ColumnTextAlign.Center"
+                        HeaderClass="center-wrap" />
+            <GridColumn Field="@nameof(VUserDtoResponse.LastName)"
+                        Title=@Translation["Surname"]
+                        Width="150px"
+                        TextAlign="ColumnTextAlign.Center"
+                        HeaderClass="center-wrap" />
+            <GridColumn Field="@nameof(VUserDtoResponse.Charge)"
+                        Title=@Translation["Position"]
+                        Width="150px"
+                        TextAlign="ColumnTextAlign.Center"
+                        HeaderClass="center-wrap" />
+            <GridColumn Field="@nameof(VUserDtoResponse.ProductionOfficeName)"
+                        Title=@Translation["ProductionOffice"]
+                        Width="150px"
+                        TextAlign="ColumnTextAlign.Center"
+                        HeaderClass="center-wrap" />
+        </GridColumns>
+    </TelerikGrid>
+</div>
+
+<div class="row mt-3">
+    <NewPaginationComponent @ref="paginationComponetPost" Filter="userFilterRequest" T="VUserDtoResponse" M="VUserDtoRequest" PaginationInfo="@paginationInfo" Uri="@UriFilterVUser" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+</div>
+
+

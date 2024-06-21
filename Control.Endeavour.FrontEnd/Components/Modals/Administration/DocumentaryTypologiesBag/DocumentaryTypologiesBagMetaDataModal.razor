@@ -1,0 +1,115 @@
+﻿@using Control.Endeavour.FrontEnd.Models.Models.Administration.MetaField.Response
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.MetaTitles.Request
+
+
+<div class="my-modal">
+
+    <TelerikRootComponent>
+        <GenericModalComponent Title="@Title" IsVisible="modalStatus" OnModalClosed="HandleModalClosed" Width="70%">
+            <ChildContent>
+                <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+
+
+                <div class="container-fluid">
+
+                    <div class="row">
+                        <h2>@TitleModal</h2>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="row">
+
+                                <div class="col-md-6">
+                                    <label>@Translation["Metadata"] <span class="red">*</span> </label>
+                                    <TelerikDropDownList Data="@metaFieldListModal"
+                                                         ValueField=@nameof( MetaFieldsDtoResponse.MetaFieldId)
+                                                         @bind-Value="metaFieldidToAdd"
+                                                         TextField=@nameof( MetaFieldsDtoResponse.NameMetaField)
+                                                         Enabled="true"
+                                                         Filterable="true"
+                                                         DefaultText=@Translation["SelectAnOption"]
+                                                         Class="mt-2"
+                                                         OnChange="(()=>EnableSaveButton())">
+
+                                    </TelerikDropDownList>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="mb-2">@Translation["Order"] <span class="red">*</span></label>
+                                    <div class="from-group">
+
+                                         
+                                        <InputModalComponent @ref="orderInput" @bind-InputValue="orderString" InputMaxLength="3" IsRequired="true" LabelText="" IsVisible="true" Placeholder="" InputType="number" FieldType="InputModalTypeEnum.Filing" InputMaxNumberValue="999" MethodValueChanged="EnableSaveButton" />
+
+
+                                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers=" ml-10" BtnType="button" BtnText="" BtnOnClick="AddToList" BtnIcon="fa-solid fa-plus" BtnDisabled="saveIsDisable"></ButtonComponent>
+                                    </div>
+                                </div>
+
+
+                              
+                            </div>
+                        </div>
+
+
+                        <div class="col-lg-12 mt-3" >
+                            <TelerikGrid Data="metaTitlesListDtoRequest" PageSize="10"
+                                         Sortable="false"
+                                         FilterMode="GridFilterMode.FilterMenu"
+                                         Resizable="true"
+                                         Reorderable="false"
+                                         EditMode="GridEditMode.Popup"
+                                         SelectionMode="GridSelectionMode.None">
+                                <GridColumns>
+                    
+                                    <GridCommandColumn Width="80px" Title="@Translation["Delete"]" HeaderClass="center-wrap" Visible="true">
+                                          
+
+                                        <div class="d-flex justify-content-around">
+                                            <GridCommandButton Title="@Translation["Delete"]"  Icon="@SvgIcon.Trash" OnClick="@((args)=> DeleteFromList((MetaTitleCreateDtoRequest)args.Item))"></GridCommandButton>
+                                        </div>
+                                    </GridCommandColumn>                               
+
+                                    <GridColumn Field=@nameof(MetaTitleCreateDtoRequest.OrderData) TextAlign="ColumnTextAlign.Center" Title="@Translation["Order"]" Width="100px" Filterable="false" HeaderClass="center-wrap" />
+                                    <GridColumn Field=@nameof(MetaTitleCreateDtoRequest.NameMetaField) TextAlign="ColumnTextAlign.Center" Title=@Translation["Name"] Width="100px" Filterable="false" HeaderClass="center-wrap" />
+                                    <GridColumn Field=@nameof(MetaTitleCreateDtoRequest.FieldTypeValue) TextAlign="ColumnTextAlign.Center" Title="@Translation["Type"]" Width="100px" Filterable="false" HeaderClass="center-wrap" />
+                                    <GridColumn Field=@nameof(MetaTitleCreateDtoRequest.ActiveState) TextAlign="ColumnTextAlign.Center" Title=@Translation["Status"] Width="100px" Filterable="false" HeaderClass="center-wrap">
+                                        <Template>
+                                            @{
+                                                MetaTitleCreateDtoRequest rowData = (MetaTitleCreateDtoRequest)context;
+                                                if (rowData != null)
+                                                {
+                                                    bool activeState = rowData.ActiveState;
+                                                    string active = activeState ? Translation["Enabled"] : Translation["Disabled"];
+                                                    @active
+                                                }
+                                            }
+                                        </Template>
+
+                                    </GridColumn>
+                                    <GridColumn Field=@nameof(MetaTitleCreateDtoRequest.CreateUser) TextAlign="ColumnTextAlign.Center" Title="@Translation["UserRecorded"]" Width="100px" Filterable="false" HeaderClass="center-wrap" />
+                                    <GridColumn Field=@nameof(MetaTitleCreateDtoRequest.CreateDate) TextAlign="ColumnTextAlign.Center" Title="@Translation["DateRecorded"]" Width="100px" Filterable="false" HeaderClass="center-wrap" />
+                                </GridColumns>
+                                <NoDataTemplate>
+                                    <img src="../img/noDataFound.png" width="8%" height="8%" />
+                                    <p> @Translation["NoGridInfo"]</p>
+                                </NoDataTemplate>
+                            </TelerikGrid>
+
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="from-group from-group--margin-top justify-content-center">
+
+                            <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="ResetFormAsync"></ButtonComponent>
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnIcon="fa-solid fa-floppy-disk" BtnOnClick="HandleValidSubmit"></ButtonComponent>
+                        </div>
+                    </div>
+                </div>
+
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>

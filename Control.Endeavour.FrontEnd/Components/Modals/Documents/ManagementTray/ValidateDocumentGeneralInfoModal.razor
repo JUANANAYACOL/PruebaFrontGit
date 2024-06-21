@@ -1,0 +1,85 @@
+﻿<TelerikRootComponent>
+    <GenericModalComponent Title=@Translation["GeneralInformation"] IsVisible="@modalStatus" Width="90%" OnModalClosed="HandleModalClosed">
+        <ChildContent>
+
+            <div class="row ml-10 text-sm-center">
+               
+                <div class="col-sm-auto">
+                    <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnClassModifiers="mt-2" BtnType="button" BtnText=@Translation["PDFImage"] BtnIcon="fa-solid fa-file-pdf" BtnOnClick="ShowPdfViewer"></ButtonComponent>
+                </div>
+
+                <div class="col-sm-auto ">
+                    <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnClassModifiers="mt-2" BtnType="button" BtnText="@btnExpandPdfText" BtnIcon="@btnExpandPdfIcon" BtnOnClick="ActionsPdfDisplayView" BtnVisible="@btnsVisiblePdfActions"></ButtonComponent>
+                </div>
+                <div class="col-sm-auto ">
+                    <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnClassModifiers="mt-2" BtnType="button" BtnText=@Translation["HideDocument"] BtnIcon="fa-solid fa-eye-slash" BtnOnClick="HidePdfViewer" BtnVisible="@btnsVisiblePdfActions"></ButtonComponent>
+                </div>
+            </div>
+
+            <div class="row ml-10 mt-3">
+                <div class="col-12 @ColTableData @DisplayTableClass mb-2">
+                    <TelerikTabStrip PersistTabContent="true">
+                        <TabStripTab Title=@Translation["DocumentInformation"]>
+                            <table class="table table-bordered">
+                                <tbody>
+                                    @foreach (var item in dataInfoDocument)
+                                    {
+                                        <tr>
+                                            <td><b>@item.Key</b></td>
+                                            <td style="word-break: break-word;">
+                                                @item.Value
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </TabStripTab>
+                        <TabStripTab Title=@Translation["DRTInformation"]>
+                            <table class="table table-bordered">
+                                <tbody>
+                                    @foreach (var item in dataInfoTrd)
+                                    {
+                                        <tr>
+                                            <td><b>@item.Key</b></td>
+                                            <td style="word-break: break-word;">
+                                                @item.Value
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </TabStripTab>
+                    </TelerikTabStrip>
+                </div>
+
+                <div class="col-12 @pdfViewerClass mb-2 @DisplayPdfViewerClass">
+
+                    <div class="row">
+                        <TelerikPdfViewer 
+                                          Width="100%"
+                                          Height="100vh"
+                                          Data="@FileData">
+                            <PdfViewerToolBar>
+                                <PdfViewerToolBarSelectionTool />
+                                <PdfViewerToolBarSeparator />
+                                <PdfViewerToolBarSearchTool />
+                                <PdfViewerToolBarSeparator />
+                                <PdfViewerToolBarPrintTool />
+                                <PdfViewerToolBarDownloadTool />
+                                <PdfViewerToolBarSeparator />
+                                <PdfViewerToolBarSpacer />
+                                <PdfViewerToolBarPagerTool />
+                                <PdfViewerToolBarSpacer />
+                                <PdfViewerToolBarSeparator />
+                                <PdfViewerToolBarZoomTool />
+                            </PdfViewerToolBar>
+                        </TelerikPdfViewer>
+                    </div>
+                </div>
+
+            </div>
+        </ChildContent>
+    </GenericModalComponent>
+</TelerikRootComponent>
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+

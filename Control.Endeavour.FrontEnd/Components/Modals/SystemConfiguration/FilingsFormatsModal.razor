@@ -1,0 +1,83 @@
+﻿<div class="my-modal">
+    <TelerikRootComponent>
+        <GenericModalComponent Title=@(Translation["Parametrization"] + " - " + Translation["FilingsFormats"]) IsVisible="@modalStatus" OnModalClosed="HandleModalClosed" Width="70%">
+            <ChildContent>
+                <EditForm Model="@DocCodeFormatDtoRequest" OnValidSubmit="HandleValidSubmit">
+
+
+                    <div class="row p-2">
+                        <label class="mb-2">@Translation["CodeFormatMessage"]</label>
+                        <div class="px-2">
+                            <textarea class="w-100 custom-textarea custom-textare-noresize mb-2" placeholder="" maxlength="200" disabled="true" @bind="@FillCodeTest"></textarea>
+                        </div>
+                    </div>
+                    <div class="row p-2">
+                        <div class="col-md-4">
+                            <label class="mb-2">@Translation["ComunicationClass"]:<span class="red">*</span></label>
+                            <TelerikDropDownList Data="@classCodeList"
+                                                 @bind-Value="DocCodeFormatDtoRequest.ClassCode"
+                                                 Id="GR_TipoDoc"
+                                                 DefaultText=@Translation["SelectAnOption"]
+                                                 TextField="Value"
+                                                 ValueField="Code"
+                                                 Filterable="true">
+                            </TelerikDropDownList>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <label class="mb-2">@Translation["Gantt_Year"]:<span class="red">*</span></label>
+                            <TelerikDropDownList Data="@Year"
+                                                 @bind-Value="@DocCodeFormatDtoRequest.Data"
+                                                 Id="DocTypeJ"
+                                                 DefaultText=@Translation["SelectAnOption"]
+                                                 TextField="valor"
+                                                 ValueField="nombre"
+                                                 Filterable="true"
+                                                 OnChange="@EnableSaveButton"
+                                                 FilterOperator="StringFilterOperator.Contains">
+                            </TelerikDropDownList>
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end justify-content-end">
+                            <div class="px-2">
+                                <TelerikSwitch @bind-Value="@DocCodeFormatDtoRequest.ActiveState" />
+                            </div>
+                            <div class="px-2">
+                                @(DocCodeFormatDtoRequest.ActiveState ? Translation["Enabled"] : Translation["Disabled"])
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row p-2">
+                        
+                        <div class="col-md-4 mb-2">
+                            <InputModalComponent InputMaxLength="2" LabelText=@(Translation["LengthOfPrefix"]+":") Placeholder=@Translation["LengthOfPrefix"] IsRequired="true" @bind-InputValue="@PrefixMaxLength" MethodValueChanged="EnableSaveButton" InputType="number" FieldType="InputModalTypeEnum.Filing" InputMaxNumberValue="99"></InputModalComponent>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <InputModalComponent InputMaxLength="2" LabelText=@(Translation["LengthOfSuffix"]+":") Placeholder=@Translation["LengthOfPrefix"] IsRequired="true" @bind-InputValue="@SuffixMaxLength" MethodValueChanged="EnableSaveButton" InputType="number" FieldType="InputModalTypeEnum.Filing" InputMaxNumberValue="99"></InputModalComponent>
+                        </div>
+                        
+                    </div>
+                    <div class="row p-2">
+                        <div class="col-md-4 mb-2">
+                            <InputModalComponent InputMaxLength="@DocCodeFormatDtoRequest.PrefixLength" IsDisabled="@IsEnablenPrefix" LabelText=@(Translation["Prefix"]+":") Placeholder=@Translation["Prefix"] IsRequired="true" @bind-InputValue="DocCodeFormatDtoRequest.Prefix" MethodValueChanged="EnableSaveButton"></InputModalComponent>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                             <InputModalComponent InputMaxLength="@DocCodeFormatDtoRequest.SuffixLength" IsDisabled="@IsEnablenSuffix" LabelText=@(Translation["Suffix"]+":") Placeholder=@Translation["Suffix"] IsRequired="true" @bind-InputValue="DocCodeFormatDtoRequest.Suffix" MethodValueChanged="EnableSaveButton"></InputModalComponent>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <InputModalComponent InputMaxLength="1" LabelText=@(Translation["Divider"]+":") Placeholder=@Translation["Divider"]  @bind-InputValue="DocCodeFormatDtoRequest.Separator" MethodValueChanged="EnableSaveButton"></InputModalComponent>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="from-group from-group--margin-top justify-content-center">
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Test"] BtnIcon="fa-solid fa-magnifying-glass" BtnDisabled="@IsEnablenButtom" BtnOnClick="SetTestFillingCode"></ButtonComponent>
+                            <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="ResetFormAsync"></ButtonComponent>
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="submit" BtnDisabled="@IsEnablenButtom" BtnIcon="fa-solid fa-floppy-disk"></ButtonComponent>
+                        </div>
+                    </div>
+                </EditForm>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>
+
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>

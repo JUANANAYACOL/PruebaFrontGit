@@ -1,0 +1,98 @@
+﻿@page "/SessionAdministration"
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.User.Request
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.User.Response
+@layout MainLayout;
+
+<div class="container-fluid mt-5">
+    <!-- Parte 1: Título y Contenido alineado a la izquierda -->
+    <div class="row titulo">
+        <div class="col-lg-10">
+            <h1>@(Translation["Administration"] + " - " + Translation["SessionAdministration"]) </h1>
+
+        </div>
+    @*     <!-- Parte 2: Botón azul alineado a la derecha -->
+        <div class="col-lg-2 text-end">
+            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers=" ml-10  btn-block" BtnType="button" BtnText=@Translation["Create"] BtnOnClick="ShowModal" BtnIcon="fa-solid fa-plus"></ButtonComponent>
+        </div> *@
+    </div>
+
+    <div class="row">
+
+        <div class="col-lg-12">
+            <h6 class="titulo-azul"> @Translation["SearchByFilters"]:</h6>
+        </div>
+
+        <div class="col-lg-4">
+
+            <InputModalComponent @bind-InputValue="Firstname" MethodValueChanged="replaceNumbers" IsRequired=" false" InputMaxLength="100" FieldType="InputModalTypeEnum.NotEmpty" LabelText=@Translation["FirstName"] Placeholder="" />
+
+        </div>
+
+        <div class="col-lg-4">
+            <InputModalComponent @bind-InputValue="Lastname" MethodValueChanged="replaceNumbers"  InputMaxLength="100" IsRequired=" false" FieldType="InputModalTypeEnum.NotEmpty" LabelText=@Translation["Surname"] Placeholder="" />
+
+
+        </div>
+        <div class="col-lg-4">
+            <label class="mb-2">@Translation["To"]  </label>
+            <TelerikDatePicker @bind-Value="@DateToSearch"
+                               Format="dd/MM/yyyy"
+                               ShowWeekNumbers="false"
+                               Min="@minValue"
+                               Class="DisabledInput">
+            </TelerikDatePicker>
+
+        </div>
+
+
+        <div class="col-lg-12">
+            <div class="from-group from-group--margin-top justify-content-end">
+
+                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="OnClickReset"></ButtonComponent>
+                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Search"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="GetBlockedUsers"></ButtonComponent>
+            </div>
+        </div>
+
+
+    </div>
+
+    <!-- Parte 3: Grilla -->
+    <div class="row mt-4">
+        <div class="col">
+            <TelerikGrid Data="BlockedList" PageSize="10"
+                         Sortable="true"
+                         FilterMode="GridFilterMode.FilterMenu"
+                         Resizable="true"
+                         Reorderable="false"
+                         EditMode="GridEditMode.Popup"
+                         SelectionMode="GridSelectionMode.None">
+                <GridColumns>
+                    <GridCommandColumn Width="80px" Title=@Translation["Grid_Unlock"] HeaderClass="center-wrap" Visible="true">
+
+
+                        <GridCommandButton Title=@Translation["Grid_Unlock"] Icon="@SvgIcon.Unlink" OnClick="@((args)=> UnblockUserSelection((BlockedUsersDtoResponse)args.Item))"></GridCommandButton>
+
+                    </GridCommandColumn>
+
+                    
+
+
+                    <GridColumn Field=@nameof(BlockedUsersDtoResponse.Fullname) TextAlign="ColumnTextAlign.Center" Title=@Translation["FullName"] Width="100px" Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(BlockedUsersDtoResponse.DateBlock) TextAlign="ColumnTextAlign.Center" Title=@Translation["DateOfBlock"] Width="100px" Filterable="false" HeaderClass="center-wrap" />
+                 
+                </GridColumns>
+                <NoDataTemplate>
+                    <img src="../img/noDataFound.png" width="8%" height="8%" />
+                    <p> @Translation["NoGridInfo"]</p>
+                </NoDataTemplate>
+            </TelerikGrid>
+        </div>
+    </div>
+    @if (dataChargue)
+    {
+        <!-- Parte 4: Botones en la izquierda, centro y derecha -->
+        <NewPaginationComponent @ref="paginationComponent" Filter="@Filter" T="BlockedUsersDtoResponse" M="BlockerUsersFilterDtoRequest" Uri="@UriFilterBlocked" PaginationInfo="@paginationInfo" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+    }
+
+    <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiCloseAsync"></NotificationsComponentModal>
+</div>

@@ -1,0 +1,93 @@
+﻿@using Control.Endeavour.FrontEnd.Models.Models.Documents.OverrideTray.Response
+<TelerikRootComponent>
+
+    <GenericModalComponent Title=@Translation["RespondRequestsMassively"] IsVisible="modalStatus" OnModalClosed="HandleModalClosed" Width="70%">
+        <ChildContent>
+            <div class="row">
+                <div class="col-12">
+                    <TelerikGrid 
+                                 Data=@RequestList
+                                 Pageable="true"
+                                 FilterMode="GridFilterMode.FilterMenu"
+                                 Resizable="true"
+                                 PageSize="10"
+                                 Navigable="true">
+                        <GridColumns>
+                            <GridCommandColumn Width="80px" Title=@Translation["Edit"] HeaderClass="center-wrap">
+                                @{
+                                    var item = (OverrideTrayRequestDtoResponse)context;
+                                    <div class="d-flex justify-content-around">
+                                        <GridCommandButton Icon="@SvgIcon.FormElement" Title="@Translation["Details"]" OnClick="@((args)=> ShowModalOverrideTrayAdmin((OverrideTrayRequestDtoResponse)args.Item))"></GridCommandButton>
+                                    </div>
+                                }
+                            </GridCommandColumn>
+                            <GridColumn Field="FilingCode"
+                                        Title=@Translation["FilingCode"]
+                                        Width="150px"
+                                        Filterable="false"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                            <GridColumn Field="NameTypeRequestCode"
+                                        Title=@Translation["CancellationType"]
+                                        Width="150px"
+                                        Filterable="false"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                            <GridColumn Field="NameTypeCode"
+                                        Title=@Translation["RequestType"]
+                                        Width="150px"
+                                        Filterable="false"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                            <GridColumn Field="NameCancelationState"
+                                        Title=@Translation["Status"]
+                                        Width="150px"
+                                        Filterable="false"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                            <GridColumn Field="CancelationReasonName"
+                                        Title=@Translation["CancellationReason"]
+                                        Width="150px"
+                                        Filterable="false"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                            <GridColumn Field="UserRequestName"
+                                        Title=@Translation["Applicant"]
+                                        Width="150px"
+                                        Filterable="false"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                        </GridColumns>
+                        <NoDataTemplate>
+                            <img src="../img/noDataFound.png" width="8%" height="8%" />
+                            <p> @Translation["NoGridInfo"]</p>
+                        </NoDataTemplate>
+                    </TelerikGrid>
+
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-12">
+                    <label>@Translation["Comment"]<span class="span-gray">@string.Format(Translation["CharactersOutOf"], contadorcarac, "500")</span></label>
+                    <textarea class="w-100 custom-textarea"
+                              id="txtComentario"
+                              @bind="@txtComentario"
+                              maxlength="500" oninput="@ContarCaracteres">
+                        </textarea>
+
+                </div>
+            </div>
+            <div class="row align-self-center mt-5">
+                <!-- Parte Derecha: Dos Botones -->
+                <div class="col">
+                    <div class="text-center">
+                        <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="reset"></ButtonComponent>
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button"  BtnIcon="fa-solid fa-floppy-disk" BtnOnClick="UpdateRequest"></ButtonComponent>
+                    </div>
+                </div>
+            </div>
+            <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+        </ChildContent>
+    </GenericModalComponent>
+</TelerikRootComponent>
+<OverrideTrayModal @ref="_ModalOverrideTray"></OverrideTrayModal>

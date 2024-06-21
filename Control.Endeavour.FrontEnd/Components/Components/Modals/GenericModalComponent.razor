@@ -1,0 +1,39 @@
+﻿<TelerikWindow Class="myWindow"
+               Modal=true
+               Resizable=false
+               Width="@regularWidth"
+               Height="@regularHeight"
+               Centered="true"
+               Visible="IsVisible"
+               Draggable="false"
+               MaxHeight="@regularMaxHeight">
+               
+    <WindowTitle>
+        <div class="row w-100">
+            <div class="col-10">
+                <strong>@Title</strong>
+            </div>
+
+            <div class="col-2 d-flex gap-4 d-flex  justify-content-end ">
+                <button class="svg-button d-none @modalExpanded d-sm-inline-block" @onclick="ExpandModal">
+                    <img src="../img/dimensionar.svg" />
+                </button>
+                <button class="svg-button">
+                    <img src="../img/vector.svg" @onclick="CloseModal" />
+                </button>
+            </div>
+        </div>
+
+    </WindowTitle>
+
+
+    <WindowContent>
+        <div class="contenedor-modal @classExpand">
+            <div class="position-container-fluid">
+                @ChildContent
+            </div>
+            <img src="../img/maskGroup.svg" alt="Tu Imagen" class="imagen-inferior-derecha" />
+        </div>
+
+    </WindowContent>
+</TelerikWindow>

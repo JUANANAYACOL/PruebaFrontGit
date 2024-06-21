@@ -1,0 +1,72 @@
+﻿@implements IAsyncDisposable
+
+<div @ref="dropContainer" class="file-upload-wrapper" @ondragenter="OnDragEnter" @ondragover="OnDragEnter" @ondragleave="OnDragLeave">
+
+    <!-- Spinner de carga -->
+    @if (isLoading)
+    {
+        <div class="spinner-container">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">@Translation["Loading"]</span>
+            </div>
+        </div>
+    }
+
+    <!-- Área de carga de archivos, oculta durante la carga -->
+    @if (!isLoading)
+    {
+        @if (FileInfos.Count == 0)
+        {
+            <div class="@hoverClass  h-100" >
+                <div class="central-container">
+                    <img src="../img/carbonDocumentAdd.svg" alt="Upload file" @onclick="TriggerFileInputClick" />
+                    <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["UploadFile"] BtnIcon="fa-solid fa-upload" BtnOnClick="TriggerFileInputClick"></ButtonComponent>
+                     <span>@Translation["Or"] </span>
+                     <span>@Translation["DragFile"] </span>
+                </div>
+            </div>
+            
+        }
+    }
+
+    <!-- Tabla de archivos subidos, oculta durante la carga -->
+    @if (!isLoading && FileInfos.Count > 0)
+    {
+        <div class="table-responsive custom-table-container mt-3">
+            <table class="table custom-table">
+                <thead>
+                    <tr>
+                        <th><img src="../img/carbonDocumentAdd.svg" alt=@Translation["UploadFile"] @onclick="TriggerFileInputClick" style="cursor:pointer; width: 30px; height: 30px;" /></th>
+
+                        <th>@Translation["Name"]</th>
+                        <th>@Translation["Details"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var fileInfo in FileInfos)
+                    {
+                        <tr>
+                            <td>
+                                <img src="../img/deleteIcon.svg" alt="Delete Icon" style="width: 20px; height: 20px; cursor: pointer;" @onclick="() => DeleteFileModalOpen(fileInfo)" />
+                            </td>
+                            <td class="align-items-center" style="word-break: break-word;">
+                                <span>@fileInfo.Name</span>
+                            </td>
+                            <td class="align-items-center">
+                                <i class="@fileInfo.IconPath" style="font-size: 18px;"></i>
+                                <span>@fileInfo.Extension</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+
+    @* @if (!ValidationField) 
+    {*@
+        <InputFile @ref="inputFile" id="@IdInput" multiple OnChange="OnChange" style="display: none;" />
+    @* } *@
+
+</div>
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>

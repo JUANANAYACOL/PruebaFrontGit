@@ -1,0 +1,84 @@
+﻿@using Microsoft.AspNetCore.Components.Forms
+@using System.ComponentModel.DataAnnotations
+<div class="my-modal">
+    <TelerikRootComponent>
+        <GenericModalComponent Title=@(Translation["Administration"] + " - " + Translation["DocumentarySeries"]) Width="70%" IsVisible="modalStatus" OnModalClosed="HandleModalClosed">
+            <ChildContent>
+                <EditForm Model="@retentionSSDtoRequest" OnValidSubmit="HandleValidSubmit">
+
+                    <div class="px-4 pt-2">
+                        <div class="row p-2">
+                            <div class="col-md-12">
+                                <h6 class="titulo-azul">@Translation["Retention"]</h6>
+                            </div>
+                            <div class="col-lg-3 mt-2">
+                                <div class="cuadro-info">
+                                    <InputModalComponent @bind-InputValue="@TimeFileManagement" IsRequired="true" InputMaxLength="4" LabelText=@(Translation["ManagementArchive"]+" ("+Translation["Years"]+"):") Placeholder="" InputType="number" FieldType="InputModalTypeEnum.Filing" MethodValueChanged="EnableSaveButton"/>
+                                </div>
+                            </div>
+                            <div class="col-lg-3 mt-2">
+                                <div class="cuadro-info">
+                                    <InputModalComponent @bind-InputValue="@TimeFileCentral" IsRequired="true" InputMaxLength="4" LabelText=@(Translation["CentralArchive"]+" ("+Translation["Years"]+"):") Placeholder="" InputType="number" FieldType="InputModalTypeEnum.Filing" MethodValueChanged="EnableSaveButton" />
+                                </div>
+                            </div>
+                            <div class="col-lg-6 mt-2">
+                                <h6 class="titulo-azul">@Translation["FinalDisposition"]<span class="red">*</span></h6>
+                                <div class="row gx-2">
+                                    <div class="col-lg-6 mt-1">
+                                        <label>
+                                            <TelerikCheckBox @bind-Value="@retentionSSDtoRequest.TotalConservation"
+                                                             OnChange="@EnableSaveButton"
+                                                             Enabled="totalConservationStatus" />
+                                            @Translation["TotalConservation"]
+                                        </label>
+                                    </div>
+                                    <div class="col-lg-6 mt-1">
+                                        <label>
+                                            <TelerikCheckBox @bind-Value="@retentionSSDtoRequest.Elimination"
+                                                             OnChange="@EnableSaveButton"
+                                                             Enabled="eliminationStatus" />
+                                            @Translation["Elimination"]
+                                        </label>
+                                    </div>
+                                    <div class="col-lg-6 mt-1">
+                                        <label>
+                                            <TelerikCheckBox @bind-Value="@retentionSSDtoRequest.TechEnvironment"
+                                                             OnChange="@EnableSaveButton"
+                                                             Enabled="techEnvironmentStatus" />
+                                            @Translation["TechEnvironment"]
+                                        </label>
+                                    </div>
+                                    <div class="col-lg-6 mt-1">
+                                        <label>
+                                            <TelerikCheckBox @bind-Value="@retentionSSDtoRequest.Selection"
+                                                             OnChange="@EnableSaveButton"
+                                                             Enabled="selectionStatus" />
+                                            @Translation["SelectionD"]
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row p-2">
+                            <div class="col-md-12">
+                                <h6 class="titulo-azul">@Translation["Procedure"]</h6>
+                            </div>
+                            <label class="mb-2">@Translation["EnterProcedure"]: <span style="color: gray">@string.Format(Translation["CharactersOutOf"], characterCounterComment, "200")</span> </label>
+                            <div class="px-2">
+                                <textarea class="w-100 custom-textarea custom-textare-noresize mb-2" placeholder="" maxlength="200" @bind="retentionSSDtoRequest.ProcedureRet" @oninput="@(e => CountCharacters(e, ref characterCounterComment))"></textarea>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="from-group from-group--margin-top justify-content-center">
+                                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="ResetFormAsync"></ButtonComponent>
+                                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="submit" BtnIcon="fa-solid fa-floppy-disk" BtnDisabled="BtnSubmitStatus"></ButtonComponent>
+                            </div>
+                        </div>
+                    </div>
+                </EditForm>
+                <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>

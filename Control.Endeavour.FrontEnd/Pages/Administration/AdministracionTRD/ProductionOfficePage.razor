@@ -1,0 +1,219 @@
+﻿@page "/ProductionOffice"
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.AdministracionTRD.Request;
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.AdministracionTRD.Response;
+
+<div class="container-fluid mt-5">
+
+    <ProductionOfficeModal @ref="productionOfficeModal" OnStatusChanged="HandleStatusChanged"
+                           OnStatusChangedUpdate="HandleStatusChangedUpdated"></ProductionOfficeModal>
+
+    <GenericSearchModal OnStatusUserChanged="HandleUserSelectedChanged" @ref="genericSearchModal"
+                        ConfigurationInUse="1"
+                        multipleSelection=false
+                        showCopiesColumn=false
+                        Title=@(Translation["Administration"] + " - " + Translation["ProductionOffices"] + " - " + Translation["UserSearch"])></GenericSearchModal>
+
+
+
+    <!-- Parte 1: Título y Contenido alineado a la izquierda -->
+    <div class="row titulo">
+        <div class="col-lg-8">
+            <h1>@(Translation["Administration"] + " - " + Translation["ProductionOffices"])</h1>
+
+        </div>
+        <!-- Parte 2: Botón azul alineado a la derecha -->
+
+        <div class="col-lg-4 text-end">
+            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10  btn-block" BtnType="button" BtnText="@(Translation["Create"])" BtnOnClick="ShowModal" BtnIcon="fa-solid fa-plus"></ButtonComponent>
+        </div>
+
+    </div>
+
+    <div class="row m-0">
+
+        <div class="col-lg-12">
+            <h6 class="titulo-azul"> @Translation["SearchByFilters"]:</h6>
+        </div>
+        <div class="col-lg-3 mt-1">
+            <label for="input2" class="mb-2">@Translation["DocumentaryVersions"]<span class="red">*</span></label>
+            <TelerikDropDownList Data="@documentalVersionsList"
+                                 Id="DocTypeJ"
+                                 DefaultText="@Translation["SelectAType"]"
+                                 TextField="Code"
+                                 ValueField="DocumentalVersionId"
+                                 Value="@IdDocumental"
+                                 ValueChanged="@( (int newValue) => GetAdministrativeUnits(newValue) )"
+                                 OnChange="EnableSaveButton"
+                                 Filterable="true"
+                                 FilterOperator="StringFilterOperator.Contains">
+            </TelerikDropDownList>
+        </div>
+
+        <div class="col-lg-3 mt-1">
+            <label for="input2" class="mb-2">@Translation["AdministrativeUnits"]<span class="red">*</span></label>
+            <TelerikDropDownList Data="@administrativeUnitsList"
+                                 DefaultText="@Translation["SelectAType"]"
+                                 TextField="Name"
+                                 ValueField="AdministrativeUnitId"
+                                 @bind-Value="idAdUnit"
+                                 OnChange="EnableSaveButton"
+                                 Filterable="true"
+                                 Enabled="@administrativeUnitEnable"
+                                 FilterOperator="StringFilterOperator.Contains">
+            </TelerikDropDownList>
+        </div>
+
+        <div class="col-lg-3 mt-1">
+            <InputModalComponent @bind-InputValue="codeFilter" IsDisabled="false" LabelText="@Translation["Code"]" Placeholder="@Translation["Code"]" InputMaxLength="5" />
+        </div>
+
+        <div class="col-lg-3 mt-1">
+            <InputModalComponent @bind-InputValue="NameFilter" IsDisabled="false" LabelText="@Translation["Name"]" Placeholder="@Translation["Name"]" InputMaxLength="100" />
+        </div>
+
+    </div>
+
+    <div class="row m-0 pb-10">
+
+        <div class="col-lg-12 mt-3 d-flex justify-content-end">
+            <div class="from-group mt-4">
+                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnClassModifiers="btn-block" BtnType="button" BtnText=@Translation["Clear"] BtnOnClick="ResetFiltersAsync" BtnIcon="fa-solid fa-eraser"></ButtonComponent>
+
+                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10 btn-block" BtnType="button" BtnText=@Translation["Search"] BtnOnClick="ApplyFiltersAsync" BtnIcon="fa-solid fa-magnifying-glass" BtnDisabled="saveIsDisable"></ButtonComponent>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Parte 3: Grilla -->
+
+
+    <div class="row mt-4">
+        <div class="col">
+
+            <TelerikGrid Data="productionOfficesList" PageSize="10"
+                         Sortable="true"
+                         FilterMode="GridFilterMode.FilterMenu"
+                         Resizable="true"
+                         Reorderable="false"
+                         EditMode="GridEditMode.Popup"
+                         SelectionMode="GridSelectionMode.None">
+                <GridToolBarTemplate>
+                    <GridCommandButton Command="ExcelExport" Icon="@SvgIcon.FileExcel" Enabled="productionOfficesList.Count>0">@Translation["ExportToExcel"]</GridCommandButton>
+                    <label class="k-checkbox-label"><TelerikCheckBox @bind-Value="@ExportAllPages" Enabled="productionOfficesList.Count>0" /> @Translation["ExportAllPages"]</label>
+                </GridToolBarTemplate>
+                <GridExport>
+                    <GridExcelExport FileName="telerik-grid-export" AllPages="@ExportAllPages" OnBeforeExport="@OnBeforeExcelExport" />
+                </GridExport>
+                <GridColumns>
+
+
+                    <GridCommandColumn Width="80px" Title=@Translation["Edit"] HeaderClass="center-wrap" Visible="true">
+
+                        <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                            <GridCommandButton Icon="@SvgIcon.Pencil" Title=@Translation["Edit"] OnClick="@((args)=> ShowModalEdit( (ProductionOfficesDtoResponse)  args.Item  ))"></GridCommandButton>
+                        </div>
+                    </GridCommandColumn>
+
+
+                    <GridCommandColumn Width="80px" Title=@Translation["Delete"] HeaderClass="center-wrap" Visible="true">
+
+                        <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                            <GridCommandButton Icon="@SvgIcon.Trash" Title=@Translation["Delete"] OnClick="@((args)=> ShowModalDelete((ProductionOfficesDtoResponse)  args.Item  ))"></GridCommandButton>
+
+                        </div>
+
+                    </GridCommandColumn>
+
+                    <GridColumn Field="@nameof(ProductionOfficesDtoResponse.Name)"
+                                Title=@Translation["Name"]
+                                Width="150px"
+                                Filterable="false"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="@nameof(ProductionOfficesDtoResponse.Code)"
+                                Title=@Translation["Code"]
+                                Width="150px"
+                                Filterable="false"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="@nameof(ProductionOfficesDtoResponse.BossName)"
+                                Title=@Translation["BossName"]
+                                Width="150px"
+                                Filterable="false"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap">
+                        <Template>
+                            @{
+                                ProductionOfficesDtoResponse rowData = (ProductionOfficesDtoResponse)context;
+                                if (rowData != null)
+                                {
+                                    var bossName = !string.IsNullOrEmpty(rowData.BossName) ? rowData.BossName : Translation["NoAssignedBoss"];
+                                    @bossName
+                                }
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field="@nameof(ProductionOfficesDtoResponse.ActiveState)"
+                                Title=@Translation["Status"]
+                                Width="150px"
+                                Filterable="false"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap">
+
+                        <Template>
+                            @{
+                                ProductionOfficesDtoResponse rowData = (ProductionOfficesDtoResponse)context;
+                                if (rowData != null)
+                                {
+                                    bool activeState = (rowData.ActiveState);
+                                    string active = activeState ? Translation["Enabled"] : Translation["Disabled"];
+                                    @active
+                                }
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field=@nameof(ProductionOfficesDtoResponse.CreateUser)
+                                Title=@Translation["UserRecorded"]
+                                Width="200px"
+                                TextAlign="ColumnTextAlign.Center"
+                                Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(ProductionOfficesDtoResponse.CreateDate)
+                                Title=@Translation["DateRecorded"]
+                                Width="200px"
+                                TextAlign="ColumnTextAlign.Center"
+                                Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(ProductionOfficesDtoResponse.UpdateUser)
+                                Title=@Translation["UserUpdated"]
+                                Width="200px"
+                                TextAlign="ColumnTextAlign.Center"
+                                Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(ProductionOfficesDtoResponse.UpdateDate)
+                                Title=@Translation["DateUpdated"]
+                                Width="200px"
+                                TextAlign="ColumnTextAlign.Center"
+                                Filterable="false" HeaderClass="center-wrap" />
+                </GridColumns>
+                <NoDataTemplate>
+                    <img src="../img/noDataFound.png" width="8%" height="8%" />
+                    <p> @Translation["NoGridInfo"]</p>
+                </NoDataTemplate>
+            </TelerikGrid>
+
+
+        </div>
+    </div>
+
+
+
+    @{
+        if (dataChargue)
+        {
+            <NewPaginationComponent @ref="paginationComponent" Filter="@productionByFilter" T="ProductionOfficesDtoResponse" M="ProductionOfficeFilterDtoRequest" Uri="@UriFilterProductionOffice" PaginationInfo="@paginationInfo" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+
+        }
+    }
+
+</div>
+<NotificationsComponentModal @ref="modalNotification" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>

@@ -1,0 +1,157 @@
+﻿<TelerikRootComponent>
+    <GenericModalComponent Title=@Translation["GeneralInformation"] IsVisible="@modalStatus" Width="90%" OnModalClosed="HandleModalClosedAsync">
+        <ChildContent>
+
+            <div class="row ml-10 text-sm-center">
+                <div class="col-sm-auto ">
+                    <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnClassModifiers="mt-2" BtnType="button" BtnText=@Translation["WorkFlow"] BtnIcon="fa-solid fa-list-check" BtnOnClick="ShowWorKFlow"></ButtonComponent>
+                </div>
+                <div class="col-sm-auto">
+                    <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnClassModifiers="mt-2" BtnType="button" BtnText=@Translation["PDFImage"] BtnIcon="fa-solid fa-file-pdf" BtnOnClick="ShowPdfViewerAsync"></ButtonComponent>
+                </div>
+                @* <div class="col-sm-auto ">
+                <div class="dropdown">
+                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnClassModifiers="mt-2 btn-absolute" BtnVisible="docTask" BtnType="button" BtnText="Expedientes" BtnIcon="fa-solid fa-clipboard" BtnOnClick="() => ToggleDropdown(ref isDropdownOpen,ref DropdownMenuRecords)"></ButtonComponent>
+                <ul class="dropdown-menu @DropdownMenuRecords">
+                <li class="pt-1 pb-1 ">
+                <a class="dropdown-item cursor-pointer-class"> <i class="fas fa-solid fa-eye me-2 ml-10"></i>Ver expediente </a>
+
+                </li>
+                <li class="pt-1 pb-1 ">
+                <a class="dropdown-item cursor-pointer-class"> <i class="fa-solid fa-window-restore me-2 ml-10"></i>Incluir expediente </a>
+
+                </li>
+                </ul>
+                </div>
+                </div>
+                <div class="col-sm-auto ">
+                <div class="dropdown">
+
+                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnClassModifiers="mt-2 btn-absolute" BtnVisible="docTask" BtnType="button" BtnText="Préstamos" BtnIcon="fa-brands fa-leanpub" BtnOnClick="() => ToggleDropdown(ref isDropdownLoans,ref DropdownMenuLoans)"></ButtonComponent>
+                <ul class="@DropdownMenuLoans">
+                <li class="pt-1 pb-1 ">
+                <a class="dropdown-item cursor-pointer-class"> <i class="fa-solid fa-folder-plus me-2 ml-10"></i>Solicitar</a>
+                </li>
+                <li class="pt-1 pb-1">
+                <a class="dropdown-item cursor-pointer-class"> <i class="fa-solid fa-magnifying-glass me-2 ml-10"></i>Consultar estado </a>
+                </li>
+                <li class="pt-1 pb-1 ">
+                <a class="dropdown-item cursor-pointer-class"> <i class="fa-solid fa-ban me-2 ml-10"></i>Consultar solicitud </a>
+                </li>
+
+
+                </ul>
+                </div>
+                </div> *@
+                <div class="col-sm-auto ">
+                    <div class="dropdown">
+
+                        <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnClassModifiers="mt-2 btn-absolute" BtnVisible="docTask" BtnType="button" BtnText=@Translation["Documents"] BtnIcon="fa-solid fa-folder-open" BtnOnClick="() => ToggleDropdown(ref isDropdownMenuDocuments, ref DropdownMenuDocuments)"></ButtonComponent>
+                        <ul class=" @DropdownMenuDocuments">
+                            <i class=""></i>
+                            <li class="pt-1 pb-1">
+                                <a class="dropdown-item cursor-pointer-class" @onclick="ShowModalUpdateTypology"> <i class="fa-solid fa-pen-to-square me-2 ml-10"></i>@Translation["UpdateTyplogy"] </a>
+                            </li>
+                            <li class="pt-1 pb-1">
+                                <a class="dropdown-item cursor-pointer-class" @onclick="ShowModalDocumentRelated"> <i class="fa-solid fa-folder-tree me-2 ml-10"></i>@Translation["DocumentRelated"] </a>
+                            </li>
+                            <li class="pt-1 pb-1 ">
+                                <a class="dropdown-item cursor-pointer-class" @onclick="ShowModalDocumentCopies"><i class="fa-solid fa-copy me-2 ml-10"></i>@Translation["Copies"]</a>
+                            </li>
+
+                            <li class="pt-1 pb-1 ">
+                                <a class="dropdown-item cursor-pointer-class" @onclick="ShowModalMetaDataDocument"> <i class="fa-solid fa-file-lines me-2 ml-10"></i>@Translation["Metadatas"]</a>
+                            </li>
+                            @* <li class="pt-1 pb-1 ">
+                            <a class="dropdown-item cursor-pointer-class"> <i class="fa-solid fa-book me-2 ml-10"></i>Indexación de metadatos</a>
+                            </li> *@
+
+
+                        </ul>
+                    </div>
+
+                </div>
+                @* <div class="col-sm-auto">
+                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnClassModifiers="mt-2" BtnType="button" BtnVisible="docTask" BtnText="Panel de firmas" BtnIcon="fa-solid fa-signature"></ButtonComponent>
+                </div> *@
+                <div class="col-sm-auto ">
+                    <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnClassModifiers="mt-2" BtnType="button" BtnText="@btnExpandPdfText" BtnIcon="@btnExpandPdfIcon" BtnOnClick="ActionsPdfDisplayView" BtnVisible="@btnsVisiblePdfActions"></ButtonComponent>
+                </div>
+                <div class="col-sm-auto ">
+                    <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnClassModifiers="mt-2" BtnType="button" BtnText=@Translation["HideDocument"] BtnIcon="fa-solid fa-eye-slash" BtnOnClick="HidePdfViewer" BtnVisible="@btnsVisiblePdfActions"></ButtonComponent>
+                </div>
+            </div>
+
+            <div class="row ml-10 mt-3">
+                <div class="col-12 @ColTableData @DisplayTableClass mb-2">
+                    <TelerikTabStrip PersistTabContent="true">
+                        <TabStripTab Title=@Translation["DocumentInformation"]>
+                            <table class="table table-bordered">
+                                <tbody>
+                                    @foreach (var item in dataInfoDocument)
+                                    {
+                                        <tr>
+                                            <td><b>@item.Key</b></td>
+                                            <td style="word-break: break-word;">
+                                                @item.Value
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </TabStripTab>
+                        <TabStripTab Title=@Translation["RDTInformation"]>
+                            <table class="table table-bordered">
+                                <tbody>
+                                    @foreach (var item in dataInfoTrd)
+                                    {
+                                        <tr>
+                                            <td><b>@item.Key</b></td>
+                                            <td style="word-break: break-word;">
+                                                @item.Value
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </TabStripTab>
+                    </TelerikTabStrip>
+                </div>
+
+                <div class="col-12 @pdfViewerClass mb-2 @DisplayPdfViewerClass">
+
+                    <div class="row">
+                        <TelerikPdfViewer 
+                                          Width="100%"
+                                          Height="100vh"
+                                          Data="@FileData">
+                            <PdfViewerToolBar>
+                                <PdfViewerToolBarSelectionTool />
+                                <PdfViewerToolBarSeparator />
+                                <PdfViewerToolBarSearchTool />
+                                <PdfViewerToolBarSeparator />
+                                <PdfViewerToolBarPrintTool />
+                                <PdfViewerToolBarDownloadTool />
+                                <PdfViewerToolBarSeparator />
+                                <PdfViewerToolBarSpacer />
+                                <PdfViewerToolBarPagerTool />
+                                <PdfViewerToolBarSpacer />
+                                <PdfViewerToolBarSeparator />
+                                <PdfViewerToolBarZoomTool />
+                            </PdfViewerToolBar>
+                        </TelerikPdfViewer>
+                    </div>
+                </div>
+
+            </div>
+        </ChildContent>
+    </GenericModalComponent>
+</TelerikRootComponent>
+<CopiesDocumentModal @ref="copiesDocumentModal"></CopiesDocumentModal>
+<RelatedDocumentsModal @ref="relatedDocumentsModal"></RelatedDocumentsModal>
+<WorKFlowModal @ref="worKFlowModal"></WorKFlowModal>
+<UpdateTypologyModal @ref="updateTypologyModal"></UpdateTypologyModal>
+<MetaDataDocumentModal @ref="metaDataDocumentModal"></MetaDataDocumentModal>
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+
+@* <ModalAssociatedDocuments @ref="modalAssociatedDocuments" OnStatusChangedJoinDoc="HandleStatusChangedJOINDOC"></ModalAssociatedDocuments>  *@

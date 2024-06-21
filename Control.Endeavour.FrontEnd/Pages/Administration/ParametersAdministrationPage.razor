@@ -1,0 +1,192 @@
+﻿@page "/ParametersAdministration"
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.SystemConfiguration.Response
+@using Control.Endeavour.FrontEnd.Models.Models.Components.Modals.Address.Response
+@layout MainLayout;
+
+<Control.Endeavour.FrontEnd.Components.Modals.SystemConfiguration.SystemFieldsModal @ref="modalsystemFields" OnChangeData="HandleRefreshGridDatasystemFieldsAsync"></Control.Endeavour.FrontEnd.Components.Modals.SystemConfiguration.SystemFieldsModal>
+
+<div class="container-fluid mt-1">
+
+    <div class="row">
+        <div class="@Panel1Class">
+            <div class="row titulo">
+                <h4>@(Translation["Administration"] + " - " + Translation["SystemParameters"])</h4>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <h6 class="titulo-azul"> @Translation["SearchByFilters"]:</h6>
+                </div>
+                <div class="col-md-6">
+                    <InputModalComponent @bind-InputValue=systemParamsFilter.ParamCode LabelText=@(Translation["Code"]+":") Placeholder=@Translation["SearchByCode"] FieldType="InputModalTypeEnum.Code" InputMaxLength="5"></InputModalComponent>
+                </div>
+                <div class="col-md-6">
+                    <InputModalComponent @bind-InputValue=systemParamsFilter.ParamName LabelText=@(Translation["Name"]+":") Placeholder=@Translation["SearchByName"] FieldType="InputModalTypeEnum.Name" InputMaxLength="100"></InputModalComponent>
+                </div>
+                <div class="col-md-12 d-flex align-items-end justify-content-end mt-3">
+                    <div class="text-md-end">
+                        <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="CleanFilter"></ButtonComponent>
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Search"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="SearchByFilter"></ButtonComponent>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <TelerikGrid Data="systemParamsList"
+                             ScrollMode="@GridScrollMode.Scrollable"
+                             Height="680px" RowHeight="60" PageSize="@pageSizeSystemParams"
+                             Sortable="true">
+                    <GridColumns>
+
+                        <GridCommandColumn Width="80px" Title=@Translation["Actions"] HeaderClass="center-wrap" Visible="true">
+                            <div class="custom-style-grid">
+                                <GridCommandButton Icon="@SvgIcon.Search" OnClick="@((args)=> ShowSystemFields((SystemParamsDtoResponse)args.Item))"></GridCommandButton>
+                            </div>
+                            
+                        </GridCommandColumn>
+                        <GridColumn Field="ParamCode"
+                                    Title=@Translation["Code"]
+                                    Width="100px"
+                                    Filterable="true"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap" />
+                        <GridColumn Field="ParamName"
+                                    Title=@Translation["Name"]
+                                    Width="100px"
+                                    Filterable="true"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap" />
+                        <GridColumn Field="Description"
+                                    Title=@Translation["Description"]
+                                    Width="180px"
+                                    Filterable="true"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap" />
+                        <GridColumn Field="CreateUser"
+                                    Title=@Translation["UserRecorded"]
+                                    Width="200px"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    Filterable="false" HeaderClass="center-wrap" />
+                        <GridColumn Field="CreateDate"
+                                    Title=@Translation["DateRecorded"]
+                                    Width="200px"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    Filterable="false" HeaderClass="center-wrap" />
+                        <GridColumn Field="UpdateUser"
+                                    Title=@Translation["UserUpdated"]
+                                    Width="200px"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    Filterable="false" HeaderClass="center-wrap" />
+                        <GridColumn Field="UpdateDate"
+                                    Title=@Translation["DateUpdated"]
+                                    Width="200px"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    Filterable="false" HeaderClass="center-wrap" />
+
+                    
+                    </GridColumns>
+                </TelerikGrid>
+
+            </div>
+        </div>
+        <div class="col-md-6 flex-md-column @Panel2Class">
+            <div class="row titulo">
+                <div class="col-md-8">
+                    <h4>@Translation["ParameterValues"]: @systemParamName</h4>
+                </div>
+                <div class="col-md-4 text-end">
+                    <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers=" ml-10" 
+                    BtnType="button" BtnText=@Translation["Create"] BtnOnClick="ShowModal" BtnIcon="fa-solid fa-plus"></ButtonComponent>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <h6 class="titulo-azul"> @Translation["SearchByFilters"]:</h6>
+                </div>
+                <div class="col-md-6">
+                    <InputModalComponent @bind-InputValue=SystemFieldsFilter.Code LabelText=@(Translation["Code"]+":") Placeholder=@Translation["SearchByCode"] FieldType="InputModalTypeEnum.Code" InputMaxLength="5"></InputModalComponent>
+                </div>
+                <div class="col-md-6">
+                    <InputModalComponent @bind-InputValue=SystemFieldsFilter.Value LabelText=@(Translation["Filter_Value"]+":") Placeholder=@Translation["Filter_Value"] FieldType="InputModalTypeEnum.Name" InputMaxLength="100"></InputModalComponent>
+                </div>
+                <div class="col-md-12 d-flex align-items-end justify-content-end mt-3">
+                    <div class="text-md-end">
+                        <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="CleanFieldsFilter"></ButtonComponent>
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Search"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="SearchFieldsByFilter"></ButtonComponent>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                </div>
+            </div>
+            <div class="row mt-3">
+
+                <TelerikGrid Data="systemFieldsList"
+                             ScrollMode="@GridScrollMode.Scrollable"
+                             Height="680px"
+                             RowHeight="60" PageSize="@pageSizeSystemFields"
+                             Sortable="true">
+                    <GridColumns>
+                        <GridCommandColumn Width="80px" Title=@Translation["Actions"] HeaderClass="center-wrap" Visible="true">
+                            <div class="custom-style-grid">
+                                <GridCommandButton Title=@Translation["Edit"] Icon="@SvgIcon.Pencil" OnClick="@((args)=> ShowModalSystemFields((SystemFieldsDtoResponse)args.Item))"></GridCommandButton>
+                            </div>
+                            @* <GridCommandButton Title=@Translation["Delete"] Icon="@SvgIcon.Trash" OnClick="@((args)=> ShowModalDeleteSystemFields((SystemFieldsDtoResponse)args.Item))"></GridCommandButton> *@
+                        </GridCommandColumn>
+                        <GridColumn Field="Code"
+                                    Title=@Translation["Code"]
+                                    Width="150px"
+                                    Filterable="true"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap" />
+                        <GridColumn Field="Value"
+                                    Title=@Translation["Filter_Value"]
+                                    Width="150px"
+                                    Filterable="true"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap" />
+                        <GridColumn Field="ActiveState"
+                                    Title=@Translation["Status"]
+                                    Width="150px"
+                                    Filterable="true"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap">
+                            <Template>
+                                @{
+                                    SystemFieldsDtoResponse rowData = (SystemFieldsDtoResponse)context;
+                                    if (rowData != null)
+                                    {
+                                        bool activeState = (bool)rowData.ActiveState!;
+                                        string active = activeState ? Translation["Enabled"] : Translation["Disabled"];
+                                        @active
+                                    }
+                                }
+                            </Template>
+                        </GridColumn>
+                        <GridColumn Field="CreateUser"
+                                    Title=@Translation["UserRecorded"]
+                                    Width="200px"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    Filterable="false" HeaderClass="center-wrap" />
+                        <GridColumn Field="CreateDate"
+                                    Title=@Translation["DateRecorded"]
+                                    Width="200px"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    Filterable="false" HeaderClass="center-wrap" />
+                        <GridColumn Field="UpdateUser"
+                                    Title=@Translation["UserUpdated"]
+                                    Width="200px"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    Filterable="false" HeaderClass="center-wrap" />
+                        <GridColumn Field="UpdateDate"
+                                    Title=@Translation["DateUpdated"]
+                                    Width="200px"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    Filterable="false" HeaderClass="center-wrap" />
+                    </GridColumns>
+                </TelerikGrid>
+
+            </div>
+        </div>
+    </div>
+</div>
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose">
+
+</NotificationsComponentModal>

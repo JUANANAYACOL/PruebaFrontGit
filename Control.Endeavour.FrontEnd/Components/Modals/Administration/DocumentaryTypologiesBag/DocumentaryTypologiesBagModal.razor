@@ -1,0 +1,56 @@
+﻿
+<div class="my-modal">
+
+    <TelerikRootComponent>
+        <GenericModalComponent Title="@Title" IsVisible="modalStatus" OnModalClosed="HandleModalClosed" Width="70%">
+            <ChildContent>
+                <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+
+               <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="row">
+
+                                <div class="col-lg-8">
+
+                                    <InputModalComponent @ref="nameInput" @bind-InputValue="name" IsRequired=" true" InputMaxLength="100" FieldType="InputModalTypeEnum.NotEmpty" LabelText=@Translation["Name"] MethodValueChanged="EnableSaveButton"  Placeholder="" />
+
+                                </div>
+           
+                                <div class="col-lg-4 mt-3">
+
+                                    <div class="from-group mt-3 d-flex align-items-end justify-content-end">
+
+
+                                        <div class="px-2">
+                                            <TelerikSwitch @bind-Value="@activeState" />
+                                        </div>
+                                        <div class="px-2">
+                                            @(activeState ? Translation["Enabled"] : Translation["Disabled"])
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <div class="col-lg-12 mt-3">
+                                    <div class="mb-2">
+                                        <label class="mb-2">@(Translation["Description"] + ":") <span style="color:gray">@string.Format(Translation["CharactersOutOf"], CharacterCounter, "200") <span class="red">*</span></span>  </label>
+                                        <textarea @bind="@description" class="w-100 custom-textarea " placeholder="" required maxlength="200" @oninput="CountCharacters"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>  
+                    <div class="row">
+                        <div class="from-group from-group--margin-top justify-content-center">
+
+                            <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="ResetFormAsync"></ButtonComponent>
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnIcon="fa-solid fa-floppy-disk" BtnDisabled="saveIsDisable" BtnOnClick="HandleValidSubmit"></ButtonComponent>
+                        </div>
+                    </div>
+                </div>
+ 
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>

@@ -1,0 +1,98 @@
+﻿@page "/ManagementValidity"
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.AdministracionTRD.Request
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.AdministracionTRD.Response
+@layout MainLayout;
+
+
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiCloseAsync" ></NotificationsComponentModal>
+<ManagementValidityModal @ref=managementValidityModal OnStatusChanged="HandleModalStatusChangedAsync"></ManagementValidityModal>
+
+<div class="container-fluid mt-5">
+    <!-- Parte 1: Título y Contenido alineado a la izquierda -->
+
+    <div class="row titulo">
+        <div class="col-lg-10">
+
+            <h1>@(Translation["Security"] + " - " + Translation["ManagementValidity"])</h1>
+
+        </div>
+        <!-- Parte 2: Botón azul alineado a la derecha -->
+        <div class="col-lg-2 text-end">
+            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers=" ml-10  btn-block" BtnType="button" BtnText=@Translation["Create"] BtnOnClick="ShowModal" BtnIcon="fa-solid fa-plus"></ButtonComponent>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <h6 class="titulo-azul"> @Translation["SearchByFilters"]:</h6>
+        </div>
+
+        <div class="col-lg-4">
+            <InputModalComponent @bind-InputValue="ProductionOfficeName" IsRequired=" false" InputMaxLength="100" FieldType="InputModalTypeEnum.NotEmpty" LabelText=@Translation["Name"] Placeholder="" />
+
+
+        </div>
+        <div class="col-lg-4">
+
+            <InputModalComponent @bind-InputValue="Code" IsRequired=" false" InputMaxLength="5" FieldType="InputModalTypeEnum.NotEmpty" LabelText=@Translation["Code"] Placeholder="" />
+
+        </div>
+
+
+        <div class="col-lg-4">
+            <div class="from-group from-group--margin-top justify-content-end">
+
+                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnOnClick="ClearData" BtnIcon="fa-solid fa-eraser"></ButtonComponent>
+                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Search"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="SearchData"></ButtonComponent>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-2">
+
+        <div class="col ">
+            <TelerikGrid Data="ListProdParameter" PageSize="10"
+                         Sortable="true"
+                         FilterMode="GridFilterMode.FilterMenu"
+                         Resizable="true"
+                         Reorderable="false"
+                         EditMode="GridEditMode.Popup"
+                         SelectionMode="GridSelectionMode.None">
+                <GridColumns>
+                         <GridCommandColumn Width="80px" Title=@Translation["Edit"] HeaderClass="center-wrap" Visible="true">
+
+                                                     <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                        <GridCommandButton Title=@Translation["Edit"] Icon="@SvgIcon.Pencil" OnClick="@((args)=> ShowModalEdit((ProdOfficeManagmentDtoResponse)args.Item))"></GridCommandButton>
+                        </div>
+                    </GridCommandColumn>
+                    
+                    <GridCommandColumn Width="80px" Title=@Translation["Delete"] HeaderClass="center-wrap" Visible="true">
+                        <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                            <GridCommandButton Title=@Translation["Delete"] Icon="@SvgIcon.Trash" OnClick="@((args) => HandleDeleteData( ( ProdOfficeManagmentDtoResponse)args.Item ))"></GridCommandButton>
+
+                    </div>
+                    </GridCommandColumn>
+               
+
+                    <GridColumn Field=@nameof(ProdOfficeManagmentDtoResponse.Name) TextAlign="ColumnTextAlign.Center" Title=@Translation["Name"] Width="100px" Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(ProdOfficeManagmentDtoResponse.PasswordExpirationTime) TextAlign="ColumnTextAlign.Center" Title=@( $"{Translation["Filter_Value"]} ({Translation["Month(s)"]})") Width="100px" Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(ProdOfficeManagmentDtoResponse.UpdateUser) TextAlign="ColumnTextAlign.Center" Title=@Translation["UserUpdated"] Width="100px" Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(ProdOfficeManagmentDtoResponse.UpdateDate) TextAlign="ColumnTextAlign.Center" Title=@Translation["DateUpdated"] Width="100px" Filterable="false" HeaderClass="center-wrap" />
+                </GridColumns>
+                <NoDataTemplate>
+                    <img src="../img/noDataFound.png" width="8%" height="8%" />
+                    <p> @Translation["NoGridInfo"]</p>
+                </NoDataTemplate>
+            </TelerikGrid>
+        </div>
+    </div>
+
+    @if (dataChargue)
+    {
+        <!-- Parte 4: Botones en la izquierda, centro y derecha -->
+        <NewPaginationComponent @ref="paginationComponent" Filter="@FilterSearch" T="ProdOfficeManagmentDtoResponse" M="ProdOfficeManagmentDtoRequest" Uri="@UriFilterProdParameter" PaginationInfo="@paginationInfo" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+    }
+
+
+</div>
+

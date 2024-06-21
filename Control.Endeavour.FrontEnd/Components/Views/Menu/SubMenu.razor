@@ -1,0 +1,279 @@
+﻿
+
+
+<div class="col-md-12 h-100 p-0">
+
+    <!-- Contenedor principal con estilos de Bootstrap-->
+    <div class="rounded-right h-100 p-3 d-flex flex-column overflow-auto main-container-menu">
+
+        <ul class="list-unstyled options menu-text-left pl-1">
+
+            <!-- Se recorre una lista de tipo Menu, que contiene los menus que hay en BD -->
+            @foreach (var menuModels in MenusModels)
+            {
+                <li>
+                    <div class="option-header">
+
+                        <!--
+                            Este boton se utiliza para desplegar los niveles del menu seleccionado, tiene el
+                            ToggleSubMenu (Abre el menu seleccionado y cierra otro menu que pudiera estar abierto
+                            anteriormente), IsExpanded(Se revisa si ya anteriormente esta expandido)
+                        -->
+                        <button @onclick="() => ToggleSubMenu(menuModels.MenuId, 1)" class="btn text-left w-100 @((IsExpanded(menuModels.MenuId, 1) ? "main-button" : "")) menu-option my-1">
+
+                            <!--
+                                Informacion del menu (el contenedor de los subniveles)
+                            -->
+                            <div class="d-flex align-items-center justify-content-between">
+
+                                <!--
+                                    Aqui se encuentra el nombre del menu
+                                -->
+                                <div class="d-flex align-items-center">
+                                    <img src="@(menuModels.Icon)" class="d-inline-block icon-menu" />
+                                    <span class="text-wrap text-color d-inline-block ml-2 levels">@menuModels.Name</span>
+                                </div>
+                                <!--
+                                    Aqui se encuentra el svg/boton de despliegue es una flecha que dependiendo si un
+                                    menu esta desplegado estara mirando hacia arriba y si un menu no esta desplegado
+                                    estara mirando hacia abajo
+                                -->
+                                <div>
+                                    <i class="ml-auto">
+                                        <!--
+                                            HasSubMenuItems ayuda a revisar si el menu tiene opciones/subniveles
+                                        -->
+                                        @if (HasSubMenuItems(menuModels))
+                                        {
+                                            <i>
+                                                <!--
+                                                    Una vez revisado si tiene opciones se revisa si el menu esta expandido
+                                                    para colocar el svg/boton de despliegue dependiendo de su estado
+                                                -->
+                                                @if (IsExpanded(menuModels.MenuId, 1))
+                                                {
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-up" viewBox="0 0 16 16">
+                                                        <path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z" />
+                                                    </svg>
+                                                }
+                                                else
+                                                {
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
+                                                        <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+                                                    </svg>
+                                                }
+                                            </i>
+                                        }
+                                    </i>
+                                </div>
+                            </div>
+
+                        </button>
+                    </div>
+
+                    <!--
+                        Desde aca se empezaran a ver observar o manejar la parte de visualizar los niveles del menu, dependiendo si
+                        este tiene niveles/opciones
+                    -->
+                    <div class="collapse @(IsExpanded(menuModels.MenuId, 1) ? "show" : "collapse") text-dark">
+
+                        <!--
+                           HasSubMenuItems ayuda a revisar si el menu tiene opciones/subniveles
+                        -->
+                        @if (HasSubMenuItems(menuModels))
+                        {
+                            <ul class="list-unstyled sub-options pl-2">
+
+                                <!-- Se recorre una coleccion de MenuItems1s, la cual son opciones de nivel 1 pertenecientes a un menu -->
+                                @foreach (var menuItem1 in menuModels.MenuItems1s)
+                                {
+                                    <li>
+                                        <div class="sub-option-header">
+
+                                            <!--
+                                                Este boton se utiliza para desplegar los niveles de la opcion de nivel 1 seleccionado, tiene el
+                                                ToggleSubMenu (Abre la opcion seleccionada y cierra otra opcion de su mismo nivel que pudiera estar
+                                                abierta anteriormente), IsExpanded(Se revisa si ya anteriormente esta expandida)
+                                            -->
+                                            <button @onclick="() => ToggleSubMenu(menuItem1.MenuItem1Id, 2)" class="btn text-left w-100 @((IsExpanded(menuItem1.MenuItem1Id, 2) ? "btn-selected" : "")) sub-option @(HasSubMenuItems(menuItem1) ? "btn-selected-with-options" : "btn-without-options")">
+                                                <!--
+                                                    Informacion de la opcion de nivel 1
+                                                -->
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <!--
+                                                        Aqui se encuentra el nombre de la opcion de nivel 1
+                                                    -->
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="text-wrap text-color-sub d-inline-block ml-2 levels">@menuItem1.Name</span>
+                                                    </div>
+                                                    <!--
+                                                        Aqui se encuentra el svg/boton de despliegue es una flecha que dependiendo si el
+                                                        nivel esta desplegado estara mirando hacia arriba y si no esta desplegado
+                                                        estara mirando hacia abajo
+                                                    -->
+                                                    <div>
+                                                        <i class="ml-auto">
+                                                            <!--
+                                                               HasSubMenuItems ayuda a revisar si el nivel 1 tiene opciones/subniveles
+                                                            -->
+                                                            @if (HasSubMenuItems(menuItem1))
+                                                            {
+                                                                <i>
+                                                                    <!--
+                                                                        Una vez revisado si tiene opciones se revisa si la opcion de nivel 1
+                                                                        esta expandido para colocar el svg/boton de despliegue dependiendo
+                                                                        de su estado
+                                                                    -->
+                                                                    @if (IsExpanded(menuItem1.MenuItem1Id, 2))
+                                                                    {
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-up" viewBox="0 0 16 16">
+                                                                            <path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z" />
+                                                                        </svg>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
+                                                                            <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+                                                                        </svg>
+                                                                    }
+                                                                </i>
+                                                            }
+                                                        </i>
+                                                    </div>
+                                                </div>
+                                            </button>
+                                        </div>
+
+                                        <!--
+                                            Se revisa si la opcion de nivel 1 esta desplegada
+                                        -->
+                                        <div class="@(IsExpanded(menuItem1.MenuItem1Id, 2) ? "show" : "collapse") text-dark">
+
+                                            <!--
+                                               HasSubMenuItems ayuda a revisar si el nivel 1 tiene opciones/subniveles
+                                            -->
+                                            @if (HasSubMenuItems(menuItem1))
+                                            {
+                                                <ul class="list-unstyled sub-options pl-3">
+                                                    <!--
+                                                        Se recorre una coleccion de MenuItems2s, la cual son opciones de nivel 2
+                                                        pertenecientes a la opcion de nivel 1
+                                                    -->
+                                                    @foreach (var menuItem2 in menuItem1.MenuItems2s)
+                                                    {
+                                                        <li>
+                                                            <div class="sub-option-header">
+                                                                <!--
+                                                                    Este boton se utiliza para desplegar los niveles de la opcion de nivel 2 seleccionado, tiene el
+                                                                    ToggleSubMenu (Abre la opcion seleccionada y cierra otra opcion de su mismo nivel que pudiera estar
+                                                                    abierta anteriormente), IsExpanded(Se revisa si ya anteriormente esta expandida)
+                                                                -->
+                                                                <button @onclick="() => ToggleSubMenu(menuItem2.MenuItem2Id, 3)" class="btn text-left w-100 @((IsExpanded(menuItem2.MenuItem2Id, 3) ? "btn-selected" : "")) sub-option @(HasSubMenuItems(menuItem2) ? "btn-selected-with-options" : "btn-without-options")">
+                                                                    <!--
+                                                                        Informacion de la opcion de nivel 2
+                                                                    -->
+                                                                    <div class="d-flex align-items-center justify-content-between">
+                                                                        <!--
+                                                                            Aqui se encuentra el nombre de la opcion de nivel 2
+                                                                        -->
+                                                                        <div class="d-flex align-items-center">
+                                                                            <span class="text-wrap text-color-sub d-inline-block ml-2 levels">@menuItem2.Name</span>
+                                                                        </div>
+                                                                        <!--
+                                                                            Aqui se encuentra el svg/boton de despliegue es una flecha que dependiendo si el
+                                                                            nivel esta desplegado estara mirando hacia arriba y si no esta desplegado
+                                                                            estara mirando hacia abajo
+                                                                        -->
+                                                                        <div>
+                                                                            <i class="ml-auto">
+                                                                                <!--
+                                                                                   HasSubMenuItems ayuda a revisar si el nivel 2 tiene opciones/subniveles
+                                                                                -->
+                                                                                @if (HasSubMenuItems(menuItem2))
+                                                                                {
+                                                                                    <i>
+                                                                                        <!--
+                                                                                            Una vez revisado si tiene opciones se revisa si la opcion de nivel 2
+                                                                                            esta expandido para colocar el svg/boton de despliegue dependiendo
+                                                                                            de su estado
+                                                                                        -->
+                                                                                        @if (IsExpanded(menuItem2.MenuItem2Id, 3))
+                                                                                        {
+                                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-up" viewBox="0 0 16 16">
+                                                                                                <path fill-rule="evenodd" d="M7.646 4.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1-.708.708L8 5.707l-5.646 5.647a.5.5 0 0 1-.708-.708l6-6z" />
+                                                                                            </svg>
+                                                                                        }
+                                                                                        else
+                                                                                        {
+                                                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-down" viewBox="0 0 16 16">
+                                                                                                <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+                                                                                            </svg>
+                                                                                        }
+                                                                                    </i>
+                                                                                }
+                                                                            </i>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </button>
+                                                            </div>
+                                                            <!--
+                                                                Se revisa si la opcion de nivel 2 esta desplegada
+                                                            -->
+                                                            <div class="@(IsExpanded(menuItem2.MenuItem2Id, 3) ? "show" : "collapse") text-dark">
+                                                                <!--
+                                                                   HasSubMenuItems ayuda a revisar si el nivel 2 tiene opciones/subniveles
+                                                                -->
+                                                                @if (HasSubMenuItems(menuItem2))
+                                                                {
+                                                                    <ul class="list-unstyled sub-options pl-4">
+                                                                        <!--
+                                                                            Se recorre una coleccion de MenuItems3s, la cual son opciones de nivel 3
+                                                                            pertenecientes a la opcion de nivel 2
+                                                                        -->
+                                                                        @foreach (var menuItem3 in menuItem2.MenuItems3s)
+                                                                        {
+                                                                            <li>
+                                                                                <div class="sub-option-header">
+                                                                                    <!--
+                                                                                        Este boton se utiliza para seleccionar una opcion de nivel 3, hay que recordar que actualmente
+                                                                                        se maneja que los menus pueden tener 3 niveles tiene el ToggleSubMenu (Abre la opcion seleccionada
+                                                                                        y cierra otra opcion de su mismo nivel que pudiera estar seleccionada anteriormente),
+                                                                                        IsExpanded(Se revisa si ya anteriormente esta expandida) pero aqui por ahora lo estamos usando para
+                                                                                        que se denote el boton como seleccionado, esto sera asi hasta que se manejen los hijos
+                                                                                    -->
+                                                                                    <button class="btn text-left w-100 sub-option btn-without-options @(IsExpanded(menuItem3.MenuItem3Id, 4) ? "btn-selected" : "")" @onclick="() => ToggleSubMenu(menuItem3.MenuItem3Id, 4)">
+                                                                                        <!--
+                                                                                            Informacion de la opcion de nivel 3
+                                                                                        -->
+                                                                                        <div class="d-flex align-items-center justify-content-between">
+                                                                                            <!--
+                                                                                                Aqui se encuentra el nombre de la opcion de nivel 3
+                                                                                            -->
+                                                                                            <div class="d-flex align-items-center">
+                                                                                                <span class="text-wrap text-color-sub d-inline-block ml-2 levels">@menuItem3.Name</span>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    </button>
+                                                                                </div>
+                                                                            </li>
+                                                                        }
+                                                                    </ul>
+                                                                }
+                                                            </div>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            }
+                                        </div>
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                </li>
+            }
+        </ul>
+
+    </div>
+</div>

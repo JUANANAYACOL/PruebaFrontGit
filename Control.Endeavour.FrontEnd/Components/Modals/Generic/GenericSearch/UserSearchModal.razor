@@ -1,0 +1,182 @@
+﻿@using Control.Endeavour.FrontEnd.Models.Models.Administration.VUser.Request;
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.VUser.Response;
+
+
+<div class="my-modal">
+    <!-- Fila para la información personal del usuario -->
+    <div class="row mb-2">
+        <!-- Nombre -->
+        <div class="col-lg-4">
+            @{
+                if (showNameField)
+                {
+                    <InputModalComponent @ref="firstNameInput" InputMaxLength="80" @bind-InputValue="firstName" IsRequired="false" LabelText="@Translation["SearchByName"]" Placeholder=@Translation["Name"] />
+                }
+            }
+        </div>
+        <!-- Apellido -->
+        <div class="col-lg-4">
+            @{
+                if (showLastNameField)
+                {
+                    <InputModalComponent @ref="lastNameInput" @bind-InputValue="lastName" InputMaxLength="80" IsRequired="false" LabelText="@Translation["SearchByLastName"]" Placeholder="@Translation["LastName"]" />
+                }
+            }
+        </div>
+        <!-- Cargo -->
+        <div class="col-lg-4">
+            @{
+                if (showCarge)
+                {
+                    <label class="mt-2">@Translation["Position"]</label>
+                    <TelerikDropDownList Data="@chargeList"
+                                         ValueField="Code"
+                                         Value="selectChargeCode"
+                                         TextField="Value"
+                                         ValueChanged="@((string newValue) => OnChangeCh(newValue))"
+                                         Filterable="true"
+                                         Enabled="isEnableCharge"
+                                         DefaultText="@Translation["Position"]"></TelerikDropDownList>
+                }
+            }
+        </div>
+    </div>
+
+    <!-- Fila para la información administrativa y botones -->
+    <div class="row mb-2">
+        <!-- Unidad Administrativa -->
+        <div class="col-lg-4">
+            @{
+                if (showParamTrdDdl)
+                {
+                    <label class="mt-2">@Translation["AdministrativeUnit"] </label>
+                    <TelerikDropDownList Data="@administrativeUnitList"
+                                         ValueField="AdministrativeUnitId"
+                                         Value="selectAdministriveUnitId"
+                                         TextField="Name"
+                                         ValueChanged="@((int newValue) => OnChangeUA(newValue))"
+                                         Filterable="true"
+                                         Enabled="isEnableAdministriveUnit"
+                                         DefaultText="@Translation["AdministrativeUnit"]"></TelerikDropDownList>
+                }
+            }
+        </div>
+        <!-- Oficina Productora -->
+        <div class="col-lg-4">
+            @{
+                if (showParamTrdDdl)
+                {
+                    <label class="mt-2">@Translation["ProductionOffice"]</label>
+                    <TelerikDropDownList Data="@productionOfficeList"
+                                         ValueField="ProductionOfficeId"
+                                         Value="selectProductionOfficetId"
+                                         TextField="Name"
+                                         ValueChanged="@((int newValue) => OnChangeOP(newValue))"
+                                         Filterable="true"
+                                         Enabled="isEnableProductionOffice"
+                                         DefaultText="@Translation["ProductionOffice"]"></TelerikDropDownList>
+                }
+            }
+        </div>
+        <!-- Botones -->
+        <div class="col-lg-4">
+            <div class="from-group from-group--margin-top justify-content-end">
+                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="OnClickButtonClear"></ButtonComponent>
+                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Search"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="OnClickButton"></ButtonComponent>
+            </div>
+        </div>
+    </div>
+
+
+    
+    <div class="row">
+        <TelerikGrid Data="@userList"
+                     PageSize="meta.PageSize"
+                     Resizable="true"
+                     ScrollMode="@GridScrollMode.Scrollable"
+                     Height="400px">
+            <GridColumns>
+                <GridColumn Width="14%" TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap">
+                    <HeaderTemplate>
+                        @{
+                            if (multipleSelection)
+                            {
+                                <TelerikCheckBox class="mr-1" @bind-Value="@selectAllManager" OnChange="@ChangeAllStateManager">
+                                </TelerikCheckBox>
+                            }
+                            <label> @Translation["Grid_Select"] </label>
+                        }
+                    </HeaderTemplate><Template>
+                        @{
+                            var userSelected = (VUserDtoResponse)context;
+                            <TelerikCheckBox @bind-Value="@userSelected!.Selected" OnChange="@(() => ChangeStateManager(userSelected))">
+                            </TelerikCheckBox>
+                        }
+                    </Template>
+                </GridColumn>
+                <GridColumn Visible="@(showCopiesColumn && multipleSelection)" Width="10%" TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap">
+                    <HeaderTemplate>
+                        <TelerikCheckBox @bind-Value="@selectAllCopies" OnChange="@ChangeAllStateCopies">
+                        </TelerikCheckBox>
+                        <label> @Translation["Copies"] </label>
+                    </HeaderTemplate>
+                    <Template>
+                        @{
+                            var userCopied = (VUserDtoResponse)context;
+                            <TelerikCheckBox @bind-Value="@userCopied!.Copy" OnChange="@(() =>ChangeStateCopies(userCopied))">
+                            </TelerikCheckBox>
+                        }
+                    </Template>
+                </GridColumn>
+                <GridColumn TextAlign="ColumnTextAlign.Center" Title="@Translation["Users"]" HeaderClass="center-wrap">
+                    <Template>
+                        @{
+                            var user = (VUserDtoResponse)context;
+
+                            <div class="row d-flex align-items-center">
+
+                                <div class="col-md-2">
+                                    <TelerikSvgIcon Icon="@SvgIcon.User" Size="@ThemeConstants.SvgIcon.Size.ExtraExtraExtraLarge"></TelerikSvgIcon>
+                                </div>
+
+                                <div class="col">
+                                    <div class="row">
+                                        <label><b>@Translation["Name"]:</b> @user?.FullName</label>
+                                    </div>
+
+                                    <div class="row">
+                                        <label> <b>@Translation["AdministrativeUnit"]:</b> @user?.AdministrativeUnitName</label>
+                                    </div>
+
+                                    <div class="row">
+                                        <label><b>@Translation["ProductionOffice"]:</b> @user?.ProductionOfficeName</label>
+                                    </div>
+
+                                    <div class="row">
+                                        <label><b>@Translation["Position"]:</b> @user?.Charge</label>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </Template>
+                </GridColumn>
+            </GridColumns>
+
+            <NoDataTemplate>
+                <img src="../img/noDataFound.png" width="8%" height="8%" />
+                <p> @Translation["NoGridInfo"]</p>
+            </NoDataTemplate>
+        </TelerikGrid>
+    </div>
+
+    <!-- Parte 4: Botones en la izquierda, centro y derecha -->
+    @if (dataChargue)
+    {
+        //<PaginationComponent @ref="paginationComponet" ObjectMeta="@meta" T="VUserDtoResponse" M="VUserDtoRequest" Filter="@vUserRequest" OnPaginationRefresh="HandlePaginationGrid"></PaginationComponent>
+        <NewPaginationComponent @ref="paginationComponet" Filter="@vUserRequest" T="VUserDtoResponse" M="VUserDtoRequest" Uri="@UriFilterVUser" PaginationInfo="@paginationInfo" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+
+
+    }
+</div>
+
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>

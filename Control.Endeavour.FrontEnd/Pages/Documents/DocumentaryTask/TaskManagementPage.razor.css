@@ -1,0 +1,83 @@
+﻿
+.pasos-mgt {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.panelDoc__Titulo {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.panelDoc__Comentario {
+    font-size: 13px;
+    margin-bottom: 10px;
+}
+
+.numero {
+    margin: 0px 10px 0px 10px;
+}
+
+@media (max-width: 1050px) {
+
+    .pasos-mgt {
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+
+    .center-items {
+        align-items: center
+    }
+}
+
+.numero-task {
+    width: 50px;
+    height: 50px;
+    background-color: #7CDAFF;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+    .numero-task h2 {
+        margin: 0px;
+        font-family: Roboto;
+        font-weight: 600;
+    }
+
+.custom-table-container {
+    border: 1px;
+    border-radius: 10px;
+    overflow: auto;
+    max-height: 400px;
+}
+
+.k-toolbar telerik-blazor k-toolbar-md {
+    border-radius: 3% !important;
+}
+
+.text-aend {
+    text-align: end !important;
+}
+
+/* region del comportamiento dropdown /*/
+
+.dropdown-menu {
+    position: absolute;
+    left: 0;
+    background-color: white;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    width: 270px !important;
+    top: 46px;
+}
+
+.dropdown-menu-show-no {
+    display: none;
+}
+
+.dropdown-menu-show-yes {
+    display: block;
+}

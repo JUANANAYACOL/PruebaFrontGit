@@ -1,0 +1,26 @@
+﻿
+/* Estilos para inputs personalizados */
+.code-input:invalid {
+    border-color: #FF7A00 !important;
+}
+
+/* Estilos para los inputs de código */
+.code-input-single {
+    display: flex;
+    justify-content: center;
+}
+
+.code-input {
+    text-align: center;
+    color: white;
+    text-transform: uppercase;
+    font-size: 3vh;
+    background-color: transparent;
+    border: 2px solid #ffffff;
+    border-radius: 12px;
+    padding: 10px;
+    width: 90%;
+    outline: none;
+    transition: border-color 0.3s ease-in-out;
+    letter-spacing: 3px;
+}

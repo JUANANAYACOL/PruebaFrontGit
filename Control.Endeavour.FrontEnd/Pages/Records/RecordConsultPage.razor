@@ -1,0 +1,1400 @@
+﻿@page "/RecordsConsult"
+@* @page "/" *@
+@using Control.Endeavour.FrontEnd.Models.Models.Records.Request
+@using Control.Endeavour.FrontEnd.Models.Models.Records.Response
+@layout MainLayout
+
+<PageTitle>@Translation["Records"]</PageTitle>
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+<MetaDataRecordsFilter @ref="metaDataFilterModal" OnChangeMetaDataFilter="HandleMetaDataFilter"></MetaDataRecordsFilter>
+<MetaDataValueModal @ref="metaDataValueModal" Title="Indexacion de metadatos" OnStatusChanged="HandleMetaDataRelationSelected"></MetaDataValueModal>
+<IndexDocumentaryTypologyModal @ref="indexDocumentaryTypologyModal" OnStatusChanged="HandleIndexDocumentaryTypologyModal"></IndexDocumentaryTypologyModal>
+<UploadPDFAutomaticIndexingModal @ref="uploadPDFAutomaticIndexingModal" OnChangeData="HandleAutomaticIndexing"></UploadPDFAutomaticIndexingModal>
+<AttachmentTrayModal @ref="attachmentTrayModal" IsDocumentAttachment="false" IsControlPanel="true"></AttachmentTrayModal>
+<GetRecordsVolumesModal @ref="getRecordsVolumes"></GetRecordsVolumesModal>
+<div class="container-fluid mt-1">
+    <div class="row titulo">
+        <div class="col-md-4">
+            <h3>@(Translation["Records"] + " - " + Translation[@RecordTitlePage])</h3>
+        </div>
+        
+        <div class="col-md-8 text-end">
+            @* <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers=" ml-10" BtnType="button" BtnText="@Translation["GenerateReport"]" BtnIcon="fa-solid fa-file-export" BtnTitle="@Translation["GenerateReport"]" BtnVisible="@visibleBottons"></ButtonComponent>
+            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers=" ml-10" BtnType="button" BtnText="@Translation["DownloadRecord"]" BtnIcon="fa-solid fa-cloud-arrow-down" BtnTitle="@Translation[" DownloadRecord"]" BtnVisible="@visibleBottons"></ButtonComponent> *@
+            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers=" ml-10" BtnType="button" BtnText="@Translation["CreateRecord"]" BtnIcon="fa-solid fa-folder-plus" BtnTitle="@Translation["CreateRecord"]" BtnVisible="@visibleBottons" BtnOnClick="OpenCreateView"></ButtonComponent>
+            <button class="svg-button @ButtonCreateRecordClass" title="Cerrar" @onclick="CloseCreateView">
+                <img src="../img/vector.svg" />
+            </button>
+        </div>
+    </div>
+    <div id="panel_consult_records" class="@PanelConsultRecordClass">
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <InputModalComponent @bind-InputValue="@recordFilter.RecordId" LabelText="@(Translation["RecordNumber"]+":")" IsVisible="true" Placeholder="" InputType="number" />
+            </div>
+            <div class="col-md-3 d-flex flex-column justify-content-between ">
+                <label class="titulo-azul">
+                    @Translation["InquiryLevel"]
+                </label>
+                <div class="k-form k-form-md k-form-vertical">
+                    <div class="k-form-field">
+
+                        <div class="k-form-field-wrap">
+                            <TelerikRadioGroup Data="@optionsFilter"
+                                               Value="@ResponseFilter"
+                                               Layout="@RadioGroupLayout.Horizontal"
+                                               ValueChanged="@( (string newValue) => OnValueChangedFilter(newValue) )">
+                            </TelerikRadioGroup>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 d-flex flex-column justify-content-between ">
+                <label class="titulo-azul">
+                    @Translation["ViewClosedRecords"]
+                </label>
+                <div class="k-form k-form-md k-form-vertical">
+                    <div class="k-form-field">
+
+                        <div class="k-form-field-wrap">
+                            <TelerikRadioGroup Data="@optionsRecordClosed"
+                                               Value="@ResponseRecordClosed"
+                                               Layout="@RadioGroupLayout.Horizontal"
+                                               ValueChanged="@( (string newValue) => OnValueChangedRecordClosed(newValue) )">
+                            </TelerikRadioGroup>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <h6 class="titulo-azul"> @Translation["FilterDRT"]</h6>
+            </div>
+            <div class="col-md-3">
+                <label class="selectorBlock--labelDropDown">@Translation["DocumentaryVersion"]:</label>
+                <TelerikDropDownList Data="@docVersionList"
+                                     ValueField="DocumentalVersionId"
+                                     Value="@idDocVersion"
+                                     TextField="Code"
+                                     ValueChanged="@( (int newValue) => GetAdministrativeUnits(newValue, "consult") )"
+                                     Filterable="true"
+                                     DefaultText=@Translation["SelectAnOption"]>
+                </TelerikDropDownList>
+            </div>
+            <div class="col-md-3">
+                <label for="input2" class="selectorBlock--labelDropDown">@Translation["AdministrativeUnits"]:</label>
+                <TelerikDropDownList Data="@adminUnitList"
+                                     ValueField="AdministrativeUnitId"
+                                     Value="@recordFilter.AdministrativeUnitId"
+                                     TextField="Name"
+                                     ValueChanged="@( (int? newValue) => GetProducOffice(newValue.Value,"consult") )"
+                                     Filterable="true"
+                                     Enabled="isEnableAdminUnit"
+                                     DefaultText="@Translation["AdministrativeUnits"]">
+                </TelerikDropDownList>
+            </div>
+            <div class="col-md-3">
+                <label class="selectorBlock--labelDropDown">@Translation["ProductionOffices"]:</label>
+                <TelerikDropDownList Data="@proOfficesList"
+                                     ValueField="ProductionOfficeId"
+                                     Value="@recordFilter.ProductionOfficeId"
+                                     TextField="Name"
+                                     ValueChanged="@( (int? newValue) => GetSeries(newValue.Value,"consult") )"
+                                     Enabled="@isEnableProOffice"
+                                     Filterable="true"
+                                     DefaultText="@Translation["ProductionOffices"]">
+                </TelerikDropDownList>
+            </div>
+            <div class="col-md-3">
+                <label class="selectorBlock--labelDropDown">@Translation["DocumentarySeries"]:</label>
+                <TelerikDropDownList Data="@seriesList"
+                                     ValueField="SeriesId"
+                                     Value="@recordFilter.SeriesId"
+                                     TextField="Name"
+                                     ValueChanged="@( (int? newValue) => GetSubSeries(newValue.Value,"consult") )"
+                                     Enabled="@isEnableSerie"
+                                     Filterable="true"
+                                     DefaultText="@Translation["DocumentarySeries"]">
+                </TelerikDropDownList>
+            </div>
+            <div class="col-md-3 mt-3">
+                <label class="selectorBlock--labelDropDown">@Translation["DocumentarySubSeries"]:</label>
+                <TelerikDropDownList Data="@subSeriesList"
+                                     ValueField="SubSeriesId"
+                                     Value="@recordFilter.SubSeriesId"
+                                     TextField="Name"
+                                     Enabled="@isEnableSubSerie"
+                                     ValueChanged="@( (int? newValue) => SelectedSubSeries(newValue.Value,"consult") )"
+                                     Filterable="true"
+                                     DefaultText="@Translation["DocumentarySubSeries"]">
+                </TelerikDropDownList>
+            </div>
+            <div class="col-md-3 mt-3 @DocumentFilterClass">
+                <label class="selectorBlock--labelDropDown">@Translation["DocumentaryTypologies"]:</label>
+                <TelerikDropDownList Data="@subSeriesList"
+                                     ValueField="SubSeriesId"
+                                     @bind-Value="@recordFilter.SubSeriesId"
+                                     TextField="Name"
+                                     Enabled="@isEnableSubSerie"
+                                     Filterable="true"
+                                     DefaultText="@Translation["DocumentaryTypologies"]">
+                </TelerikDropDownList>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <h6 class="titulo-azul"> @Translation["FilterRecords"]</h6>
+            </div>
+            <div class="col-md-3 ">
+                <label for="input2" class="selectorBlock--labelDropDown">@Translation["RecordType"]:</label>
+                <TelerikDropDownList Data="@recordTypeList"
+                                     ValueField="Code"
+                                     TextField="Value"
+                                     @bind-Value="@recordFilter.RecordType"
+                                     Filterable="true"
+                                     DefaultText="@Translation["RecordType"]">
+                </TelerikDropDownList>
+            </div>
+            <div class="col-md-3 ">
+                <label for="input2" class="selectorBlock--labelDropDown">@Translation["FileRecordType"]:</label>
+                <TelerikDropDownList Data="@recordFileTypeList"
+                                     ValueField="Code"
+                                     @bind-Value="@recordFilter.RecordFileType"
+                                     TextField="Value"
+                                     Filterable="true"
+                                     DefaultText="@Translation["FileRecordType"]">
+                </TelerikDropDownList>
+            </div>
+
+            <div class="col-md-6 d-flex align-items-end justify-content-end">
+                <div class="text-md-end">
+                    <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnClassModifiers="mx-4" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="HandleCleanFilter"></ButtonComponent>
+                    <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Search"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="HandleSearchFilter"></ButtonComponent>
+                </div>
+            </div>
+
+
+        </div>
+
+        <div class="row mt-4">
+
+            <TelerikGrid Data="@recordsInfoList" PageSize="10">
+                <GridColumns>
+                    <GridCommandColumn Width="80px" Title="@Translation["Upload"]" HeaderClass="center-wrap" Visible="true">
+
+                        @{
+                            <div class="d-flex justify-content-around command-button-container">
+                                <GridCommandButton Title="@Translation["Upload"]" Icon="@SvgIcon.InfoCircle" Size="24px"
+                                                   OnClick="@((args)=> OpenViewRecord((VRecordsDtoResponse) args.Item))"></GridCommandButton>
+                            </div>
+                        }
+                    </GridCommandColumn>
+                    @* <GridCommandColumn Width="80px" Title="@Translation["RecordHistory"]" HeaderClass="center-wrap" Visible="true">
+
+                        @{
+                            <div class="d-flex justify-content-around command-button-container">
+                                <GridCommandButton Title="@Translation["RecordHistory"]" Icon="@SvgIcon.InfoCircle" Size="24px"
+                                                   OnClick="@((args)=> GetRecordHistory((VRecordsDtoResponse) args.Item))"></GridCommandButton>
+                            </div>
+                        }
+                    </GridCommandColumn> *@
+                    @* <GridCommandColumn Width="100px" Title="MetaDatos del expediente" HeaderClass="center-wrap" Visible="true">
+                        @{
+                            <div class="d-flex justify-content-around command-button-container">
+                                <GridCommandButton Title=@Translation["Upload"] Icon="@SvgIcon.PaperclipAlt" Size="24px"></GridCommandButton>
+                            </div>
+                        }
+                    </GridCommandColumn> *@
+
+                    <GridColumn Field="RecordNumber"
+                                Title="@Translation["RecordNumber"]"
+                                Width="150px"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="RecordFileTypeName"
+                                Title="@Translation["FileRecordType"]"
+                                Width="150px"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="RecordTypeName"
+                                Title="@Translation["RecordType"]"
+                                Width="150px"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="Volumes"
+                                Title="@Translation["VolumeCount"]"
+                                Width="150px"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Width="350px">
+                        <HeaderTemplate>
+                            <label> @Translation["RecordMetadata"]</label>
+                        </HeaderTemplate>
+                        <Template>
+                            @{
+                                var data = (VRecordsDtoResponse)context;
+                                <div>
+                                    @if (!string.IsNullOrEmpty(data?.MetaData) && data.MetaData.Contains(":"))
+                                    {
+                                        var metaDataEntries = data.MetaData.Split(new[] { "\n, " }, StringSplitOptions.RemoveEmptyEntries);
+                                        bool hasContent = false;
+
+                                        foreach (var entry in metaDataEntries)
+                                        {
+                                            var keyValue = entry.Split(new[] { ':' }, 2);
+                                            if (keyValue.Length == 2)
+                                            {
+                                                var key = keyValue[0].Trim();
+                                                var value = keyValue[1].Trim();
+                                                key = char.ToUpper(key[0]) + key.Substring(1).ToLower();
+                                                value = char.ToUpper(value[0]) + value.Substring(1).ToLower();
+
+                                                <div>
+                                                    <label><b>@key:</b> @value</label><br />
+                                                </div>
+                                                hasContent = true;
+                                            }
+                                        }
+
+                                        if (!hasContent)
+                                        {
+                                            <div>@Translation["NotApply"]</div>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <div>@Translation["NotApply"]</div>
+                                    }
+                                </div>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Width="350px">
+                        <HeaderTemplate>
+                            <label> @Translation["DRTInformation"]</label>
+                        </HeaderTemplate>
+                        <Template>
+                            @{
+                                var data = (VRecordsDtoResponse)context;
+                                <div>
+                                    <div class="mb-1">
+                                        <label><b>@Translation["AdministrativeDepartment"]:</b> @(!string.IsNullOrEmpty(data?.NameAdministrativeUnits) ? data.NameAdministrativeUnits : "N/A")</label>
+                                    </div>
+                                    <div class="mb-1">
+                                        <label><b>@Translation["ProductionOffice"]:</b> @(!string.IsNullOrEmpty(data?.NameProductionOffices) ? data.NameProductionOffices : "N/A")</label>
+                                    </div>
+                                    <div class="mb-1">
+                                        <label><b>@Translation["Serie"]:</b> @(!string.IsNullOrEmpty(data?.NameSeries) ? data.NameSeries : "N/A")</label>
+                                    </div>
+                                    <div class="mb-1">
+                                        <label><b>@Translation["SubSerie"]:</b> @(!string.IsNullOrEmpty(data?.NameSubSeies) ? data.NameSubSeies : "N/A")</label>
+                                    </div>
+                                </div>
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Width="250px">
+                        <HeaderTemplate>
+                            <label>@Translation["Creation"]</label>
+                        </HeaderTemplate>
+                        <Template>
+                            @{
+                                var data = (VRecordsDtoResponse)context;
+                                <div>
+                                    <div class="mb-1">
+                                        <label><b>@Translation["DateRecorded"]:</b> @(data?.CreateDate?.ToString("yyyy-MM-dd") ?? "N/A")</label>
+                                    </div>
+                                    <div class="mb-1">
+                                        <label><b>@Translation["UserRecorded"]:</b> @(!string.IsNullOrEmpty(data?.CreateUser) ? data.CreateUser : "N/A")</label>
+                                    </div>
+                                </div>
+                            }
+                        </Template>
+                    </GridColumn>
+                    
+
+                </GridColumns>
+            </TelerikGrid>
+            <NewPaginationComponent @ref="paginationComponent" Filter="@recordFilter" T="VRecordsDtoResponse" M="RecordFilterDtoRequest" Uri="@UriFilterRecords" PaginationInfo="@paginationInfo" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+        </div>
+    </div>
+
+    <div id="panel_create_records" class="@PanelCreateRecordClass">
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <h6 class="titulo-azul">@Translation["RecordType"]</h6>
+            </div>
+            <div class="col-md-3 ">
+                <label for="input2" class="selectorBlock--labelDropDown mb-2">@Translation["RecordType"]: <span class="red">*</span></label>
+                <TelerikDropDownList Data="@recordTypeList"
+                                     ValueField="Code"
+                                     TextField="Value"
+                                     @bind-Value="@createRequest.RecordType"
+                                     Filterable="true"
+                                     DefaultText="@Translation["RecordType"]">
+                </TelerikDropDownList>
+            </div>
+            <div class="col-md-3">
+                <label for="input2" class="selectorBlock--labelDropDown mb-2">@Translation["FileRecordType"]: <span class="red">*</span></label>
+                <TelerikDropDownList Data="@recordFileTypeList"
+                                     ValueField="Code"
+                                     @bind-Value="@createRequest.RecordFileType"
+                                     TextField="Value"
+                                     Filterable="true"
+                                     DefaultText="@Translation["FileRecordType"]">
+                </TelerikDropDownList>
+            </div>
+            <div class="col-md-3">
+                <InputModalComponent @bind-InputValue="@RecordVolume" LabelText="@(Translation["VolumeCount"]+":")" Placeholder="" InputType="number" IsRequired="true" />
+            </div>
+            <div class="col-md-3">
+                <InputModalComponent @bind-InputValue="@createRequest.RecordName" IsRequired="true" InputMaxLength="50" LabelText=@(Translation["RecordName"]+":") Placeholder=@Translation["RecordName"] FieldType="InputModalTypeEnum.None" />
+            </div>
+        </div>RecordName
+
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <h6 class="titulo-azul">@Translation["DRTInformation"]</h6>
+            </div>
+            <div class="col-md-3">
+                <label class="selectorBlock--labelDropDown mb-2">@Translation["DocumentaryVersion"]:<span class="red">*</span></label>
+                <TelerikDropDownList Data="@docVersionList"
+                                     ValueField="DocumentalVersionId"
+                                     Value="@idDocVersionCreate"
+                                     TextField="Code"
+                                     ValueChanged="@( (int newValue) => GetAdministrativeUnits(newValue, "create") )"
+                                     Filterable="true"
+                                     DefaultText=@Translation["SelectAnOption"]>
+                </TelerikDropDownList>
+            </div>
+            <div class="col-md-3 ">
+                <label for="input2" class="selectorBlock--labelDropDown mb-2">@Translation["AdministrativeUnits"]:<span class="red">*</span></label>
+                <TelerikDropDownList Data="@adminUnitListCreate"
+                                     ValueField="AdministrativeUnitId"
+                                     Value="@AdministrativeUnitId"
+                                     TextField="Name"
+                                     ValueChanged="@( (int? newValue) => GetProducOffice(newValue.Value,"create") )"
+                                     Filterable="true"
+                                     DefaultText="@Translation["AdministrativeUnits"]">
+                </TelerikDropDownList>
+            </div>
+            <div class="col-md-3">
+                <label class="selectorBlock--labelDropDown mb-2">@Translation["ProductionOffices"]: <span class="red">*</span></label>
+                <TelerikDropDownList Data="@proOfficesListCreate"
+                                     ValueField="ProductionOfficeId"
+                                     Value="@ProductionOfficeId"
+                                     TextField="Name"
+                                     ValueChanged="@( (int? newValue) => GetSeries(newValue.Value,"create") )"
+                                     Enabled="@isEnableProOfficeCreate"
+                                     Filterable="true"
+                                     DefaultText="@Translation["ProductionOffices"]">
+                </TelerikDropDownList>
+            </div>
+            <div class="col-md-3">
+                <label class="selectorBlock--labelDropDown mb-2">@Translation["DocumentarySeries"]: <span class="red">*</span></label>
+                <TelerikDropDownList Data="@seriesListCreate"
+                                     ValueField="SeriesId"
+                                     Value="@createRequest.SeriesId"
+                                     TextField="Name"
+                                     ValueChanged="@( (int? newValue) => GetSubSeries(newValue.Value,"create") )"
+                                     Enabled="@isEnableSerieCreate"
+                                     Filterable="true"
+                                     DefaultText="@Translation["DocumentarySeries"]">
+                </TelerikDropDownList>
+            </div>
+            <div class="col-md-3">
+                <label class="selectorBlock--labelDropDown mb-2">@Translation["DocumentarySubSeries"]: </label>
+                <TelerikDropDownList Data="@subSeriesListCreate"
+                                     ValueField="SubSeriesId"
+                                     Value="@createRequest.SubSeriesId"
+                                     TextField="Name"
+                                     ValueChanged="@( (int? newValue) => SelectedSubSeries(newValue.Value,"create") )"
+                                     Enabled="@isEnableSubSerieCreate"
+                                     Filterable="true"
+                                     DefaultText="@Translation["DocumentarySubSeries"]">
+                </TelerikDropDownList>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-12 mb-3">
+                <h6 class="titulo-azul">@Translation["RecordMetadata"]</h6>
+            </div>
+            <div class="col-md-12">
+                <TelerikGrid Data="@metaDataList"
+                             PageSize="@metaDataList.Count()"
+                             ScrollMode=GridScrollMode.Scrollable>
+                    <GridColumns>
+
+                        <GridCommandColumn Width="80px" Title=@Translation["Edit"] HeaderClass="center-wrap" Visible="true">
+                            <GridCommandButton Icon="@SvgIcon.Pencil" Title=@Translation["Edit"] OnClick="@((args)=> MetaDataSelected((VMetaDataDtoResponse) args.Item))"></GridCommandButton>
+                        </GridCommandColumn>
+                        <GridColumn Title="@Translation["Status"]"
+                                    Width="150px"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap">
+                            <Template>
+                                @{
+                                    VMetaDataDtoResponse rowData = (VMetaDataDtoResponse)context;
+                                    switch (rowData.Color)
+                                    {
+                                        case "MDC,V":
+                                            <img src="../img/completo.png" title="Completo" />
+                                            break;
+                                        case "MDC,AZ":
+                                            <img src="../img/ausente.png" title="Ausente" />
+                                            break;
+                                        case "MDC,A":
+                                            <img src="../img/incompleto.png" title="Incompleto" />
+                                            break;
+                                        case "MDC,NE":
+                                            <img src="../img/noAplica.png" title="No aplica" />
+                                            break;
+                                        case "MDC,R":
+                                            <img src="../img/incompleto.png" title="Incompleto" />
+                                            break;
+                                    }
+                                }
+                            </Template>
+
+                        </GridColumn>
+
+                        <GridColumn Field=@nameof(VMetaDataDtoResponse.NameMetaField)
+                                    Title="@Translation["Metadata"]"
+                                    Width="150px"
+                                    Filterable="true"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap">
+                            <Template>
+                                @{
+                                    VMetaDataDtoResponse rowData = (VMetaDataDtoResponse)context;
+                                    if (rowData != null && rowData.NameMetaField != null)
+                                    {
+                                        string formattedText = Char.ToUpper(rowData.NameMetaField[0]) + rowData.NameMetaField.Substring(1).ToLower();
+                                        @formattedText
+                                    }
+                                }
+                            </Template>
+                        </GridColumn>
+                        <GridColumn Field=@nameof(VMetaDataDtoResponse.MetaValue)
+                                    Title="@Translation["MetadataValue"]"
+                                    Width="150px"
+                                    Filterable="true"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap" />
+                        <GridColumn Field=@nameof(VMetaDataDtoResponse.Mandatory)
+                                    Title="@Translation["Required"]"
+                                    Width="150px"
+                                    Filterable="true"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap">
+                            <Template>
+                                @{
+                                    VMetaDataDtoResponse rowData = (VMetaDataDtoResponse)context;
+                                    if (rowData != null)
+                                    {
+                                        bool activeState = (bool)rowData.Mandatory!;
+                                        string activeText = activeState ? Translation["Required"] : Translation["NotRequired"];
+                                        string colorClass = activeState ? "red" : "";
+                                        <span class="@colorClass">@activeText</span>
+                                    }
+                                }
+                            </Template>
+                        </GridColumn>
+                        <GridColumn Field=@nameof(VMetaDataDtoResponse.FieldTypeName)
+                                    Title="@Translation["MetadataType"]"
+                                    Width="150px"
+                                    Filterable="true"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap">
+                            <Template>
+                                @{
+                                    VMetaDataDtoResponse rowData = (VMetaDataDtoResponse)context;
+                                    if (rowData != null && rowData.FieldTypeName != null)
+                                    {
+                                        string formattedText = Char.ToUpper(rowData.FieldTypeName[0]) + rowData.FieldTypeName.Substring(1).ToLower();
+                                        @formattedText
+                                    }
+                                }
+                            </Template>
+                        </GridColumn>
+
+
+                    </GridColumns>
+
+                    <NoDataTemplate>
+                        <img src="../img/noDataFound.png" width="8%" height="8%" />
+                        <p> No hay información</p>
+                    </NoDataTemplate>
+                </TelerikGrid>
+            </div>
+        </div>
+
+        <div class="d-flex flex-column flex-md-row justify-content-end mt-4">
+            
+            <div class="d-flex flex-wrap justify-content-end">
+                
+               
+                
+                <div class="p-2">
+                    <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-md-2" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="CleanCreateForm"></ButtonComponent>
+                </div>
+               
+                <div class="p-2">
+                    <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-md-2" BtnType="button"  BtnIcon="fa-solid fa-floppy-disk" BtnOnClick="HandleCreateForm"></ButtonComponent>
+                </div>
+            </div>
+        </div>
+
+
+
+
+    </div>
+
+    <div id="panel_view_records" class="@PanelViewRecordClass">
+        <TelerikTabStrip PersistTabContent="true" ActiveTabIndex="@ActiveTabIndex" ActiveTabIndexChanged="TabChangedHandler">
+            <TabStripTab Title=@Translation["Files"]>
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <h6 class="titulo-azul">@Translation["TypesRecords"]</h6>
+                        </div>
+                        <div class="col-md-3 ">
+                            <label for="input2" class="selectorBlock--labelDropDown mb-2">@Translation["TypesRecords"]: <span class="red">*</span></label>
+                            <TelerikDropDownList Data="@recordTypeList"
+                                                 ValueField="Code"
+                                                 TextField="Value"
+                                                 @bind-Value="@createdRecord.RecordType"
+                                                 Filterable="true"
+                                                 DefaultText="@Translation["TypesRecords"]"
+                                                 Enabled="false">
+                            </TelerikDropDownList>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="input2" class="selectorBlock--labelDropDown mb-2">@Translation["FileRecordType"]: <span class="red">*</span></label>
+                            <TelerikDropDownList Data="@recordFileTypeList"
+                                                 ValueField="Code"
+                                                 @bind-Value="@createdRecord.RecordFileType"
+                                                 TextField="Value"
+                                                 Filterable="true"
+                                                 DefaultText="@Translation["FileRecordType"]"
+                                                 Enabled="false">
+                            </TelerikDropDownList>
+                        </div>
+                        <div class="col-md-3">
+                            <InputModalComponent @bind-InputValue="@RecordVolume" LabelText="@(Translation["VolumeCount"] + ":")" Placeholder="" InputType="number" IsRequired="true" IsDisabled="true" />
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-12">
+                            <h6 class="titulo-azul">@Translation["DRTInformation"]</h6>
+                        </div>
+                        <div class="col-md-3 ">
+                            <label for="input2" class="selectorBlock--labelDropDown mb-2">@Translation["AdministrativeUnits"]:<span class="red">*</span></label>
+                            <TelerikDropDownList Data="@adminUnitListCreate"
+                                                 ValueField="AdministrativeUnitId"
+                                                 Value="@AdministrativeUnitId"
+                                                 TextField="Name"
+                                                 ValueChanged="@( (int? newValue) => GetProducOffice(newValue.Value,"create") )"
+                                                 Filterable="true"
+                                                 Enabled="false"
+                                                 DefaultText="@Translation["AdministrativeUnits"]">
+                            </TelerikDropDownList>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="selectorBlock--labelDropDown mb-2">@Translation["ProductionOffices"]: <span class="red">*</span></label>
+                            <TelerikDropDownList Data="@proOfficesListCreate"
+                                                 ValueField="ProductionOfficeId"
+                                                 Value="@ProductionOfficeId"
+                                                 TextField="Name"
+                                                 ValueChanged="@( (int? newValue) => GetSeries(newValue.Value,"create") )"
+                                                 Enabled="false"
+                                                 Filterable="true"
+                                                 DefaultText="@Translation["ProductionOffices"]">
+                            </TelerikDropDownList>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="selectorBlock--labelDropDown mb-2">@Translation["DocumentarySeries"]: <span class="red">*</span></label>
+                            <TelerikDropDownList Data="@seriesListCreate"
+                                                 ValueField="SeriesId"
+                                                 Value="@createdRecord.SeriesId"
+                                                 TextField="Name"
+                                                 ValueChanged="@( (int? newValue) => GetSubSeries(newValue.Value,"create") )"
+                                                 Enabled="false"
+                                                 Filterable="true"
+                                                 DefaultText="@Translation["DocumentarySeries"]">
+                            </TelerikDropDownList>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="selectorBlock--labelDropDown mb-2">@Translation["DocumentarySubSeries"]: </label>
+                            <TelerikDropDownList Data="@subSeriesListCreate"
+                                                 ValueField="SubSeriesId"
+                                                 Value="@createdRecord.SubSeriesId"
+                                                 TextField="Name"
+                                                 ValueChanged="@( (int? newValue) => SelectedSubSeries(newValue.Value,"create") )"
+                                                 Enabled="false"
+                                                 Filterable="true"
+                                                 DefaultText="@Translation["DocumentarySubSeries"]">
+                            </TelerikDropDownList>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4">
+                        <div class="col-md-12 mb-3">
+                            <h6 class="titulo-azul">@Translation["RecordMetadata"]</h6>
+                        </div>
+                        <div class="col-md-12">
+                            <TelerikGrid Data="@metaDataList"
+                                         PageSize="@metaDataList.Count()"
+                                         ScrollMode=GridScrollMode.Scrollable>
+                                <GridColumns>
+
+                                    <GridCommandColumn Width="80px" Title=@Translation["Edit"] HeaderClass="center-wrap" Visible="true">
+                                        <GridCommandButton Icon="@SvgIcon.Pencil" Title=@Translation["Edit"] OnClick="@((args)=> MetaDataSelected((VMetaDataDtoResponse) args.Item))"></GridCommandButton>
+                                    </GridCommandColumn>
+                                    <GridColumn Title="@Translation["Status"]"
+                                                Width="150px"
+                                                TextAlign="ColumnTextAlign.Center"
+                                                HeaderClass="center-wrap">
+                                        <Template>
+                                            @{
+                                                VMetaDataDtoResponse rowData = (VMetaDataDtoResponse)context;
+                                                switch (rowData.Color)
+                                                {
+                                                    case "MDC,V":
+                                                        <img src="../img/completo.png" title="Completo" />
+                                                        break;
+                                                    case "MDC,AZ":
+                                                        <img src="../img/ausente.png" title="Ausente" />
+                                                        break;
+                                                    case "MDC,A":
+                                                        <img src="../img/incompleto.png" title="Incompleto" />
+                                                        break;
+                                                    case "MDC,NE":
+                                                        <img src="../img/noAplica.png" title="No aplica" />
+                                                        break;
+                                                    case "MDC,R":
+                                                        <img src="../img/incompleto.png" title="Incompleto" />
+                                                        break;
+                                                }
+                                            }
+                                        </Template>
+
+                                    </GridColumn>
+
+                                    <GridColumn Field=@nameof(VMetaDataDtoResponse.NameMetaField)
+                                                Title="@Translation["Metadata"]"
+                                                Width="150px"
+                                                Filterable="true"
+                                                TextAlign="ColumnTextAlign.Center"
+                                                HeaderClass="center-wrap">
+                                        <Template>
+                                            @{
+                                                VMetaDataDtoResponse rowData = (VMetaDataDtoResponse)context;
+                                                if (rowData != null && rowData.NameMetaField != null)
+                                                {
+                                                    string formattedText = Char.ToUpper(rowData.NameMetaField[0]) + rowData.NameMetaField.Substring(1).ToLower();
+                                                    @formattedText
+                                                }
+                                            }
+                                        </Template>
+                                    </GridColumn>
+                                    <GridColumn Field=@nameof(VMetaDataDtoResponse.MetaValue)
+                                                Title="@Translation["MetadataValue"]"
+                                                Width="150px"
+                                                Filterable="true"
+                                                TextAlign="ColumnTextAlign.Center"
+                                                HeaderClass="center-wrap" />
+                                    <GridColumn Field=@nameof(VMetaDataDtoResponse.Mandatory)
+                                                Title="@Translation["Required"]"
+                                                Width="150px"
+                                                Filterable="true"
+                                                TextAlign="ColumnTextAlign.Center"
+                                                HeaderClass="center-wrap">
+                                        <Template>
+                                            @{
+                                                VMetaDataDtoResponse rowData = (VMetaDataDtoResponse)context;
+                                                if (rowData != null)
+                                                {
+                                                    bool activeState = (bool)rowData.Mandatory!;
+                                                    string activeText = activeState ? Translation["Required"] : Translation["NotRequired"];
+                                                    string colorClass = activeState ? "red" : "";
+                                                    <span class="@colorClass">@activeText</span>
+                                                }
+                                            }
+                                        </Template>
+                                    </GridColumn>
+                                    <GridColumn Field=@nameof(VMetaDataDtoResponse.FieldTypeName)
+                                                Title="@Translation["MetadataType"]"
+                                                Width="150px"
+                                                Filterable="true"
+                                                TextAlign="ColumnTextAlign.Center"
+                                                HeaderClass="center-wrap">
+                                        <Template>
+                                            @{
+                                                VMetaDataDtoResponse rowData = (VMetaDataDtoResponse)context;
+                                                if (rowData != null && rowData.FieldTypeName != null)
+                                                {
+                                                    string formattedText = Char.ToUpper(rowData.FieldTypeName[0]) + rowData.FieldTypeName.Substring(1).ToLower();
+                                                    @formattedText
+                                                }
+                                            }
+                                        </Template>
+                                    </GridColumn>
+
+
+                                </GridColumns>
+
+                                <NoDataTemplate>
+                                    <img src="../img/noDataFound.png" width="8%" height="8%" />
+                                    <p> No hay información</p>
+                                </NoDataTemplate>
+                            </TelerikGrid>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-column flex-md-row justify-content-end mt-4">
+
+                        <div class="d-flex flex-wrap justify-content-end">
+
+                            <div class="p-2">
+                                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-md-2" BtnType="button" BtnText=@Translation["New"] BtnIcon="fa-solid fa-folder-plus" BtnOnClick="OpenCreateView" ></ButtonComponent>
+                            </div>
+
+                            <div class="p-2">
+                                <ButtonComponent BtnClassColor="btnStyle--primary"
+                                                 BtnClassModifiers="ml-md-2"
+                                                 BtnType="button"
+                                                 BtnText=@Translation["Volumes"]
+                                                 BtnIcon="fa-solid fa-eraser"
+                                                 BtnOnClick="@(() => OpenVolumesModal(createdRecord))">
+                                </ButtonComponent>
+                            </div>
+
+                            <div class="p-2">
+                                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-md-2" BtnType="button" BtnText=@Translation["Save"] BtnIcon="fa-solid fa-floppy-disk" BtnOnClick="HandleCreateForm"></ButtonComponent>
+                            </div>
+                        </div>
+                    </div>
+                </TabStripTab>
+
+            <TabStripTab Title=@Translation["IndexRecord"]>
+                
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <h6 class="titulo-azul">@Translation["RecordsDocket"]: @createdRecord.RecordNumber</h6>
+                    </div>
+                    <div class="col-md-4 mt-1">
+
+                        <TelerikDropDownList Data="@lstRecordVolumens"
+                                             Value="@RecordVolumens"
+                                             Id="RC_RecordVolumens"
+                                             DefaultText=@Translation["FileVolume"]
+                                             TextField="NameTome"
+                                             ValueField="VolumeId"
+                                             Filterable="true"
+                                             ValueChanged="@( (int? newValue) => GetDocumentaryTypologyByVolumenId(newValue.Value))"
+                                             FilterOperator="StringFilterOperator.Contains">
+                        </TelerikDropDownList>
+
+                    </div>
+                    <div class="col-md-2 mt-1">
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText="" BtnIcon="fa-solid fa-rotate" BtnTitle="@TitleUploadFileImage" BtnDisabled="DisabledUploadFileImage" BtnOnClick="GetUploadFileImage"></ButtonComponent>
+                    </div>
+                </div>
+
+                <div class="row mt-4 @PanelTableTypologyTDM">
+                    <div class="col-lg-6 d-flex align-items-end">
+                        <h6 class="titulo-azul">@Translation["ControlPanelTDM"] :</h6>
+                    </div>
+                    <div class="col-lg-6 text-end">
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText="@TextDashboard" BtnIcon="@ShowDashboardIcon" BtnOnClick="ShowDashboard"></ButtonComponent>
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText="@TextPDF" BtnIcon="@ShowPDFIcon" BtnOnClick="ShowPDFViewer"></ButtonComponent>
+                    </div>
+                </div>
+
+                <div class="row mt-4 @PanelTableTypologyTDM">
+                    <div id="tableTypologies" class="@DisplayDashboard">
+
+                        <TelerikGrid Data="@DocumentarTypologyTDM"
+                                     PageSize="@DocumentarTypologyTDM.Count()"
+                                     ScrollMode=GridScrollMode.Scrollable>
+                            <GridColumns>
+
+                                <GridColumn Width="350px">
+                                    <HeaderTemplate>
+                                        <label> @Translation["DocumentInformation"]:</label>
+                                    </HeaderTemplate>
+                                    <Template>
+                                        @{
+                                            var data = (DocumentaryTypologyTDMDtoRequest)context;
+
+                                            switch (data.Color)
+                                            {
+                                                case "MDC,V":
+                                                    ColorText = "TextCompleto";
+                                                    break;
+                                                case "MDC,AZ":
+                                                    ColorText = "TextAusente";
+                                                    break;
+                                                case "MDC,A":
+                                                    ColorText = "TextIncompleto";
+                                                    break;
+                                                case "MDC,NE":
+                                                    ColorText = "TextNoAplica";
+                                                    break;
+                                                case "MDC,R":
+                                                    ColorText = "TextIncompleto";
+                                                    break;
+                                            }
+                                            
+                                            <div class="row d-flex justify-content-center mt-4">
+
+                                                <div class="w-45 d-flex justify-content-center p-0">
+                                                    <button class="btnGrid" title="@Translation["PDFImage"]" @onclick="() => ViewIndexedPDF(data)" disabled="@(data.DocumentId == 0)">
+                                                        <svg viewBox="0 0 512 512"><path d="M240.9 160c-7.6 0-13.8 4-15.4 9.9-4.9 18.6.2 46.3 9.4 82.3l-2.4 5.9c-6.6 16.4-14.8 33-22.1 47.6l-1 1.9c-7.7 15.3-14.6 28.4-21 39.4l-6.5 3.5c-.5.3-11.6 6.3-14.3 7.9-22.2 13.6-36.9 28.9-39.4 41.2-.8 3.9-.2 8.9 3.7 11.2l6.3 3.2c2.7 1.4 5.6 2.1 8.6 2.1 15.8 0 34.2-20.2 59.5-65.3 29.2-9.7 62.5-17.8 91.6-22.3 22.2 12.8 49.5 21.7 66.8 21.7q4.65 0 7.8-.9c3.3-.9 6.1-2.8 7.8-5.4 3.4-5.2 4-12.2 3.1-19.5-.3-2.1-2-4.8-3.8-6.6-5.1-5.2-16.5-7.9-33.7-8.1-11.7-.1-25.8.9-40.6 3-6.6-3.9-13.5-8.2-18.8-13.3-14.4-13.8-26.5-32.9-34-53.9.5-2 .9-3.7 1.3-5.4 0 0 8.1-47.1 6-63.1-.3-2.2-.5-2.8-1.1-4.5l-.7-1.9c-2.2-5.2-6.5-10.7-13.3-10.4zm2.7 8.4c5.1 0 8 13.1 8.2 25.4.3 12.3-2.6 20.9-6 27.3-2.9-9.4-4.3-24.3-4.3-34-.1-.1-.3-18.7 2.1-18.7m.4 104.1c8.6 16 19.3 29.5 31.9 40.4 1.6 1.3 3.2 2.7 5 4.1-25.6 5.2-47.7 11.5-67.1 19.1 3.6-6.5 7.2-13.3 11-20.6 9.1-17.7 14.9-31.6 19.2-43m102.2 51.6c9.3 0 12 0 21.1 2.3 9.1 2.4 9.2 7.2 7.6 8.2s-6 1.6-8.9 1.6c-9.2 0-20.7-4.3-36.8-11.4 6.3-.4 11.9-.7 17-.7m-165.4 35.8c-17.7 28.8-29.5 40.3-37.3 43.8 2.9-8.1 14.3-24 31.2-38.1 1.1-.9 3.7-3.4 6.1-5.7M352 32H96c-17.7 0-32 14.3-32 32v384c0 17.7 14.3 32 32 32h320c17.7 0 32-14.3 32-32V128zm64 416H96V64h224v96h96z"></path></svg>
+                                                    </button>
+                                                </div>
+                                                <div class="w-45 d-flex justify-content-center p-0">
+                                                    <button class="btnGrid" title="@Translation["IndexDT"]" @onclick="() => OpenIndexDocumentaryTypologyModal(data)">
+                                                        <svg viewBox="0 0 512 512"><path d="M128 128H96V64c0-17.7 14.3-32 32-32h224l64 64h-96V64H128zm122.9 193.2L224 349.3V416h66.7l28.1-26.9 141.6-141.6-67.9-67.9zm28.4 62.1L268 372l-11.3-11.3 135.8-135.8 22.6 22.6zM416 337.155l32-32V448c0 17.7-14.3 32-32 32H128c-17.7 0-32-14.3-32-32v-96h32v96h288zM502.7 205.3 480 227.8 412.2 160l22.6-22.6c12.4-12.4 32.8-12.4 45.3 0l22.6 22.6c12.4 12.4 12.4 32.8 0 45.3M288 144 112 320 0 208l45-45 67 67L243 99zm-96 272h-32v-32h32z"></path></svg>
+                                                    </button>
+                                                </div>                                                
+                                                <div class="w-45 d-flex justify-content-center p-0">
+                                                    <button class="btnGrid" title="@Translation["Metadata"]" @onclick="() => ShowTabMetadata(data)" disabled="@(data.DocumentId == 0)">
+                                                        <svg viewBox="0 0 512 512"><path d="M502.7 173.3 480 195.8 412.2 128l22.6-22.6c12.4-12.4 32.8-12.4 45.3 0l22.6 22.6c12.4 12.4 12.4 32.8 0 45.3m-110.2-25.7 67.9 67.9-141.6 141.6-28.1 26.9H224v-66.7l26.9-28.1zm22.6 67.9-22.6-22.6-135.8 135.8L268 340l11.3 11.3zM160 320h32v-32h-32zm0-64h96v-32h-96zm128-96H160v32h128zM160 384h32v-32h-32zm256 64H96V64h224v96l80.11-79.89L352 32H96c-17.7 0-32 14.3-32 32v384c0 17.7 14.3 32 32 32h320c17.7 0 32-14.3 32-32V273.155l-32 32z"></path></svg>
+                                                    </button>
+                                                </div>
+                                                <div class="w-45 d-flex justify-content-center p-0">
+                                                    <button class="btnGrid" title="@Translation["Attachment"]" @onclick="() => ShowAttachmentsModal(data)" disabled="@(data.DocumentId == 0)">
+                                                        <svg viewBox="0 0 512 512"><path d="M64 416h224v32H64zm224-64H64v32h224zM400 0C288 0 288 96 288 96v160s0 64 80 64 80-64 80-64V96s0-32-48-32-48 32-48 32v128h32V116c0-11 .6-20 16-20s16 9 16 20v140s0 32-48 32-48-32-48-32V96s0-64 80-64 80 64 80 64v128h32V96s0-96-112-96M106.7 288 96 320H64l64-192h32l64 192h-32l-10.7-32zm10.6-32h53.3L144 176zM320 480H32V96h224V64H32C14.3 64 0 78.3 0 96v384c0 17.7 14.3 32 32 32h288c17.7 0 32-14.3 32-32V352h-32z"></path></svg>
+                                                    </button>
+                                                </div>
+                                                <div class="w-45 d-flex justify-content-center p-0">
+                                                    <button class="btnGrid" title="@Translation["DuplicateDocument"]" @onclick="noDisponible" disabled="@(data.DocumentId == 0)">
+                                                        <svg viewBox="0 0 512 512"><path d="M448 480c0 17.7-14.3 32-32 32H128c-17.7 0-32-14.3-32-32v-96h32v96h288V96H128v64H96V96c0-17.7 14.3-32 32-32h288c17.7 0 32 14.3 32 32zM63.9 32l254.3-.2L286.4 0 63.8.2C46.2.2 32 14.4 32 32l.1 128H64zm.1 351H32v32c0 17.7 14.3 32 32 32zm-32-62.9S64 288 95 288v32l65-48.1L96 224v32c-32.1 0-64 32.1-64 64.1M352 384l-160 .1V416l160-.1zm-96-192c-35.3 0-64 28.7-64 64s28.7 64 64 64 64-28.7 64-64h-64zm32-32v64h64c0-35.3-28.7-64-64-64"></path></svg>
+                                                    </button>
+                                                </div>                                                
+                                                <div class="w-45 d-flex justify-content-center p-0">
+                                                    <button class="btnGrid" title="@Translation["IncludeImage"]" @onclick="() => AutomaticIndexing(data)">
+                                                        <svg viewBox="0 0 512 512"><path d="M32 384v96h448v-96zm192-64h64V192h96L256 32 128 192h96z"></path></svg>
+                                                    </button>
+                                                </div>
+
+                                            </div>
+                                            <div class="row d-flex text-start mt-4 w-100">
+                                                <div class="row p-4 @ColorText card-Info" >
+                                                    <div class="col-lg-12 mb-1">
+                                                        <label><b>@Translation["Typologie"]:</b> @(!string.IsNullOrEmpty(data?.TypologyName) ? data.TypologyName : "N/A")</label>
+                                                    </div>
+                                                    <div class="col-lg-12 mb-1">
+                                                        <div class="row">
+                                                            <div class="col-md-6">
+                                                                <label><b>@Translation["StartFolio"]:</b> @(data?.StartFolio != 0 ? data?.StartFolio : "0")</label>
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <label><b>@Translation["EndFolio"]:</b> @(data?.EndFolio != 0 ? data?.EndFolio : "0")</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-12 mb-1 min-height">
+                                                        <label><b>@Translation["Comment"]:</b> @(!string.IsNullOrEmpty(data?.DocDescription) ? data?.DocDescription : "N/A")</label>
+                                                    </div>
+                                                    <div class=" col-lg-12 mb-1 footer-card">
+                                                        <label><b>@Translation["DocumentID"]:</b> @(data?.DocumentId.ToString()), <b>@Translation["Origin"]:</b> @(data?.OriginName)</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </Template>
+                                </GridColumn>
+
+                                <GridColumn Title="@Translation["Status"]"
+                                            Width="150px"
+                                            TextAlign="ColumnTextAlign.Center"
+                                            HeaderClass="center-wrap">
+                                    <Template>
+                                        @{
+                                            DocumentaryTypologyTDMDtoRequest rowData = (DocumentaryTypologyTDMDtoRequest)context;
+                                            switch (rowData.Color)
+                                            {
+                                                case "MDC,V":
+                                                    <div class="row d-flex justify-content-center">
+                                                        <img class="imgEstado" src="../img/completo.png" title="@Translation["Gantt_Editor_PercentComplete"]"/>
+                                                        <label class="@ColorText">
+                                                            @Translation["Gantt_Editor_PercentComplete"]
+                                                        </label>
+                                                    </div>
+                                                    break;
+                                                case "MDC,AZ":
+                                                    <div class="row d-flex justify-content-center">
+                                                        <img class="imgEstado" src="../img/ausente.png" title="@Translation["Absent"]"/>
+                                                        <label class="@ColorText">
+                                                            @Translation["Absent"]
+                                                        </label>
+                                                    </div>
+                                                    break;
+                                                case "MDC,A":
+                                                    <div class="row d-flex justify-content-center">
+                                                        <img class="imgEstado" src="../img/incompleto.png" title="@Translation["Incomplete"]"/>
+                                                        <label class="@ColorText">
+                                                            @Translation["Incomplete"]
+                                                        </label>
+                                                    </div>
+                                                    break;
+                                                case "MDC,NE":
+                                                    <div class="row d-flex justify-content-center">
+                                                        <img class="imgEstado" src="../img/noAplica.png" title="@Translation["NotApply"]"/>
+                                                        <label class="@ColorText">
+                                                            @Translation["NotApply"]
+                                                        </label>
+                                                    </div>
+                                                    break;
+                                                case "MDC,R":
+                                                    <div class="row d-flex justify-content-center">
+                                                        <img class="imgEstado" src="../img/incompleto.png" title="@Translation["Incomplete"]"/>
+                                                        <label class="@ColorText">
+                                                            @Translation["Incomplete"]
+                                                        </label>
+                                                    </div>
+                                                    break;
+                                            }
+                                        }
+                                    </Template>
+
+                                </GridColumn>
+
+                                <GridColumn Width="100px"
+                                            TextAlign="ColumnTextAlign.Center">
+                                    <HeaderTemplate>
+                                        <label> @Translation["Creation"]</label>
+                                    </HeaderTemplate>
+                                    <Template>
+                                        @{
+                                            var data = (DocumentaryTypologyTDMDtoRequest)context;
+                                            <div class="mb-1 row d-flex justify-content-center">
+                                                <label class="@ColorText"><b>@Translation["UserBelieve"]:</b> @(!string.IsNullOrEmpty(data?.CreateUser) ? data.CreateUser : "N/A")</label>
+                                            </div>
+                                            <div class="mb-1 row d-flex justify-content-center">
+                                                <label class="@ColorText"><b>@Translation["CreationDate"]:</b> @(!string.IsNullOrEmpty(data?.CreateDate.ToString()) ? data.CreateDate.ToString() : "N/A")</label>
+                                            </div>
+                                        }
+                                    </Template>
+                                </GridColumn>
+
+                            </GridColumns>
+
+                            <NoDataTemplate>
+                                <img src="../img/noDataFound.png" width="8%" height="8%" />
+                                <p> No hay información</p>
+                            </NoDataTemplate>
+                        </TelerikGrid>
+
+                    </div>
+                    
+                    <div id="viewPDF" class="@DisplayPDF">
+                        <TelerikPdfViewer @ref="@PdfViewerRef"
+                                          Width="100%"
+                                          Height="162vh"
+                                          Data="@FileData">
+                            <PdfViewerToolBar>
+                                <PdfViewerToolBarPagerTool />
+                                <PdfViewerToolBarSelectionTool />
+                                <PdfViewerToolBarSeparator />
+                                <PdfViewerToolBarSearchTool />
+                                <PdfViewerToolBarSeparator />
+                                <PdfViewerToolBarSeparator />
+                                <PdfViewerToolBarZoomTool />
+                            </PdfViewerToolBar>
+                        </TelerikPdfViewer>
+                    </div>
+                </div>
+            </TabStripTab>
+
+            <TabStripTab Title=@Translation["MetadataTypology"] Class="@DisplayMetadataTypology">
+
+                <div class="row mt-0 d-flex align-items-end">
+                    <div class="col-md-10">
+                        <h6 class="titulo-azul">@Translation["TypologyMetadata"]: @TitleMetadataTypology</h6>
+                    </div>
+                    <div class="col-md-2 mt-1 d-flex justify-content-end">
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText="@TextMassive" BtnIcon="fa-solid fa-list-check" BtnTitle="@TitleUploadFileImage" BtnDisabled="DisabledUploadFileImage" BtnOnClick="noDisponible"></ButtonComponent>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div id="tableMetadataTypology" class="col-lg-12">
+
+                        <TelerikGrid Data="@MetaDataTypologyList"
+                                     PageSize="@MetaDataTypologyList.Count()"
+                                     ScrollMode=GridScrollMode.Scrollable>
+                            <GridColumns>
+
+                                <GridCommandColumn Width="80px" Title=@Translation["Edit"] HeaderClass="center-wrap" Visible="true">
+                                    <GridCommandButton Icon="@SvgIcon.Pencil" Title=@Translation["Edit"] OnClick="@((args)=> MetaDataTypologySelected((MetaDataTypologyDtoResponse) args.Item))"></GridCommandButton>
+                                </GridCommandColumn>
+                                <GridColumn Title="@Translation["Status"]"
+                                            Width="150px"
+                                            TextAlign="ColumnTextAlign.Center"
+                                            HeaderClass="center-wrap">
+                                    <Template>
+                                        @{
+                                            MetaDataTypologyDtoResponse rowData = (MetaDataTypologyDtoResponse)context;
+                                            switch (rowData.Color)
+                                            {
+                                                case "MDC,V":
+                                                    <img src="../img/completo.png" title="Completo" />
+                                                    ColorMetadataTypology = "TextCompleto";
+                                                    break;
+                                                case "MDC,AZ":
+                                                    <img src="../img/ausente.png" title="Ausente" />
+                                                    ColorMetadataTypology = "TextAusente";
+                                                    break;
+                                                case "MDC,A":
+                                                    <img src="../img/incompleto.png" title="Incompleto" />
+                                                    ColorMetadataTypology = "TextIncompleto";
+                                                    break;
+                                                case "MDC,NE":
+                                                    <img src="../img/noAplica.png" title="No aplica" />
+                                                    ColorMetadataTypology = "TextNoAplica";
+                                                    break;
+                                                case "MDC,R":
+                                                    <img src="../img/incompleto.png" title="Incompleto" />
+                                                    ColorMetadataTypology = "TextIncompleto";
+                                                    break;
+                                            }
+                                        }
+                                    </Template>
+
+                                </GridColumn>
+
+                                <GridColumn Field=@nameof(MetaDataTypologyDtoResponse.NameMetaField)
+                                            Title="@Translation["Metadata"]"
+                                            Width="150px"
+                                            Filterable="true"
+                                            TextAlign="ColumnTextAlign.Center"
+                                            HeaderClass="center-wrap">
+                                    <Template>
+                                        @{
+                                            MetaDataTypologyDtoResponse rowData = (MetaDataTypologyDtoResponse)context;
+                                            if (rowData != null && rowData.NameMetaField != null)
+                                            {
+                                                string formattedText = Char.ToUpper(rowData.NameMetaField[0]) + rowData.NameMetaField.Substring(1).ToLower();
+                                                <label class="@ColorMetadataTypology">@formattedText</label>
+                                            }
+                                        }
+                                    </Template>
+                                </GridColumn>
+                                <GridColumn Field=@nameof(MetaDataTypologyDtoResponse.MetaValue)
+                                            Title="@Translation["MetadataValue"]"
+                                            Width="150px"
+                                            Filterable="true"
+                                            TextAlign="ColumnTextAlign.Center"
+                                            HeaderClass="center-wrap" />
+                                <GridColumn Field=@nameof(MetaDataTypologyDtoResponse.Mandatory)
+                                            Title="@Translation["Required"]"
+                                            Width="150px"
+                                            Filterable="true"
+                                            TextAlign="ColumnTextAlign.Center"
+                                            HeaderClass="center-wrap">
+                                    <Template>
+                                        @{
+                                            MetaDataTypologyDtoResponse rowData = (MetaDataTypologyDtoResponse)context;
+                                            if (rowData != null)
+                                            {
+                                                bool activeState = (bool)rowData.Mandatory!;
+                                                string activeText = activeState ? Translation["Required"] : Translation["NotRequired"];
+                                                string colorClass = activeState ? "red" : "";
+                                                <span class="@colorClass">@activeText</span>
+                                            }
+                                        }
+                                    </Template>
+                                </GridColumn>
+                                <GridColumn Field=@nameof(MetaDataTypologyDtoResponse.FieldTypeName)
+                                            Title="@Translation["MetadataType"]"
+                                            Width="150px"
+                                            Filterable="true"
+                                            TextAlign="ColumnTextAlign.Center"
+                                            HeaderClass="center-wrap">
+                                    <Template>
+                                        @{
+                                            MetaDataTypologyDtoResponse rowData = (MetaDataTypologyDtoResponse)context;
+                                            if (rowData != null && rowData.FieldTypeName != null)
+                                            {
+                                                string formattedText = Char.ToUpper(rowData.FieldTypeName[0]) + rowData.FieldTypeName.Substring(1).ToLower();
+                                                @formattedText
+                                            }
+                                        }
+                                    </Template>
+                                </GridColumn>
+
+
+                            </GridColumns>
+
+                            <NoDataTemplate>
+                                <img src="../img/noDataFound.png" width="8%" height="8%" />
+                                <p> No hay información</p>
+                            </NoDataTemplate>
+                        </TelerikGrid>
+
+                    </div>
+                </div>
+
+            </TabStripTab>
+
+        </TelerikTabStrip>
+     </div>
+
+@* 
+    <div id="panel_history_records" class="@PanelHistoryRecord">
+
+        <TelerikTabStrip>
+
+            <TabStripTab Title=@Translation["RECLASIFICACION_EXPEDIENTE"]>
+                <div class="row mt-4">
+                    <div class="col-md-3 d-flex flex-column justify-content-between ">
+                        <label class="titulo-azul">
+                            @Translation["RECLASIFICACION_EXPEDIENTE"]
+                        </label>
+                    </div>
+
+                </div>
+                <div class="row mt-4">
+                    <TelerikGrid Data="@recordHistoryList.Where(y=>y.HistoryType.Equals("OPEXP,CHE"))" PageSize="recordHistoryList.Count">
+                        <GridColumns>
+
+                            <GridColumn Field=@nameof(RecordHistoryDtoResponse.CreateDate)
+                                        Title="@Translation["Date"]"
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                            
+                            <GridColumn Field=@nameof(RecordHistoryDtoResponse.AdministrativeUnits)
+                                        Title="@Translation["DocumentaryVersion"]"
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                            <GridColumn Field=@nameof(RecordHistoryDtoResponse.AdministrativeUnits)
+                                        Title="@Translation["AdministrativeUnit"]"
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                            <GridColumn Field=@nameof(RecordHistoryDtoResponse.ProductionOffice)
+                                        Title="@Translation["ProductionOffice"]"
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                            <GridColumn Field=@nameof(RecordHistoryDtoResponse.Series)
+                                        Title="@Translation["Serie"]"
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                            <GridColumn Field=@nameof(RecordHistoryDtoResponse.SubSeries)
+                                        Title="@Translation["SubSerie"]"
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+
+                            <GridColumn Field=@nameof(RecordHistoryDtoResponse.CreateUser)
+                                        Title="@Translation["User"]"
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+
+                            <GridColumn Field=@nameof(RecordHistoryDtoResponse.ClosedTypeName)
+                                        Title="@Translation["ClosedTypeName"]"
+                                        Width="170px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                            <GridColumn Field=@nameof(RecordHistoryDtoResponse.RecordFileTypeName)
+                                        Title="@Translation["Operation"]"
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                            <GridColumn Field=@nameof(RecordHistoryDtoResponse.Justification)
+                                        Title="@Translation["Justification"]"
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+
+                            <GridColumn Field=@nameof(RecordHistoryDtoResponse.CreateUser)
+                                        Title="@Translation["User"]"
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                        </GridColumns>
+                        <NoDataTemplate>
+                            <img src="../img/noDataFound.png" width="8%" height="8%" />
+                            <p> @Translation["NoGridInfo"]</p>
+                        </NoDataTemplate>
+                    </TelerikGrid>
+
+                </div>
+            </TabStripTab>
+
+            <TabStripTab Title=@Translation["INCLUSION_EXPEDIENTE"]>
+                <div class="row mt-4">
+                    <div class="col-md-3 d-flex flex-column justify-content-between ">
+                        <label class="titulo-azul">
+                            @Translation["INCLUSION_EXPEDIENTE"]
+                        </label>
+                    </div>
+
+                </div>
+                <div class="row mt-4">
+                    <TelerikGrid Data="@recordHistoryList.Where(y=>y.HistoryType.Equals("OPEXP,RABI"))" PageSize="recordHistoryList.Count">
+                        <GridColumns>
+
+                            <GridColumn Field=@nameof(RecordHistoryDtoResponse.ChangeDate)
+                                        Title="@Translation["Date"]"
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+
+                            <GridColumn Field=@nameof(RecordHistoryDtoResponse.CreateUser)
+                                        Title="@Translation["User"]"
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+
+                            <GridColumn Field=@nameof(RecordHistoryDtoResponse.ClosedTypeName)
+                                        Title="@Translation["ClosedTypeName"]"
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                            <GridColumn Field=@nameof(RecordHistoryDtoResponse.OperationName)
+                                        Title="@Translation["Operation"]"
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                            <GridColumn Field=@nameof(RecordHistoryDtoResponse.Justification)
+                                        Title="@Translation["Justification"]"
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                        </GridColumns>
+                        <NoDataTemplate>
+                            <img src="../img/noDataFound.png" width="8%" height="8%" />
+                            <p> @Translation["NoGridInfo"]</p>
+                        </NoDataTemplate>
+                    </TelerikGrid>
+
+                </div>
+            </TabStripTab>
+
+            <TabStripTab Title=@Translation["CIERRE_EXPEDIENTE"]>
+
+                <div class="row mt-4">
+                    <div class="col-md-3 d-flex flex-column justify-content-between ">
+                        <label class="titulo-azul">
+                            @Translation["CIERRE_EXPEDIENTE"]
+                        </label>
+                    </div>
+
+                </div>
+                <div class="row mt-4">
+                    <TelerikGrid Data="@recordHistoryList.Where(y=>y.HistoryType.Equals("OPEXP,CER"))" PageSize="recordHistoryList.Count">
+                        <GridColumns>
+
+                            <GridColumn Field=@nameof(RecordHistoryDtoResponse.ChangeDate)
+                                        Title="@Translation["Date"]"
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+
+                            <GridColumn Field=@nameof(RecordHistoryDtoResponse.CreateUser)
+                                        Title="@Translation["User"]"
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+
+                            <GridColumn Field=@nameof(RecordHistoryDtoResponse.ClosedTypeName)
+                                        Title="@Translation["ClosedTypeName"]"
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                            <GridColumn Field=@nameof(RecordHistoryDtoResponse.OperationName)
+                                        Title="@Translation["Operation"]"
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                            <GridColumn Field=@nameof(RecordHistoryDtoResponse.Active)
+                                        Title="@Translation["Operation"]"
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                            <GridColumn Field=@nameof(RecordHistoryDtoResponse.Justification)
+                                        Title="@Translation["Justification"]"
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                        </GridColumns>
+                        <NoDataTemplate>
+                            <img src="../img/noDataFound.png" width="8%" height="8%" />
+                            <p> @Translation["NoGridInfo"]</p>
+                        </NoDataTemplate>
+                    </TelerikGrid>
+
+                </div>
+            </TabStripTab>
+
+            <TabStripTab Title=@Translation["TRANSFERENCIA_EXPEDIENTE"] Disabled="true">
+                <div class="row mt-4">
+                    <div class="col-md-3 d-flex flex-column justify-content-between ">
+                        <label class="titulo-azul">
+                            @Translation["TRANSFERENCIA_EXPEDIENTE"]
+                        </label>
+                    </div>
+
+                </div>
+                <div class="row mt-4">
+                    <TelerikGrid Data="@recordHistoryList.Where(y=>y.HistoryType.Equals("OPEXP,TRA"))" PageSize="recordHistoryList.Count">
+                        <GridColumns>
+
+                            <GridColumn Field=@nameof(RecordHistoryDtoResponse.ChangeDate)
+                                        Title="@Translation["Date"]"
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+
+                            <GridColumn Field=@nameof(RecordHistoryDtoResponse.CreateUser)
+                                        Title="@Translation["User"]"
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+
+                            <GridColumn Field=@nameof(RecordHistoryDtoResponse.ClosedTypeName)
+                                        Title="@Translation["ClosedTypeName"]"
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                            <GridColumn Field=@nameof(RecordHistoryDtoResponse.OperationName)
+                                        Title="@Translation["Operation"]"
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                            <GridColumn Field=@nameof(RecordHistoryDtoResponse.Justification)
+                                        Title="@Translation["Justification"]"
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                        </GridColumns>
+                        <NoDataTemplate>
+                            <img src="../img/noDataFound.png" width="8%" height="8%" />
+                            <p> @Translation["NoGridInfo"]</p>
+                        </NoDataTemplate>
+                    </TelerikGrid>
+
+                </div>
+            </TabStripTab>
+
+        </TelerikTabStrip>
+
+    </div>
+ *@
+
+</div>

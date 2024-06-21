@@ -1,0 +1,36 @@
+﻿
+<div class="card shadow bg-white rounded">
+    <div class="card-body">
+        <div class="row d-flex align-items-center ">
+            <div class="col-md-3 text-center">
+
+                <img src="..\img\userCardImage.svg" />
+            </div>
+            <div class="col-md-9 d-flex flex-column align-items-start">
+                @if(LeadManagerId == null && ValidLeadManager)
+                {
+                    <div class="row">
+                        <label><b>Gestor lider:</b> No aplica</label>
+                    </div>
+                }
+                else
+                {
+                    <div class="row">
+                        <label><b>@Translation["Name"]:</b> @FullName</label>
+                    </div>
+                    <div class="row">
+                        <label> <b>@Translation["AdministrativeDepartment"]:</b> @AdministrativeUnitName</label>
+                    </div>
+                    <div class="row">
+                        <label> <b>@Translation["ProductionOffice"]:</b> @ProductionOfficeName</label>
+                    </div>
+                    <div class="row">
+                        <label> <b>@Translation["Position"]:</b> @Positionname</label>
+                    </div>
+                }
+            </div>
+        </div>
+
+    </div>
+</div>
+

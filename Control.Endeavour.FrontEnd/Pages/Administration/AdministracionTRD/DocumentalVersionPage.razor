@@ -1,0 +1,239 @@
+﻿@page "/DocumentalVersion"
+@layout MainLayout;
+
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.AdministracionTRD.Request;
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.AdministracionTRD.Response;
+
+<DocumentalVersionModal @ref="modalDocumentalVersion" OnChangeData="HandleRefreshGridData"></DocumentalVersionModal>
+<AdministrativeActModal @ref="modalAdministrativeAct"></AdministrativeActModal>
+
+
+<div class="container-fluid mt-5">
+    <!-- Parte 1: Título y Contenido alineado a la izquierda -->
+    <div class="row titulo">
+        <div class="col-lg-8">
+            <h1>@(Translation["Administration"] + " - " + Translation["DocumentaryVersions"])</h1>
+        </div>
+        <!-- Parte 2: Botón azul alineado a la derecha -->
+        <div class="col-lg-4 text-end">
+            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10  btn-block" BtnType="button" BtnText="@(Translation["Create"])" BtnOnClick="ShowModal" BtnIcon="fa-solid fa-plus"></ButtonComponent>
+        </div>
+    </div>
+
+    <div class="row m-0">
+
+        <div class="col-lg-12">
+            <h6 class="titulo-azul"> @Translation["SearchByFilters"]:</h6>
+        </div>
+        <div class="col-lg-3 mt-1">
+            <label for="input2" class="mb-2">@Translation["VersionType"]</label>
+            <TelerikDropDownList Data="@documentalType"
+                                 Id="DocTypeJ"
+                                 DefaultText="@Translation["SelectAType"]"
+                                 TextField="Value"
+                                 ValueField="Value"
+                                 @bind-Value="versionTypeFilter"
+                                 Filterable="true"
+                                 FilterOperator="StringFilterOperator.Contains">
+            </TelerikDropDownList>
+        </div>
+
+        <div class="col-lg-3 mt-1">
+            <InputModalComponent @bind-InputValue="codeFilter" IsDisabled="false" LabelText="@Translation["Code"]" Placeholder="@Translation["Code"]" InputMaxLength="5" />
+        </div>
+
+        <div class="col-lg-3 mt-1">
+            <InputModalComponent @bind-InputValue="NameFilter" IsDisabled="false" LabelText="@Translation["Name"]" Placeholder="@Translation["Name"]" InputMaxLength="100" />
+        </div>
+
+        <div class="col-lg-3 mt-1">
+            <div class="row mb-2">
+                <label class="text-filter" for="identification">@Translation["CurrentDocumentaryVersion"]</label>
+            </div>
+
+            <div class="row">
+                <div class="k-form k-form-md k-form-vertical">
+                    <div class="k-form-field">
+                        <div class="k-form-field-wrap">
+                            <TelerikRadioGroup Data="@optionsRecordClosed"
+                                               Value="@ResponseRecordClosed"
+                                               Layout="@RadioGroupLayout.Horizontal"
+                                               ValueChanged="@((string selectedValue) => OnValueChangedRecordClosed(selectedValue))">
+                            </TelerikRadioGroup>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="row m-0 pb-10">
+
+        <div class="col-lg-3 mt-2">
+            <label class="mb-2">@Translation["StartDate"]</label>
+            <TelerikDatePicker @bind-Value="@startDateFilter"
+                               Format="MM/dd/yyyy"
+                               ShowWeekNumbers="false"
+                               Max="@maxValueTo"
+                               OnChange="@updateMinValue" Class="DisabledInput">
+            </TelerikDatePicker>
+        </div>
+
+        <div class="col-lg-3 mt-2">
+            <label class="mb-2">@Translation["EndDate"]</label>
+            <TelerikDatePicker @bind-Value="@endDatefilter"
+                               Format="MM/dd/yyyy"
+                               ShowWeekNumbers="false"
+                               Min="@minValueTo"
+                               Max="DateTime.Now"
+                               OnChange="@updateMaxValue" Class="DisabledInput">
+            </TelerikDatePicker>
+        </div>
+
+        <div class="col-lg-6 mt-3 d-flex justify-content-end">
+            <div class="from-group mt-4">
+                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnClassModifiers="btn-block" BtnType="button" BtnText=@Translation["Clear"] BtnOnClick="ResetFiltersAsync" BtnIcon="fa-solid fa-eraser"></ButtonComponent>
+
+                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10 btn-block" BtnType="button" BtnText=@Translation["Search"] BtnOnClick="ApplyFiltersAsync" BtnIcon="fa-solid fa-magnifying-glass"></ButtonComponent>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Parte 3: Grilla -->
+    <div class="row mt-4">
+        <div class="col">
+            <TelerikGrid Data="documentalVersionsList" PageSize="10"
+                         Sortable="true"
+                         FilterMode="GridFilterMode.FilterMenu"
+                         Resizable="true"
+                         Reorderable="false"
+                         EditMode="GridEditMode.Popup"
+                         SelectionMode="GridSelectionMode.None">
+                <GridToolBarTemplate>
+                    <GridCommandButton Command="ExcelExport" Icon="@SvgIcon.FileExcel" Enabled="@(documentalVersionsList!=null && documentalVersionsList.Count>0)">@Translation["ExportToExcel"]</GridCommandButton>
+                    <label class="k-checkbox-label"><TelerikCheckBox @bind-Value="@ExportAllPages" Enabled="@(documentalVersionsList!=null && documentalVersionsList.Count>0)" /> @Translation["ExportAllPages"]</label>
+                </GridToolBarTemplate>
+                <GridExport>
+                    <GridExcelExport FileName="telerik-grid-export" AllPages="@ExportAllPages" OnBeforeExport="@OnBeforeExcelExport" />
+                </GridExport>
+                <GridColumns>
+                    <GridCommandColumn Width="80px" Title=@Translation["Edit"] HeaderClass="center-wrap" Visible="true">
+                        <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                            <GridCommandButton Title=@Translation["Edit"] Icon="@SvgIcon.Pencil" OnClick="@((args)=> ShowModalEdit((DocumentalVersionDtoResponse)args.Item))"></GridCommandButton>
+                        </div>
+                    </GridCommandColumn>
+                    <GridCommandColumn Width="90px" Title=@Translation["Delete"] HeaderClass="center-wrap" Visible="true">
+                        <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                            <GridCommandButton Title=@Translation["Delete"] Icon="@SvgIcon.Trash" OnClick="@((args)=> HandleRecordToDelete((DocumentalVersionDtoResponse)args.Item))"></GridCommandButton>
+                        </div>
+                    </GridCommandColumn>
+                    <GridColumn Field=@nameof(DocumentalVersionDtoResponse.Name) Title=@Translation["Name"] Width="150px" Filterable="false" />
+                    <GridColumn Field=@nameof(DocumentalVersionDtoResponse.Code) Title=@Translation["Code"] HeaderClass="center-wrap" Width="120px" Filterable="false" TextAlign="ColumnTextAlign.Center" />
+                    <GridColumn Field=@nameof(DocumentalVersionDtoResponse.VersionType) Title=@Translation["VersionType"] HeaderClass="center-wrap" Width="180px" Filterable="false" TextAlign="ColumnTextAlign.Center" />
+                    <GridColumn Field=@nameof(DocumentalVersionDtoResponse.StartDate) Title=@Translation["StartDate"] Width="175px" Filterable="false">
+                        <Template>
+                            @{
+                                DocumentalVersionDtoResponse rowData = (DocumentalVersionDtoResponse)context;
+                                if (rowData != null && rowData.StartDate.HasValue)
+                                {
+                                    DateTime startDate = rowData.StartDate.Value;
+                                    <span>@startDate.ToString("dd/MM/yyyy")</span>
+                                }
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field=@nameof(DocumentalVersionDtoResponse.EndDate) Title=@Translation["EndDate"] Width="175px" Filterable="false">
+                        <Template>
+                            @{
+                                DocumentalVersionDtoResponse rowData = (DocumentalVersionDtoResponse)context;
+                                if (rowData != null && rowData.EndDate.HasValue)
+                                {
+                                    DateTime endDate = rowData.EndDate.Value;
+                                    <span>
+                                        @endDate.ToString("dd/MM/yyyy")
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>@Translation["CurrentDocumentaryVersion"]</span>
+                                }
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridCommandColumn Width="150px" Title=@Translation["AdministrativeActs"] HeaderClass="center-wrap" Visible="true">
+                        <div class="text-center">
+                            <GridCommandButton Icon="@SvgIcon.Search" OnClick="@((args) => ShowModalAdminstrativeAct((DocumentalVersionDtoResponse)args.Item))" Class="text-center"></GridCommandButton>
+                        </div>
+                    </GridCommandColumn>
+                    <GridColumn Field=@nameof(DocumentalVersionDtoResponse.FileOrganizationId) Title=@Translation["OrganizationChart"] TextAlign="@ColumnTextAlign.Center" HeaderClass="center-wrap" Width="140px" Filterable="false" ShowFilterCellButtons="false">
+                        <Template>
+                            @{
+                                DocumentalVersionDtoResponse rowData = (DocumentalVersionDtoResponse)context;
+                                if (rowData != null)
+                                {
+                                    int fileOrganizationId = rowData.FileOrganizationId;
+                                    if (fileOrganizationId != 0)
+                                    {
+                                        <div class="text-center">
+                                            <TelerikButton OnClick="@(() => DownloadFile(rowData.FileOrganizationId))" Class="text-center" Icon="@SvgIcon.Download"></TelerikButton>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span>@Translation["NoOrganizationChart"]</span>
+                                    }
+                                }
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field=@nameof(DocumentalVersionDtoResponse.ActiveState) Title=@Translation["Status"] Width="140px" Filterable="false">
+                        <Template>
+                            @{
+                                DocumentalVersionDtoResponse rowData = (DocumentalVersionDtoResponse)context;
+                                if (rowData != null)
+                                {
+                                    bool activeState = (bool)rowData.ActiveState!;
+                                    string active = activeState ? Translation["Enabled"] : Translation["Disabled"];
+                                    @active
+                                }
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field=@nameof(DocumentalVersionDtoResponse.CreateUser)
+                                Title=@Translation["UserRecorded"]
+                                Width="200px"
+                                TextAlign="ColumnTextAlign.Center"
+                                Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(DocumentalVersionDtoResponse.CreateDate)
+                                Title=@Translation["DateRecorded"]
+                                Width="200px"
+                                TextAlign="ColumnTextAlign.Center"
+                                Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(DocumentalVersionDtoResponse.UpdateUser)
+                                Title=@Translation["UserUpdated"]
+                                Width="200px"
+                                TextAlign="ColumnTextAlign.Center"
+                                Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(DocumentalVersionDtoResponse.UpdateDate)
+                                Title=@Translation["DateUpdated"]
+                                Width="200px"
+                                TextAlign="ColumnTextAlign.Center"
+                                Filterable="false" HeaderClass="center-wrap" />
+                </GridColumns>
+                <NoDataTemplate>
+                    <img src="../img/noDataFound.png" width="8%" height="8%" />
+                    <p> @Translation["NoGridInfo"]</p>
+                </NoDataTemplate>
+            </TelerikGrid>
+        </div>
+    </div>
+
+    <NewPaginationComponent @ref="paginationComponent" T="DocumentalVersionDtoResponse" M="DocumentalVersionFilterDtoRequest" Uri="@UriFilterDocumentalVersion" Filter="@filterDtoRequest" PaginationInfo="@paginationInfo" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+</div>
+
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiCloseAsync"></NotificationsComponentModal>

@@ -1,0 +1,69 @@
+﻿<div class="my-modal">
+    <TelerikRootComponent>
+        <GenericModalComponent Title=@Translation["Documents"] IsVisible="modalStatus" Width="60%" OnModalClosed="HandleModalClosed">
+            <ChildContent>
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <div class="row d-flex mb-4">
+                            <div class="col-md-3">
+                                <h5 class="mb-0 titulo-azul">@Translation["DocumentaryTaskID"]:</h5>
+                            </div>
+                            <div class="col-md-4 p-0">
+                                <h5 class="mb-0">@taskId</h5>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <TelerikGrid Data="@DocworkFlowList" PageSize="@DocworkFlowList.Count()"
+                                     FilterMode="GridFilterMode.FilterMenu"
+                                     Resizable="true"
+                                     ScrollMode="@GridScrollMode.Scrollable"
+                                     Height="460px"
+                                     RowHeight="60"
+                                     SelectionMode="GridSelectionMode.None">
+                            <GridColumns>
+                                <GridCommandColumn Width="180px" Title=@Translation["File"] HeaderClass="center-wrap" Visible="true">
+                                    @{
+                                        <div class="d-flex justify-content-around">
+                                            <GridCommandButton Title=@Translation["SeeDocument"] Icon="@SvgIcon.Search" OnClick="@((args)=> HandleViewAttachment((WorkFlowDocumentaryTaskDtoResponse)args.Item))"></GridCommandButton>
+                                        </div>
+                                    }
+                                </GridCommandColumn>  
+                                <GridColumn Width="350px">
+                                    <HeaderTemplate>
+                                        <label> @Translation["Detail"] </label>
+                                    </HeaderTemplate>
+                                    <Template>
+                                        @{
+                                            var workFlowInfo = (WorkFlowDocumentaryTaskDtoResponse)context;
+                                            <div class="row">
+                                                <div class="col">
+                                                    <div class="row">
+                                                        <label><b>@Translation["Instruction"]:</b> @workFlowInfo?.InstructionCode</label>
+                                                    </div>
+                                                    <div class="row">
+                                                        <label> <b>@Translation["File"]:</b> @workFlowInfo?.ArchiveName</label>
+                                                    </div>
+                                                    <div class="row">
+                                                        <label> <b>@Translation["Detail"]:</b> @workFlowInfo?.TaskDescription</label>
+                                                    </div>
+                                                    <div class="row">
+                                                        <label><b>@Translation["UserAttached"]:</b> @workFlowInfo?.CreateUser</label>
+                                                    </div>
+                                                    <div class="row">
+                                                        <label><b>@Translation["DateAttached"]:</b> @workFlowInfo?.CreateDate</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </Template>
+                                </GridColumn>
+                            </GridColumns>
+                        </TelerikGrid>
+                    </div>
+                </div>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>
+<ViewDocumentModal @ref="viewDocumentModal"></ViewDocumentModal>

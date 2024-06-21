@@ -1,0 +1,60 @@
+﻿<div class="my-modal">
+    <TelerikRootComponent>
+
+        <GenericModalComponent Title=@(Translation["Administration"] + " - " + Translation["CancellationReason"]) IsVisible="modalStatus" OnModalClosed="HandleModalClosed">
+            <ChildContent>
+                    <div class="row">
+                        <div class="col-md-6 mt-3">
+                            <label>@Translation["CancellationType"]<span class="red">*</span></label>
+                            <TelerikDropDownList Data="@ReasonCodeList"
+                                                 Value="@ReasonCode"
+                                                 TextField="Value"
+                                                 ValueField="Code"
+                                                 DefaultText="@DTReason"
+                                                 ValueChanged="@((string value) => BindReasonCode(value))"
+                                                 Filterable="true"
+                                                 FilterOperator="StringFilterOperator.Contains">
+                            </TelerikDropDownList>
+                        </div>
+                        <div class="col-md-6 mt-3">
+                            <label>@Translation["RequestType"]<span class="red">*</span></label>
+                            <TelerikDropDownList Data="@TypeCodeList"
+                                                 Value="@TypeCode"
+                                                 TextField="Value"
+                                                 ValueField="Code"
+                                                 DefaultText="@DTTypeCode"
+                                                 Filterable="true"
+                                                 Enabled="@Habilitar"
+                                                 ValueChanged="@((string value) => BindTypeCode(value))"
+                                                 FilterOperator="StringFilterOperator.Contains">
+                            </TelerikDropDownList>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-8 mb-1 mt-1">
+                            <InputModalComponent IsRequired="true" LabelText=@Translation["CancellationReason"] MethodValueChanged="ValidateEnableButton" InputMaxLength="200" Placeholder="@placeHolderDefault" IsVisible="true" @bind-InputValue="@NameReason"></InputModalComponent>
+                        </div>
+                        <div class="col-md-4 mt-3">
+                            <div class="from-group mt-4 d-flex align-items-end justify-content-start">
+                                <div class="px-2">
+                                    <TelerikSwitch @bind-Value="@activeState" />
+                                </div>
+                                <div class="px-2">
+                                    @(activeState ? Translation["Enabled"] : Translation["Disabled"])
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row align-self-center mt-5">
+                        <div class="col">
+                            <div class="text-center">
+                                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="reset"></ButtonComponent>
+                                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button"  BtnIcon="fa-solid fa-floppy-disk" BtnDisabled="enableButton" BtnOnClick="Save"></ButtonComponent>
+                            </div>
+                        </div>
+                    </div>
+                <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>

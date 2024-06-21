@@ -1,0 +1,132 @@
+﻿@page "/Profile"
+@using Control.Endeavour.FrontEnd.Components.Modals.Administration.Profile
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.Profile.Response
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.Profile.Request
+@layout MainLayout;
+
+<ProfileModal @ref="profileModal" OnStatusChanged="HandleProfileModalStatusChangedAsync"></ProfileModal>
+<div class="container-fluid mt-5">
+    <!-- Parte 1: Título y Contenido alineado a la izquierda -->
+    <div class="row titulo">
+        <div class="col-lg-10">
+            <h1>@(Translation["Administration"] + " - " + Translation["Profiles"])</h1>
+
+        </div>
+        <!-- Parte 2: Botón azul alineado a la derecha -->
+        <div class="col-lg-2 text-end">
+            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers=" ml-10  btn-block" BtnType="button" BtnText=@Translation["Create"] BtnOnClick="ShowModal" BtnVisible="Permissions.Create" BtnIcon="fa-solid fa-plus"></ButtonComponent>
+        </div>
+    </div>
+
+    <div class="row">
+
+
+        <div class="col-lg-12">
+            <h6 class="titulo-azul"> @Translation["SearchByFilters"]:</h6>
+        </div>
+
+
+        <div class="col-lg-4">
+            <InputModalComponent @ref="ProfileNameInput" @bind-InputValue="ProfileName" IsRequired=" false" InputMaxLength="50" FieldType="InputModalTypeEnum.NotEmpty" LabelText=@($"{Translation["Profile"]}:") Placeholder="@Translation["Profile"]" MethodValueChanged="replaceNumbers" />
+
+
+        </div>
+        <div class="col-lg-4">
+            <InputModalComponent @ref="ProfileCodeInput" @bind-InputValue="ProfileCode" IsRequired=" false" InputMaxLength="5" FieldType="InputModalTypeEnum.NotEmpty" LabelText=@($"{Translation["Code"]}:") Placeholder="@Translation["Code"]" />
+
+        </div>
+        <div class="col-lg-4">
+            <div class="from-group from-group--margin-top justify-content-end">
+
+                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="OnClickReset"></ButtonComponent>
+                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Search"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="GetProfiles"></ButtonComponent>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Parte 3: Grilla -->
+    <div class="row mt-4 @(Permissions.Read?string.Empty: "d-none" )">
+        <div class="col">
+            <TelerikGrid Data="profileList" PageSize="10"
+                         Sortable="true"
+                         FilterMode="GridFilterMode.FilterMenu"
+                         Resizable="true"
+                         Reorderable="false"
+                         EditMode="GridEditMode.Popup"
+                         SelectionMode="GridSelectionMode.None"
+                         >
+                <GridToolBarTemplate>
+                    <GridCommandButton Command="ExcelExport" Icon="@SvgIcon.FileExcel">@Translation["ExportToExcel"]</GridCommandButton>
+                    <label class="k-checkbox-label"><TelerikCheckBox @bind-Value="@ExportAllPages" /> @Translation["ExportAllPages"]</label>
+                </GridToolBarTemplate>
+                <GridExport>
+                    <GridExcelExport FileName="telerik-grid-export" AllPages="@ExportAllPages" OnBeforeExport="@OnBeforeExcelExport" />
+                </GridExport>
+
+
+
+                <GridColumns>
+                    <GridCommandColumn Width="80px" Title=@Translation["Edit"] HeaderClass="center-wrap" Visible="Permissions.Update">
+
+                        <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                            <GridCommandButton Title=@Translation["Edit"] Icon="@SvgIcon.Pencil" OnClick="@((args)=> ShowModalEdit((ProfileDtoResponse)args.Item))"></GridCommandButton>
+
+                        </div>
+                    </GridCommandColumn>
+
+                    <GridCommandColumn Width="80px" Title=@Translation["Delete"] HeaderClass="center-wrap" Visible="Permissions.Delete">
+                        <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                            <GridCommandButton Title=@Translation["Delete"] Icon="@SvgIcon.Trash" OnClick="@((args) => HandleRecordToDelete( ( ProfileDtoResponse)args.Item ))"></GridCommandButton>
+
+                        </div>
+                    </GridCommandColumn>
+
+
+
+                    <GridColumn Field=@nameof(ProfileDtoResponse.Profile1) TextAlign="ColumnTextAlign.Center" Title=@Translation["Profile"] Width="100px" Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(ProfileDtoResponse.ProfileCode) TextAlign="ColumnTextAlign.Center" Title=@Translation["Code"] Width="100px" Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(ProfileDtoResponse.Description) TextAlign="ColumnTextAlign.Center" Title=@Translation["Description"] Width="100px" Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(ProfileDtoResponse.ActiveState)
+                                Title=@Translation["Status"]
+                                Width="150px"
+                                Filterable="false"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap">
+                        <Template>
+                            @{
+                                ProfileDtoResponse rowData = (ProfileDtoResponse)context;
+                                if (rowData != null)
+                                {
+                                    bool activeState = rowData.ActiveState;
+                                    string active = activeState ? Translation["Enabled"] : Translation["Disabled"];
+                                    @active
+                                }
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field=@nameof(ProfileDtoResponse.CreateUser) TextAlign="ColumnTextAlign.Center" Title=@Translation["UserRecorded"] Width="100px" Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(ProfileDtoResponse.CreateDate) TextAlign="ColumnTextAlign.Center" Title=@Translation["DateRecorded"] Width="100px" Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(ProfileDtoResponse.UpdateUser) TextAlign="ColumnTextAlign.Center" Title=@Translation["UserUpdated"] Width="100px" Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(ProfileDtoResponse.UpdateDate) TextAlign="ColumnTextAlign.Center" Title=@Translation["DateUpdated"] Width="100px" Filterable="false" HeaderClass="center-wrap" />
+
+
+
+
+                </GridColumns>
+                <NoDataTemplate>
+                    <img src="../img/noDataFound.png" width="8%" height="8%" />
+                    <p> @Translation["NoGridInfo"]</p>
+                </NoDataTemplate>
+            </TelerikGrid>
+        </div>
+    </div>
+    @if (dataChargue &&  ( Permissions.Read))
+    {
+        <!-- Parte 4: Botones en la izquierda, centro y derecha -->
+
+        <NewPaginationComponent  @ref="paginationComponent" Filter="@profileFilterDtoRequest" T="ProfileDtoResponse" M="ProfileFilterDtoRequest" Uri="@UriFilterProfile" PaginationInfo="@paginationInfo" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+
+    }
+</div>
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiCloseAsync"></NotificationsComponentModal>

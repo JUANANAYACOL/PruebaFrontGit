@@ -1,0 +1,96 @@
+﻿/*#region titulos */
+
+
+.texto {
+    font-size: 20px;
+}
+/*#endregion */
+
+/*#region Botones Limpiar/Guardar/Trámite*/
+.botones {
+    width: 48%;
+    height: 38px;
+    flex-shrink: 0;
+    border-radius: 5px;
+    border-width: 2px;
+    border-style: solid;
+    text-align: center;
+    font-family: Roboto;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+}
+
+    .botones.guardar {
+        background: #2196F3;
+        color: #fff;
+        border: 1px solid #2196F3;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .botones.tramite {
+        background: #2196F3;
+        color: #fff;
+        border: 1px solid #2196F3;
+        width: 100%;
+    }
+
+    .botones.limpiar {
+        border: 1px solid #2196F3;
+        background: #fff;
+        color: #2C2C2C;
+        width: 100%;
+        position: flex;
+        justify-content: center;
+    }
+
+
+/*#endregion */
+
+/*#region Botones iconos */
+
+.iconboton {
+    background-color: transparent !important;
+    border-color: transparent !important;
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+
+/*#endregion */
+
+/*#region filtroFecha */
+
+.positionrow {
+    position: relative;
+    top: -63px;
+}
+
+/*#endregion */
+
+/*#region Grid */
+.position {
+    position: relative;
+    top: -64px;
+}
+
+
+/*#endregion */
+
+/*#region Cards */
+
+.pt-86 {
+    padding: 0px 86px;
+}
+
+/*#endregion */
+
+/*#region DropDownListText */
+.text {
+    margin-bottom: 6px;
+}
+
+
+/*#endregion */

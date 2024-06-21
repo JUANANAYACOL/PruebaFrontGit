@@ -1,0 +1,56 @@
+﻿@using Control.Endeavour.FrontEnd.Models.Models.Administration.ThirdUser.Response
+<div class="my-modal">
+    <TelerikRootComponent>
+        <GenericModalComponent Title=@(Translation["Entrusts"]) IsVisible="modalStatus" OnModalClosed="HandleModalClosed" Width="60%">
+            <ChildContent>
+                <TelerikGrid Data="@ThirdUsers"
+                             ScrollMode="@GridScrollMode.Scrollable"
+                             Height="300px" RowHeight="50" PageSize="@ThirdUsers.Count"
+                             Sortable="true">
+                    <GridColumns>
+                        <GridColumn Width="80px" Context="ChildContext" TextAlign="ColumnTextAlign.Center">
+                            <HeaderTemplate>
+                                <label title="@Translation["Grid_Select"]">@Translation["SelectAbv"]</label>
+                            </HeaderTemplate>
+                            <Template>
+                                @{
+                                    var thirdUser = (ThirdUserDtoResponse)ChildContext;
+                                    <TelerikCheckBox Value="@thirdUser.Selected"
+                                                     ValueChanged="@( (bool value) => OnCheckBoxChangedAsync(value, thirdUser,"SelectedRecord") )" />
+                                }
+                            </Template>
+                        </GridColumn>
+                        <GridColumn Width="80px" Visible="@AllowCopiesSelection" Context="ChildContext" TextAlign="ColumnTextAlign.Center">
+                            <HeaderTemplate>
+                                <label>@Translation["Copies"]</label>
+                            </HeaderTemplate>
+                            <Template>
+                                @{
+                                    var thirdUser = (ThirdUserDtoResponse)ChildContext;
+                                    <TelerikCheckBox Value="@thirdUser.Copy"
+                                                     ValueChanged="@( (bool value) => OnCheckBoxChangedAsync(value, thirdUser, "SelectedCopies") )" />
+
+                                }
+                            </Template>
+                        </GridColumn>
+                        <GridColumn 
+                                    Field="Names"
+                                    Title=@Translation["Name"]
+                                    Width="150px"
+                                    Filterable="true"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap" />
+                        <GridColumn Field="Email"
+                                    Title=@Translation["Email"]
+                                    Width="150px"
+                                    Filterable="true"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap" />
+                    </GridColumns>
+                </TelerikGrid>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>
+
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>

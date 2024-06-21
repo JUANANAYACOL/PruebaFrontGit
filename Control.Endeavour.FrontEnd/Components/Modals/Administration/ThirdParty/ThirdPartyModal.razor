@@ -1,0 +1,196 @@
+﻿<div class="my-modal">
+    <TelerikRootComponent>
+        <GenericModalComponent Title=@($"{Translation["Administration"]} - {(personType == "PN" ? Translation["NaturalPerson"] : Translation["LegalPerson"])}") IsVisible=ModalStatus Width="55%" OnModalClosed="HandleModalClosed">
+            <ChildContent>
+                <EditForm Model="@thirdPartyDtoResponse" OnValidSubmit="HandleValidSubmit">
+                    <div class="container-fluid">
+
+                        <div class="row">
+                            <div class="container mt-4">
+                                @if (personType.Equals("PN"))
+                                {
+                                    <!-- Persona Natural -->
+                                    <div id="Panel_natural">
+
+                                        <!-- Primera fila -->
+                                        <div class="row">
+                                            <div class="col-lg-4 mt-1">
+                                                <label for="input2" class="mb-2">@Translation["IdType"]<span class="red">*</span></label>
+                                                <TelerikDropDownList Data="@identificationTypeList"
+                                                                     @bind-Value="@identificationTypeCode"
+                                                                     DefaultText=@Translation["SelectAnOption"]
+                                                                     TextField="Value"
+                                                                     ValueField="Code"
+                                                                     Filterable="true"
+                                                                     FilterOperator="StringFilterOperator.Contains"
+                                                                     OnChange="EnableSaveButton">
+                                                </TelerikDropDownList>
+                                            </div>
+
+                                            <div class="col-lg-4 mt-1">
+                                                <InputModalComponent @ref=identification @bind-InputValue="thirdPartyDtoResponse.IdentificationNumber" MethodValueChanged="EnableSaveButton" InputMaxLength="10" IsRequired="true" LabelText=@Translation["Identification"] Placeholder=@Translation["Identification"] FieldType="InputModalTypeEnum.NumbersOnly" />
+                                            </div>
+                                            <div class="col-lg-4 mt-1">
+                                                <InputModalComponent @ref=names @bind-InputValue="thirdPartyDtoResponse.Names" MethodValueChanged="EnableSaveButton" InputMaxLength="100" IsRequired="true" LabelText=@Translation["Names"] Placeholder=@Translation["Names"] FieldType="InputModalTypeEnum.Name" />
+                                            </div>
+                                        </div>
+
+                                        <!-- Segunda fila -->
+                                        <div class="row mt-2">
+                                            <div class="col-lg-4 mt-1">
+                                                <InputModalComponent @ref=lastNames @bind-InputValue="thirdPartyDtoResponse.LastName" MethodValueChanged="EnableSaveButton" InputMaxLength="100" IsRequired="@((personType == "PN") ? true : false)" LabelText=@Translation["LastName"] Placeholder=@Translation["LastName"] FieldType="InputModalTypeEnum.Name" />
+                                            </div>
+                                            <div class="col-lg-4 mt-1">
+                                                <InputModalComponent @ref=webpage @bind-InputValue="thirdPartyDtoResponse.WebPage" InputMaxLength="200" IsRequired="false" LabelText=@Translation["Website"] Placeholder=@Translation["Website"] FieldType="InputModalTypeEnum.Website" />
+                                            </div>
+                                            <div class="col-lg-4 mt-1">
+                                                <InputModalComponent @ref=email1 @bind-InputValue="thirdPartyDtoResponse.Email1" InputType="email" MethodValueChanged="EnableSaveButton" InputMaxLength="150" IsRequired="true" LabelText=@Translation["Email"] Placeholder=@Translation["Email"] FieldType="InputModalTypeEnum.Email" />
+                                            </div>
+                                        </div>
+
+                                        <!-- Tercera fila -->
+                                        <div class="row mt-2">
+
+                                            <div class="col-lg-4 mt-1">
+                                                <InputModalComponent @ref="phone1" @bind-InputValue="thirdPartyDtoResponse.Phone1" InputMaxLength="10" IsRequired="true" LabelText=@(Translation["Phone"] + " 1") IsVisible="true" Placeholder=@(Translation["Phone"] + " 1") MethodValueChanged="EnableSaveButton" InputType="number" FieldType="InputModalTypeEnum.Filing" InputMaxNumberValue="9999999999" />
+
+                                            </div>
+                                            <div class="col-lg-4 mt-1">
+                                                <InputModalComponent @ref="phone2" @bind-InputValue="thirdPartyDtoResponse.Phone2" InputMaxLength="10" IsRequired="false" LabelText=@(Translation["Phone"] + " 2") IsVisible="true" Placeholder=@(Translation["Phone"] + " 2") MethodValueChanged="EnableSaveButton" InputType="number" FieldType="InputModalTypeEnum.Filing" InputMaxNumberValue="9999999999" />
+
+
+                                            </div>
+                                            <div class="col-lg-4 mt-1">
+
+                                                <InputModalComponent @ref=chargue @bind-InputValue="thirdPartyDtoResponse.Charge" InputMaxLength="70" IsRequired=false LabelText="@Translation["Position"]" Placeholder="@Translation["Position"]" FieldType="InputModalTypeEnum.Name"></InputModalComponent>
+
+
+
+                                            </div>
+                                        </div>
+
+                                        <!-- Cuarta fila -->
+                                        <div class="row mt-3">
+                                            <div class="col-lg-8 mt-1">
+                                                <div class="row">
+                                                    <ButtonGroupComponent LabelText=@Translation["Address"] InputPlaceholder=@Translation["EnterAddress"] BtnTitle=@Translation["EnterAddress"] @bind-InputValue="textAddress" MethodValueChanged="EnableSaveButton" InputRequired="true" BtnClassColor="btnStyle--primary" BtnClassModifiers="" BtnIcon="fa-solid fa-plus" BtnOnClick="OpenNewModal"></ButtonGroupComponent>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-4 mt-1 d-flex align-items-end switch-position-modal">
+                                                <label> <TelerikSwitch @bind-Value="@activeState" /> @(activeState ? Translation["Enabled"] : Translation["Disabled"])</label>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                }
+                                else
+                                {
+                                    <!-- Persona Juridica -->
+                                    <div id="Panel_juridica">
+
+                                        <!-- Primera fila -->
+                                        <div class="row">
+                                            <div class="col-lg-4 mt-1">
+                                                <label for="input2" class="mb-2">@Translation["IdType"]<span class="red">*</span></label>
+
+                                                <TelerikDropDownList Data="@identificationTypeList"
+                                                                     @bind-Value="@identificationTypeCode"
+                                                                     DefaultText=@Translation["SelectAnOption"]
+                                                                     TextField="Value"
+                                                                     ValueField="Code"
+                                                                     Filterable="true"
+                                                                     FilterOperator="StringFilterOperator.Contains"
+                                                                     OnChange="EnableSaveButton">
+                                                </TelerikDropDownList>
+
+                                            </div>
+                                            <div class="col-lg-4 mt-1">
+                                                <InputModalComponent @ref=identification @bind-InputValue="thirdPartyDtoResponse.IdentificationNumber" MethodValueChanged="EnableSaveButton" InputMaxLength="10" IsRequired="true" LabelText=@Translation["Identification"] Placeholder=@Translation["Identification"] FieldType="InputModalTypeEnum.NumbersOnly" />
+                                            </div>
+                                            <div class="col-lg-4 mt-1">
+                                                <InputModalComponent @ref=names @bind-InputValue="thirdPartyDtoResponse.Names" MethodValueChanged="EnableSaveButton" InputMaxLength="100" IsRequired="true" LabelText=@Translation["BusinessName"] Placeholder=@Translation["BusinessName"] FieldType="InputModalTypeEnum.Name" />
+                                            </div>
+                                        </div>
+
+                                        <!-- Segunda fila -->
+                                        <div class="row mt-2">
+
+                                            <div class="col-lg-4 mt-1">
+                                                <InputModalComponent @ref="phone1" @bind-InputValue="thirdPartyDtoResponse.Phone1" InputMaxLength="10" IsRequired="true" LabelText=@(Translation["Phone"] + " 1") IsVisible="true" Placeholder=@(Translation["Phone"] + " 1") MethodValueChanged="EnableSaveButton" InputType="number" FieldType="InputModalTypeEnum.Filing" InputMaxNumberValue="9999999999" />
+
+
+
+                                            </div>
+
+                                            <div class="col-lg-4 mt-1">
+
+                                                <InputModalComponent @ref="phone2" @bind-InputValue="thirdPartyDtoResponse.Phone2" InputMaxLength="10" IsRequired="false" LabelText=@(Translation["Phone"] + " 2") IsVisible="true" Placeholder=@(Translation["Phone"] + " 2") MethodValueChanged="EnableSaveButton" InputType="number" FieldType="InputModalTypeEnum.Filing" InputMaxNumberValue="9999999999" />
+
+                                            </div>
+
+                                            <div class="col-lg-4 mt-1">
+                                                <InputModalComponent @ref=email1 @bind-InputValue="thirdPartyDtoResponse.Email1" InputType="email" MethodValueChanged="EnableSaveButton" InputMaxLength="150" IsRequired="true" LabelText=@(Translation["Email"] + " 1") Placeholder=@(Translation["Email"] + " 1") FieldType="InputModalTypeEnum.Email" />
+                                            </div>
+
+                                        </div>
+
+                                        <!-- Tercera fila -->
+                                        <div class="row mt-2">
+
+                                            <div class="col-lg-4 mt-1">
+                                                <InputModalComponent @ref=email2 @bind-InputValue="thirdPartyDtoResponse.Email2" InputType="email" InputMaxLength="150" IsRequired="false" LabelText=@(Translation["Email"] + " 2") Placeholder=@(Translation["Email"] + " 2") FieldType="InputModalTypeEnum.Email" />
+                                            </div>
+                                            <div class="col-lg-4 mt-1">
+                                                <InputModalComponent @ref=webpage @bind-InputValue="thirdPartyDtoResponse.WebPage" InputMaxLength="200" IsRequired="false" LabelText=@Translation["Website"] Placeholder=@Translation["Website"] FieldType="InputModalTypeEnum.Website" />
+                                            </div>
+
+                                            <div class="col-lg-4 mt-1">
+                                                <label for="input2" class="mb-2">@Translation["Nature"]</label>
+
+                                                <TelerikDropDownList Data="@natureList"
+                                                                     @bind-Value="@natureCode"
+                                                                     DefaultText=@Translation["SelectAnOption"]
+                                                                     TextField="Value"
+                                                                     ValueField="Code"
+                                                                     Filterable="true"
+                                                                     FilterOperator="StringFilterOperator.Contains">
+                                                </TelerikDropDownList>
+                                            </div>
+                                        </div>
+
+                                        <!-- Cuarta fila -->
+                                        <div class="row mt-2">
+                                            <div class="col-lg-4 mt-1">
+                                                <InputModalComponent @ref=initials @bind-InputValue="thirdPartyDtoResponse.Initials" InputMaxLength="20" IsRequired="false" LabelText=@Translation["Initials"] Placeholder=@Translation["EnterInitials"] FieldType="InputModalTypeEnum.Name" />
+                                            </div>
+                                            <div class="col-lg-4 mt-1 d-flex align-items-end switch-position-modal">
+                                                <label> <TelerikSwitch @bind-Value="@activeState" />  @(activeState ? Translation["Enabled"] : Translation["Disabled"])</label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Quinta fila -->
+                                        <div class="row mt-3">
+                                            <div class="col-lg-8 mt-1">
+                                                <div class="row">
+                                                    <ButtonGroupComponent LabelText=@Translation["Address"] InputPlaceholder=@Translation["EnterAddress"] BtnTitle=@Translation["EnterAddress"] @bind-InputValue="textAddress" MethodValueChanged="EnableSaveButton" InputRequired="true" BtnClassColor="btnStyle--primary" BtnClassModifiers="" BtnIcon="fa-solid fa-plus" BtnOnClick="OpenNewModal"></ButtonGroupComponent>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="from-group from-group--margin-top justify-content-center">
+                                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="ResetFormAsync"></ButtonComponent>
+                                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnIcon="fa-solid fa-floppy-disk" BtnOnClick="HandleValidSubmit" BtnDisabled="saveIsDisable"></ButtonComponent>
+                            </div>
+                        </div>
+                    </div>
+                </EditForm>
+                <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>

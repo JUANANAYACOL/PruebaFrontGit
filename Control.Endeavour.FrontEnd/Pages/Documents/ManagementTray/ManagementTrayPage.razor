@@ -1,0 +1,320 @@
+﻿@page "/ManagementTray"
+@* @page "/"   *@
+@layout MainLayout
+
+<!-- Modales -->
+<ManagementOfProceduresModal @ref="managementOfProcedures" OnChangeData="HandleRefreshData"></ManagementOfProceduresModal>
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+<GeneralInformationModal @ref="generalInformation"></GeneralInformationModal>
+<AttachmentTrayModal @ref="attachmentTrayModal"  IsDocumentAttachment="true"></AttachmentTrayModal>
+<PageTitle>ManagementTray</PageTitle>
+<div class="container-fluid mt-1">
+    <!-- Parte 1: Título y Contenido alineado a la izquierda -->
+    <div class="row titulo">
+        <div class="col-8">
+            <h1>@HeaderTitle</h1>
+        </div>
+    </div>
+</div>
+
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Columna de tarjetas ajustada para todas las pantallas -->
+        <div class="col-12 col-lg-7">
+            <div class="row">
+                <!-- Tarjetas con clases responsivas para ajuste automático -->
+                <div class="col-6 col-md-4 col-lg-3 mb-3 cursor-pointer-class" @onclick="@((args)=> GetData(DocumentStatusEnum.WithoutProcessingWord))">
+                    <DynamicCardGestionComponent BorderColor="#AB2222"
+                                                 LabelText="@Translation[DocumentStatusEnum.WithoutProcessingWord.GetDisplayValue()]"
+                                                 CardNumber="@Enp"
+                                                 CardNumberPercen="@EnpP" />
+                </div>
+                <div class="col-6 col-md-4 col-lg-3 mb-3 cursor-pointer-class" @onclick="@((args)=> GetData(DocumentStatusEnum.InProgressWord))">
+                    <DynamicCardGestionComponent BorderColor="#EAD519"
+                                                 LabelText="@Translation[@DocumentStatusEnum.InProgressWord.GetDisplayValue()]"
+                                                 CardNumber="@Etr"
+                                                 CardNumberPercen="@EtrP" />
+                </div>
+                <div class="col-6 col-md-4 col-lg-3 mb-3 cursor-pointer-class" @onclick="@((args)=> GetData(DocumentStatusEnum.SuccessfullManagementWord))">
+                    <DynamicCardGestionComponent BorderColor="#82A738"
+                                                 LabelText="@Translation[DocumentStatusEnum.SuccessfullManagementWord.GetDisplayValue()]"
+                                                 CardNumber="@Gex"
+                                                 CardNumberPercen="@GexP" />
+                </div>
+                <div class="col-6 col-md-4 col-lg-3 mb-3 cursor-pointer-class" @onclick="@((args)=> GetData(DocumentStatusEnum.Copy))">
+                    <DynamicCardGestionComponent BorderColor="#41BAEA"
+                                                 LabelText="@Translation[DocumentStatusEnum.Copy.GetDisplayValue()]"
+                                                 CardNumber="@Cop"
+                                                 CardNumberPercen="@CopP" />
+                </div>
+                <div class="col-md-12 pt-4">
+                    <strong class="mt-2 pt-4 titulo-azul">@(Translation["SearchByFilters"])</strong>
+                </div>
+
+                <!-- Primera fila: IdControl, Número de Radicado, Clase de Comunicación -->
+                <div class="row pt-3">
+                    <div class="col-md-4">
+                        <InputModalComponent @ref="IdcontrolInput" @bind-InputValue="idControl" IsDisabled="false" LabelText=@Translation["ControlID"] Placeholder="IdControl" InputType="number" />
+                    </div>
+                    <div class="col-md-4">
+                        <InputModalComponent @ref="NumRadicaInput" @bind-InputValue="numRadicado" IsDisabled="false" LabelText="@Translation["FilingNumber"]" Placeholder="@Translation["FilingNumber"]" />
+                    </div>
+                    <div class="col-md-4">
+                        <label class="text">@Translation["ComunicationClass"]</label>
+                        <TelerikDropDownList Data="@FormatCL"
+                                             Value="@classCodeValue"
+                                             Id="CL_Clase"
+                                             DefaultText="@textClase"
+                                             TextField="Value"
+                                             ValueField="Code"
+                                             Filterable="true"
+                                             ValueChanged="@((string Value) => ChangeClassCodeAction(Value))"
+                                             FilterOperator="StringFilterOperator.Contains">
+                        </TelerikDropDownList>
+                    </div>
+                </div>
+
+                <!-- Segunda fila: Prioridad y Fecha de Vencimiento (con mayor tamaño para estética) -->
+                <div class="row pt-3">
+                    <div class="col-md-4">
+                        <label class="text">@Translation["Priority"]</label>
+                        <TelerikDropDownList Data="@FormatBG"
+                                             @bind-Value="@prioridadValue"
+                                             Id="GR_Prioridad"
+                                             DefaultText="@textPrio"
+                                             TextField="Value"
+                                             ValueField="Code"
+                                             Filterable="true"
+                                             FilterOperator="StringFilterOperator.Contains">
+                        </TelerikDropDownList>
+                    </div>
+                    <div class="col-md-6 d-flex flex-column justify-content-between ">
+                        <label class="titulo-azul">
+                            @Translation["DueDateFilterQuestion"]
+                        </label>
+                        <div class="k-form k-form-md k-form-vertical">
+                            <div class="k-form-field">
+
+                                <div class="k-form-field-wrap">
+                                    <TelerikRadioGroup Data="@optionsRecordClosed"
+                                                       Value="@ResponseRecordClosed"
+                                                       Layout="@RadioGroupLayout.Horizontal"
+                                                       ValueChanged="@( (string newValue) => OnValueChangedRecordClosed(newValue) )">
+                                    </TelerikRadioGroup>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tercera fila: Año, Mes, Día -->
+                <div class="row pt-3">
+                    <div class="col-md-4">
+                        <label class="text">@Translation["Gantt_Year"]</label>
+
+                        <TelerikDropDownList Data="@Year"
+                                             @bind-Value="@yearValue"
+                                             Id="DocTypeJ"
+                                             DefaultText="@textYear"
+                                             TextField="nombre"
+                                             ValueField="valor"
+                                             Filterable="true"
+                                             OnChange="cascadingMes"
+                                             FilterOperator="StringFilterOperator.Contains">
+                        </TelerikDropDownList>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="text">@Translation["Gantt_Month"]</label>
+
+                        <TelerikDropDownList Data="@Mounth"
+                                             @bind-Value="@mounthValue"
+                                             Id="DocTypeJ"
+                                             DefaultText="@textMes"
+                                             TextField="nombre"
+                                             ValueField="valor"
+                                             Filterable="true"
+                                             Enabled="enabledMes"
+                                             OnChange="cascadingDia"
+                                             FilterOperator="StringFilterOperator.Contains">
+                        </TelerikDropDownList>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="text">@Translation["Gantt_Day"]</label>
+
+                        <TelerikDropDownList Data="@Days"
+                                             @bind-Value="@daysValue"
+                                             Id="DocTypeJ"
+                                             DefaultText="@textDia"
+                                             TextField="nombre"
+                                             ValueField="valor"
+                                             Filterable="true"
+                                             Enabled="enabledDia"
+                                             FilterOperator="StringFilterOperator.Contains">
+                        </TelerikDropDownList>
+                    </div>
+                </div>
+
+                <!-- Fila de botones: Buscar, Limpiar, Trámite Masivo -->
+                
+                <div class="d-flex flex-column flex-md-row justify-content-end mt-4">
+
+                    <div class="d-flex flex-wrap justify-content-end">
+
+                        <div class="p-2">
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["MassProcessing"] BtnIcon="fa-solid fa-folder-tree" BtnOnClick="OpenModalManagementProceduresTM"></ButtonComponent>
+                        </div>
+
+                        <div class="p-2">
+                            <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="Refresh"></ButtonComponent>
+                        </div>
+
+                        <div class="p-2">
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Search"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="Search"></ButtonComponent>
+                        </div>
+                    </div>
+
+                    
+                </div>
+            </div>
+        </div>
+        <!-- Columna para gráfica y total de trámites, ajustada para responsividad -->
+        <div class="col-12 col-lg-5 pt-0">
+            <div class="row">
+                <div class="col-12">
+                    <TelerikChart >
+                        <ChartSeriesItems>
+                            <ChartSeries Type="ChartSeriesType.Donut"
+                                         Data="@Data"
+                                         Field="@nameof(DataCardDtoRequest.Value)"
+                                         CategoryField="@nameof(DataCardDtoRequest.Category)">
+                                <ChartSeriesTooltip Visible="true" Context="item">
+                                    <Template>
+                                        @item.Percentage.ToString("P2")
+                                    </Template>
+                                </ChartSeriesTooltip>
+
+                            </ChartSeries>
+                        </ChartSeriesItems>
+
+                        <ChartLegend Visible=true Position="ChartLegendPosition.Bottom">
+                        </ChartLegend>
+                    </TelerikChart>
+                </div>
+                <div class="col-12 d-flex justify-content-center mt-3">
+                    <strong>@Translation["TotalProcedures"]: @Total</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row col-md-12">
+    <div class="col-md-12">
+        <strong class="mt-2 pt-4 texto">@Translation["Status"]: @Estado</strong>
+    </div>
+    <div class="col-md-12">
+          <TelerikGrid Data="GeneralList" 
+                     PageSize="Meta.PageSize"
+                     Sortable="true"
+                     FilterMode="GridFilterMode.FilterMenu"
+                     Resizable="true"
+                     SelectionMode="GridSelectionMode.None">
+            <GridColumns>
+                
+                <GridColumn Width="80px" Visible="activateProcedure">
+                    <HeaderTemplate>
+                        <label> @Translation["Selection"]</label>
+                    </HeaderTemplate>
+                    <Template>
+
+                        @{
+                            var data = (DocumentDtoResponse)context; 
+                            <TelerikCheckBox @bind-Value="@data!.Selected" OnChange="@(() => ChangeStateManagementTray(data))">
+                            </TelerikCheckBox>
+                        }
+                                
+                    </Template>
+                </GridColumn>
+                <GridCommandColumn Width="120px" Title="@Translation["Actions"]" HeaderClass="center-wrap" Visible="true">
+                    <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                        @{
+                            if (activateProcedure)
+                            {
+                                <GridCommandButton Icon="@SvgIcon.Pencil" Title=@Translation["Tramit"] OnClick="@((args)=> ShowModalManagementProcedure((DocumentDtoResponse)args.Item))"></GridCommandButton>
+                            }
+                        }
+                        <GridCommandButton Icon="@SvgIcon.InfoCircle" Title=@Translation["GeneralInformation"] OnClick="@((args)=> ShowModalGeneralInformation((DocumentDtoResponse)args.Item))"> </GridCommandButton>
+                        <GridCommandButton Icon="@SvgIcon.FilePdf" Title=@Translation["DownloadPDF"] OnClick="@((args)=> DownloadPdfFile((DocumentDtoResponse)args.Item))"> </GridCommandButton>
+                        <GridCommandButton Icon="@SvgIcon.Paperclip" Title=@Translation["Attachments"] OnClick="@((args)=> ShowModalAttachments((DocumentDtoResponse)args.Item))"> </GridCommandButton>
+                    </div>
+                    
+                </GridCommandColumn>
+                <GridColumn Width="310px">
+                    <HeaderTemplate>
+                        <label> @Translation["GeneralInformation"] </label>
+                    </HeaderTemplate>
+                    <Template>
+                        @{
+                            var data = (DocumentDtoResponse)context;
+                            <div class="row d-flex align-items-center">
+                                <div class="col">
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <label><b>@Translation["FilingUpper"]:</b> @data?.FilingCode</label>
+                                        </div>
+                                        <div class="col-6">
+                                            <label><b>@Translation["ControlID"]:</b> @data?.ControlId</label>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <label><b>@Translation["Subject"]:</b> @data?.DocDescription</label>
+                                    </div>
+                                    <div class="row">
+                                        <label><b>@Translation["Signatories"]:</b> @data?.DocumentSignatories</label>
+                                    </div>
+                                    <div class="row">
+                                        <label><b>@Translation["Recipient(s)"]:</b> @data?.DocumentReceivers</label>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </Template>
+                </GridColumn>
+                <GridColumn Field="CreateDate" Title="@Translation["FilingDate"]" Width="150px" Filterable="true" TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap" />
+                <GridColumn Field="DueDate" Title=@Translation["DueDate"] Width="150px" Filterable="true" TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap">
+                    <Template>
+                        @{
+                            var data = (DocumentDtoResponse)context;
+                            var dueDate = data.DueDate;
+                            
+                            if (dueDate.HasValue)
+                            {
+                                var daysDifference = (dueDate.Value - DateTime.Today).Days;
+                                var remainingOrExpired = daysDifference >= 0 ? @Translation["RemainingDays"] : @Translation["ExpiredDays"];
+
+                                <div class="text-center">
+                                    @dueDate.Value.ToString("dd/MM/yyyy HH:mm:ss") <br>
+                                    @remainingOrExpired: @Math.Abs(daysDifference)
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-center">
+                                    @Translation["NotApply"]
+                                </div>
+                            }
+                            
+                        } 
+                        
+                    </Template>
+                </GridColumn>
+
+            </GridColumns>
+        </TelerikGrid>   
+
+    </div>
+    
+    <NewPaginationComponent @ref="paginationComponent" T="DocumentDtoResponse" M="ManagementTrayFylterDtoRequest" Filter="@FilterDtoRequest" PaginationInfo="@paginationInfo" Uri="@UriFilterDocuments" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+</div>
+

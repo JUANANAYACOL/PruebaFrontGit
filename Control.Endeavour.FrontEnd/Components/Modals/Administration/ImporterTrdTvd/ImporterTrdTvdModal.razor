@@ -1,0 +1,63 @@
+﻿<div class="my-modal">
+
+
+    <TelerikRootComponent>
+        <GenericModalComponent Title=@(Translation["Administration"] + " - " + Translation["DRT/DVTImporter"]) IsVisible=@modalStatus Width="60%" OnModalClosed="HandleModalClosed">
+
+            <ChildContent>
+                <div class="container-fluid">
+
+                    <div class="row mt-1">
+                        <div class="col-lg-12">
+                            <label for="input2">@Translation["DocumentaryVersion"]<span class="red">*</span></label>
+                            <TelerikDropDownList Data="@documentalVersionList"
+                                                 DefaultText="@Translation[textDocumentalVersion]"
+                                                 TextField="Code"
+                                                 ValueField="DocumentalVersionId"
+                                                 @bind-Value="idDocumentalVersion"
+                                                 OnChange="Checking"
+                                                 Filterable="true"
+                                                 FilterOperator="StringFilterOperator.Contains">
+                            </TelerikDropDownList>
+                        </div>
+                    </div>
+
+                    <div class="row mt-1">
+                        <div class="col-lg-12 mt-2">
+                            <label for="input2" class="mb-2">@Translation["UploadYourTemplate"]<span class="red">*</span></label>
+                            <DragAndDropTemplateComponent IdInputElement="template" MaxFileCount="1" MaxFileSizeMB="@FileSize" VisibleFiles="true" AllowedExtensions="@AllowedExtensions"
+                                                          FileInfos="template" OnFileListChanged="CheckingFile2"></DragAndDropTemplateComponent>
+                        </div>
+                    </div>
+
+                    <div class="row mt-1">
+                        <div class="col-lg-12 mt-2">
+                            <label class="mb-2">@Translation["Description"]: <span style="color:gray">@string.Format(Translation["CharactersOutOf"], characterCounter, "200")</span> </label>
+                            <textarea @bind="@description" class="w-100 custom-textarea" id="GR_Asunto" placeholder="" maxlength="200" @oninput="CountCharacters"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="row mt-1">
+                        <div class="from-group col-lg-12 mt-2">
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="" BtnType="button" BtnDisabled="readyToCheck" BtnText=@Translation["ReviewTemplate"] BtnIcon="fa fa-refresh" BtnOnClick="ValidateImport"></ButtonComponent>
+
+                            @if (enableDownloadReport)
+                            {
+                                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["DownloadErrorReport"] BtnIcon="fa fa-download" BtnOnClick="DownloadFile"></ButtonComponent>
+                            }
+
+                        </div>
+
+                        <div class="row">
+                            <div class="from-group from-group--margin-top justify-content-center">
+                                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="ResetFormAsync"></ButtonComponent>
+                                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnIcon="fa-solid fa-floppy-disk" BtnDisabled="saveIsDisable" BtnOnClick="CreateImport"></ButtonComponent>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>

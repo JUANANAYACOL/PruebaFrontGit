@@ -1,0 +1,11 @@
+﻿ @inherits LayoutComponentBase
+<TelerikRootComponent>
+    <div class="d-flex  align-items-center vw-100 vh-100 ">
+        <div class="responsive-background"></div>
+        <div class="d-flex flex-column align-items-center justify-content-center">
+            <img src="../img/controlLogoNotFound.png" width="40%" height="60%" />
+            <p align="center" role="alert" class="NotFound--paragraphStyle"> @Translation["NotFoundpage_1"] <br />@Translation["NotFoundpage_2"] </p>
+            <ButtonComponent BtnClassColor="btnStyle--primary " BtnClassModifiers="ml-10  btn-block" BtnType="button" BtnText=@Translation["ReturnToMain"] BtnOnClick="RedirectPage" BtnIcon="fa-solid fa-house"></ButtonComponent>
+        </div>
+    </div>
+</TelerikRootComponent>

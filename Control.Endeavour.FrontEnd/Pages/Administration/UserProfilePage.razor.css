@@ -1,0 +1,65 @@
+﻿
+.title-profile {
+    color: #636363;
+    font-family: Roboto;
+    font-size: 24px;
+}
+
+.user-name {
+    color: #636363;
+    font-family: Roboto;
+    font-size: 50px;
+}
+
+.row-container {
+    height: 70%;
+}
+
+.span-gray {
+    color: #9D9D9C;
+    font-size: 16px;
+}
+
+.input-container {
+    margin-bottom: 0px;
+    display: flex;
+    align-items: center;
+    flex: 1;
+    margin-right: 0px;
+}
+
+.signature-image {
+    max-height: 6rem;
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+    .input-container input {
+        margin-right: 0px;
+        border-radius: 6px;
+        padding: 2px;
+        padding-left: 12px;
+        border: 1px solid #7D7D7D;
+        font-family: Roboto;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 32px;
+        width: 100%;
+        margin-left: 0px;
+        transition: border-color 0.3s ease-in-out;
+        box-shadow: none;
+        outline: none;
+    }
+
+        .input-container input:required:invalid {
+            border-color: red !important;
+        }
+
+        .input-container input:focus {
+            border-color: #41BAEA !important;
+        }

@@ -1,0 +1,77 @@
+﻿<TelerikRootComponent>
+    <GenericModalComponent Title="Documentos asociados" IsVisible="@modalStatus" Width="60%" OnModalClosed="HandleModalClosed">
+        <ChildContent>
+            <div class="px-4 py-2">
+                <div class="row p-2">
+                    <div class="col-md-8">
+                        <div class="row">
+                            <div class="col-12 col-md">
+                                <h3 class="mb-0 titulo-azul">@Translation["FilingUpper"]:</h3>
+                            </div>
+                            <div class="col-12 col-md">
+                                <h3 class="mb-0 titulo-azul">@FilingCode</h3>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12 col-md">
+                                <h5 class="mb-0 titulo-azul">@Translation["DocumentID"]:</h5>
+                            </div>
+                            <div class="col-12 col-md">
+                                <h5 class="mb-0">@ControlId</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row p-2">
+                    <TelerikGrid Data="@docRelatedList" PageSize="@docRelatedList.Count()"
+                                 Sortable="true"
+                                 SelectionMode="GridSelectionMode.None"
+                                 Height="30%">
+                        <GridColumns>
+
+                            <GridCommandColumn Width="80px" Title=@Translation["Actions"] HeaderClass="center-wrap" Visible="true">
+                                <GridCommandButton Title=@Translation["Edit"] Icon="@SvgIcon.InfoCircle" OnClick="@((args)=> ShowModalInformation((DocRelationDtoResponse)args.Item))"></GridCommandButton>
+                            </GridCommandColumn>
+
+                            <GridColumn Field="FilingCode"
+                                        Title=@Translation["Filed"]
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                            <GridColumn Field="DocDescription"
+                                        Title=@Translation["Description"]
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                            <GridColumn Field="DocDate"
+                                        Title=@Translation["Date"]
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                            
+                        </GridColumns>
+                        <NoDataTemplate>
+                            <img src="../img/noDataFound.png" width="8%" height="8%" />
+                            <p>
+                                @Translation["NoRelatedDocumentsFound"]
+                            </p>
+                        </NoDataTemplate>
+                    </TelerikGrid>
+                </div>
+                <div class="row">
+
+                    <div class="from-group from-group--margin-top justify-content-center">
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Link"] BtnIcon="fa-solid fa-link" BtnOnClick="ShowDocRelationModal"></ButtonComponent>
+                    </div>
+                </div>
+            </div>
+            
+        </ChildContent>
+    </GenericModalComponent>
+</TelerikRootComponent>
+
+
+<DocumentRelationModal @ref="docRelationModal" IsGestionDocumentRelated="true" OnValiteDocument="HandleValidateDocumentAsync" OnDocumentAssociated="HandleDocumentAssociated" ></DocumentRelationModal>
+<ValidateDocumentGeneralInfoModal @ref="validateDocumentInfo"></ValidateDocumentGeneralInfoModal>
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+

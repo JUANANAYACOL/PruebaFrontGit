@@ -1,0 +1,261 @@
+﻿@page "/OverrideTray"
+@using Control.Endeavour.FrontEnd.Models.Models.Documents.OverrideTray.Response
+@using Control.Endeavour.FrontEnd.Models.Models.Documents.OverrideTray.Request
+@layout MainLayout
+
+<OverrideTrayModal @ref="_ModalOverrideTray"  OnChangeData="HandleRefreshGridData"></OverrideTrayModal>
+<OverrideTrayAdminModal @ref="_ModalOverrideTrayAdmin" OnChangeData="HandleRefreshGridData"></OverrideTrayAdminModal>
+<div class="container-fluid mt-5">
+    <!-- Parte 1: Título y Contenido alineado a la izquierda -->
+    <div class="row">
+        <div class="col-8">
+            <h1>@(Translation["Comunications"] + " - " + Translation["OverrideTray"])</h1>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="row-3">
+        <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers=" ml-10" BtnType="button" BtnText=@Translation["Create"] BtnOnClick="ShowModalOverrideTray" BtnIcon="fa-solid fa-plus"></ButtonComponent>
+    </div>
+
+    <div class="row mt-3">
+
+        <div class="row flex-grow-1 flex-column-reverse flex-md-row">
+            <!-- Primera columna -->
+            <div class="col order-2 order-md-1 d-flex flex-column align-items-stretch m-md-5">
+                <!-- Primera fila -->
+                <div class="row flex-grow-1">
+                    <div class="col d-flex align-items-center mb-3" @onclick="@HandleClickCardPendiente">
+                        <!-- Contenido de la tarjeta 1 -->
+                        <DynamicCardGestionComponent 
+                                              BorderColor="#AB2222"
+                                              LabelText="@CardPendiente"
+                                              CardNumber="@CardP" 
+                                              CardNumberPercen="@CardPP"/>
+                    </div>
+
+                    <!-- Tarjeta 2 -->
+                    <div class="col d-flex align-items-center mb-3" @onclick="@HandleClickCardAnulado">
+                        <!-- Contenido de la tarjeta 2 -->
+                        <DynamicCardGestionComponent 
+                                              BorderColor="#82A738"
+                                              LabelText="@CardAnulados"
+                                              CardNumber="@CardA"
+                                              CardNumberPercen="@CardPA"/>
+                    </div>
+                </div>
+                <!-- Segunda fila -->
+                <div class="row flex-grow-1">
+                    <div class="col d-flex align-items-center mb-3" @onclick="@HandleClickCardDesanulado">
+                        <!-- Contenido de la tarjeta 3 -->
+                        <DynamicCardGestionComponent 
+                                              BorderColor="#41BAEA"
+                                              LabelText="@CardDesanulados"
+                                              CardNumber="@CardD"
+                                              CardNumberPercen="@CardPD"/>
+                    </div>
+
+                    <!-- Tarjeta 4 -->
+                    <div class="col d-flex align-items-center mb-3" @onclick="@HandleClickCardRechazado">
+                        <!-- Contenido de la tarjeta 4 -->
+                        <DynamicCardGestionComponent 
+                                              BorderColor="#EAD519"
+                                              LabelText="@CardRechazados"
+                                              CardNumber="@CardR"
+                                              CardNumberPercen="@CardPR"/>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Segunda columna -->
+            <div class="col order-1 order-md-2 d-flex align-items-center justify-content-center">
+                <div class="content-bottom-right custom-chart" style="width: 600px">
+                    <TelerikChart>
+
+                        <ChartSeriesItems>
+                            <ChartSeries Type="ChartSeriesType.Donut"
+                                         Data="@Data"
+                                         Field="@nameof(DataCardDtoRequest.Value)"
+                                         CategoryField="@nameof(DataCardDtoRequest.Category)">
+                                <ChartSeriesTooltip Visible="true" Context="item">
+                                    <Template>
+                                        @item.Percentage.ToString("P")
+                                    </Template>
+                                </ChartSeriesTooltip>
+
+                            </ChartSeries>
+                        </ChartSeriesItems>
+
+                        <ChartLegend Visible=true Position="ChartLegendPosition.Right">
+                        </ChartLegend>
+                    </TelerikChart>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (isAdmin)
+    {
+        <div class="row">
+            <div class="col-md-3 mt-2">
+                <label>@Translation["CancellationType"]<span class="darkred">*</span></label>
+                <TelerikDropDownList Data="@TypeRequestCodeList"
+                                     Value="@TypeRequestCode"
+                                     TextField="Value"
+                                     ValueField="Code"
+                                     DefaultText="@Translation["SelectAnOption"]"
+                                     Filterable="true"
+                                     Enabled="isTypeRequestCode"
+                                     ValueChanged="@((string value) => ConfirmTypeRequestCode(value))"
+                                     FilterOperator="StringFilterOperator.Contains">
+                </TelerikDropDownList>
+            </div>
+            <div class="col-md-3 mt-2">
+                <label>@Translation["CancellationReason"]</label>
+                <TelerikDropDownList Data="@overrideTrayReasons"
+                                     Value="@Reason"
+                                     TextField="NameReason"
+                                     ValueField="CancelationReasonId"
+                                     DefaultText=@Translation["SelectAnOption"]
+                                     Filterable="true"
+                                     Enabled="isReason"
+                                     ValueChanged="@((int newValue) => ReasonSelected(newValue))"
+                                     FilterOperator="StringFilterOperator.Contains">
+                </TelerikDropDownList>
+            </div>
+            <div class="col-md-3">
+                <ButtonGroupComponent LabelText=@Translation["User"] InputPlaceholder="Seleccione usuario" BtnTitle=@Translation["SearchRecipients"] @bind-InputValue="@vUserSelected.FullName" BtnClassColor="btnStyle--primary"
+                                      BtnClassModifiers="m-0" BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="ShowUsersModal"></ButtonGroupComponent>
+            </div>
+            <div class="col-md-3 button-pdt">
+                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="reset"></ButtonComponent>
+            </div>
+            @if (isButton)
+            {
+                <div class="col-md-12 mt-2">
+                    <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers=" ml-10" BtnType="button" BtnText="@TypeRequestLabel" BtnIcon="fa fa-exclamation" BtnOnClick="ShowModalAdmin" BtnVisible="@isButton"></ButtonComponent>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- grilla -->
+    <div class="row mt-2">
+        <div>
+
+            <TelerikGrid Data="RequestList" PageSize="10"
+                         Resizable="true"
+                         SelectionMode="GridSelectionMode.None">
+@*                 <GridToolBarTemplate>
+                    @if (RequestList.Any())
+                    {
+                        <GridCommandButton Command="ExcelExport" Icon="@SvgIcon.FileExcel">@Translation["ExportToExcel"]</GridCommandButton>
+                        <label class="k-checkbox-label"><TelerikCheckBox @bind-Value="@ExportAllPages" /> @Translation["ExportAllPages"]</label>
+                    }
+                </GridToolBarTemplate>
+                <GridExport>
+                    <GridExcelExport FileName="telerik-grid-export" AllPages="@ExportAllPages" OnBeforeExport="@OnBeforeExcelExport" />
+                </GridExport> *@
+                <GridColumns>
+                    <GridCommandColumn Width="80px" Title=@Translation["Tramit"] HeaderClass="center-wrap" Visible="isAdmin">
+                        @{
+                            var item = (OverrideTrayRequestDtoResponse)context;
+
+                            if (item.TypeCode.Equals(typeCode) && item.CancelationState.Equals("TEA,PE"))
+                            {
+                                <div class="d-flex justify-content-around">
+                                    <GridCommandButton Icon="@SvgIcon.FormElement" Title="@Translation["Details"]" OnClick="@((args)=> ShowModalOverrideTrayAdmin((OverrideTrayRequestDtoResponse)args.Item))"></GridCommandButton>
+                                </div>
+                            }
+                        }
+                    </GridCommandColumn>
+                    <GridCommandColumn Width="80px" Title=@Translation["Delete"] HeaderClass="center-wrap" Visible="isAction">
+                        @{
+                            var item = (OverrideTrayRequestDtoResponse)context;
+
+                            if (item.IsRequestUser && item.CancelationState.Equals("TEA,PE"))
+                            {
+                                <div class="d-flex justify-content-around">
+                                    <GridCommandButton Icon="@SvgIcon.Trash" Title=@Translation["DeleteTask"] OnClick="@((args)=> ShowModalDelete((OverrideTrayRequestDtoResponse)args.Item))"></GridCommandButton>
+                                </div>
+                            }
+                        }
+                    </GridCommandColumn>
+                    <GridColumn Width="80px" Visible="isSelected">
+                        <HeaderTemplate>
+                            <label> @Translation["Selection"]</label>
+                        </HeaderTemplate>
+                        <Template>
+
+                            @{
+                                var data = (OverrideTrayRequestDtoResponse)context;
+
+                                if (data.TypeCode.Equals(typeCode) && data.CancelationState.Equals("TEA,PE"))
+                                {
+                                    <div class="d-flex justify-content-around">
+                                        <TelerikCheckBox @bind-Value="@data!.selectRecord" OnChange="@(() => AddRequest(data))">
+                                        </TelerikCheckBox>
+                                    </div>
+                                }
+                            }
+
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field="FilingCode"
+                                Title=@Translation["FilingUpper"]
+                                Width="150px"
+                                Filterable="false"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="NameTypeRequestCode"
+                                Title=@Translation["CancellationType"]
+                                Width="150px"
+                                Filterable="false"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="NameTypeCode"
+                                Title=@Translation["RequestType"]
+                                Width="150px"
+                                Filterable="false"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="NameCancelationState"
+                                Title=@Translation["Status"]
+                                Width="150px"
+                                Filterable="false"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="CancelationReasonName"
+                                Title=@Translation["CancellationReason"]
+                                Width="150px"
+                                Filterable="false"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="UserManagerName"
+                                Title=@Translation["Responsible"]
+                                Width="150px"
+                                Filterable="false"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="UserRequestName"
+                                Title=@Translation["Applicant"]
+                                Width="150px"
+                                Filterable="false"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+
+                </GridColumns>
+                <NoDataTemplate>
+                    <img src="../img/noDataFound.png" width="8%" height="8%" />
+                    <p> @Translation["NoGridInfo"]</p>
+                </NoDataTemplate>
+            </TelerikGrid>
+        </div>
+    </div>
+    <NewPaginationComponent @ref="paginationComponetPost" T="OverrideTrayRequestDtoResponse" M="CancelationRequestQueryFilter" Uri="@UriFilterRecords" Filter="@Request" PaginationInfo="@paginationInfo" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+    <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+    <NotificationsComponentModal @ref="notificationModalSucces"></NotificationsComponentModal>
+</div>
+<GenericSearchModal @ref="genericSearchModal" ConfigurationInUse="1" multipleSelection=false showCopiesColumn=false
+                    Title=@Translation["UserFinder"] OnStatusUserChanged="HandleUserChangedAsync"></GenericSearchModal>

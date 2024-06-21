@@ -1,0 +1,52 @@
+﻿<div class="my-modal">
+    <TelerikRootComponent>
+
+        <GenericModalComponent Title=@(Translation["Administration"] + " - " + Translation["GeneralSystemKeys"]) IsVisible="modalStatus" OnModalClosed="HandleModalClosedAsync" Width="60%">
+            <ChildContent>
+                    <EditForm Model="@appKeysDtoRequest" OnValidSubmit="HandleValidSubmit">
+                        
+                        <div class="row p-2">
+                            <div class="col-md-6 mb-2">
+                            <InputModalComponent MethodValueChanged="ValidateEnableButton" @ref="inputKeyName" @bind-InputValue="appKeysDtoRequest.KeyName" LabelText=@(Translation["KeyName"]+":") Placeholder=@Translation["EnterName"] FieldType="InputModalTypeEnum.Name" InputMaxLength="50" IsRequired="true" IsDisabled="IsEditForm"></InputModalComponent>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                            <InputModalComponent MethodValueChanged="ValidateEnableButton" @ref="inputValue1" @bind-InputValue="appKeysDtoRequest.Value1" LabelText=@(Translation["Value"]+" 1:") Placeholder=@(Translation["EnterTheValue"]+" 1") IsRequired="true" ></InputModalComponent>
+                            </div>
+
+                        </div>
+                        <div class="row p-2">
+                            <div class="col-md-6 mb-2">
+                            <InputModalComponent @ref="inputValue2" @bind-InputValue="appKeysDtoRequest.Value2" LabelText=@(Translation["Value"]+" 2:") Placeholder=@(Translation["EnterTheValue"]+" 2") ></InputModalComponent>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                            <InputModalComponent @ref="inputValue3" @bind-InputValue="appKeysDtoRequest.Value3" LabelText=@(Translation["Value"]+" 3:") Placeholder=@(Translation["EnterTheValue"]+" 3") ></InputModalComponent>
+                            </div>
+
+                        </div>
+                        <div class="row p-2">
+                            <div class="col-md-6 mb-2">
+                                <InputModalComponent @ref="inputValue4" @bind-InputValue="appKeysDtoRequest.Value4" LabelText=@(Translation["Value"]+" 4:") Placeholder=@(Translation["EnterTheValue"]+" 4") ></InputModalComponent>
+                            </div>
+                            <div class="col-md-6 mb-2 d-flex align-items-end justify-content-end">
+                                <div class="px-2">
+                                    <TelerikSwitch @bind-Value="@appKeysDtoRequest.ActiveState" />
+                                </div>
+                                <div class="px-2">
+                                    @(appKeysDtoRequest.ActiveState ? Translation["Enabled"] : Translation["Disabled"])
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="from-group from-group--margin-top justify-content-center">
+                                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="ResetForm"></ButtonComponent>
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="submit" BtnDisabled="@enableButton" BtnIcon="fa-solid fa-floppy-disk"></ButtonComponent>
+                            </div>
+                        </div>
+                    </EditForm>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>
+
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>

@@ -1,0 +1,134 @@
+﻿@using Control.Endeavour.FrontEnd.Models.Models.Documents.DocumentsTask.Response
+
+<div class="my-modal">
+    <TelerikRootComponent>
+        <GenericModalComponent Title=@Translation["FormatMasterList"] IsVisible="modalStatus" Width="70%" OnModalClosed="HandleModalClosed">
+            <ChildContent>
+                <!-- div para el filtro de busqueda-->
+                <div class="row mt-2 mx-1">
+                    <h5>@Translation["SelectZeroPaperEditor"]</h5>
+                </div>
+                <div class="row mt-4 mx-0 px-5 d-flex flex-row">
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <InputModalComponent @ref="inputCode" @bind-InputValue="filter.Code" LabelText=@Translation["Code"] InputMaxLength="5" Placeholder=@Translation["Code"] IsVisible="true"></InputModalComponent>
+                        </div>
+                        <div class="mb-3">
+                            <InputModalComponent @ref="inputName" @bind-InputValue="filter.NameTemplate" LabelText=@Translation["Name"] InputMaxLength="50" Placeholder=@Translation["Name"] IsVisible="true"></InputModalComponent>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <InputModalComponent @ref="inputVersion" @bind-InputValue="version" LabelText=@Translation["Version"] InputMaxLength="10" Placeholder=@Translation["Version"] InputType="number" FieldType="InputModalTypeEnum.Filing" IsVisible="true"></InputModalComponent>
+                        </div>
+                        <div class="mb-3">
+                            <InputModalComponent @ref="inputProcess" @bind-InputValue="filter.Process" LabelText=@Translation["Process"] InputMaxLength="50" Placeholder=@Translation["Process"] IsVisible="true"></InputModalComponent>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="from-group from-group--margin-top justify-content-center">
+                            <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["NoUseTemplate"] BtnIcon="fa-solid fa-circle-xmark" BtnOnClick="(e) => LoadFile(BasicTemplate)"></ButtonComponent>
+                            <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="ResetFormAsync"></ButtonComponent>
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Search"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="GetTemplateDoc"></ButtonComponent>
+                        </div>
+                    </div>
+                </div>
+                <!-- div para la grilla-->
+                <div class="row mt-3">
+                    @if (!wordOnline)
+                    {
+                        <TelerikGrid Data="templateDocumentList" PageSize="10"
+                                     Resizable="true"
+                                     SelectionMode="GridSelectionMode.None">
+                            <GridColumns>
+                                <GridColumn Field="TempCode"
+                                            Title=@Translation["Code"]
+                                            Width="80px"
+                                            Filterable="true"
+                                            TextAlign="ColumnTextAlign.Center"
+                                            HeaderClass="center-wrap" />
+                                <GridColumn Field="TempName"
+                                            Title=@Translation["Name"]
+                                            Width="150px"
+                                            Filterable="true"
+                                            TextAlign="ColumnTextAlign.Center"
+                                            HeaderClass="center-wrap" />
+                                <GridColumn Field="TempVersion"
+                                            Title=@Translation["Version"]
+                                            Width="80px"
+                                            Filterable="true"
+                                            TextAlign="ColumnTextAlign.Center"
+                                            HeaderClass="center-wrap" />
+                                <GridColumn Field="Process"
+                                            Title=@Translation["Process"]
+                                            Width="150px"
+                                            Filterable="true"
+                                            TextAlign="ColumnTextAlign.Center"
+                                            HeaderClass="center-wrap" />
+                                <GridCommandColumn Width="80px" Title=@Translation["UploadTemplate"] HeaderClass="center-wrap" Visible="true">
+                                    <div class="d-flex justify-content-around">
+                                        <GridCommandButton Icon="@SvgIcon.Upload" Title=@Translation["Upload"] Class="upload-button" OnClick="@((args)=> LoadFile((TemplateDocumentDtoResponse)args.Item))"></GridCommandButton>
+                                    </div>
+                                </GridCommandColumn>
+                            </GridColumns>
+                            <NoDataTemplate>
+                                <img src="../img/noDataFound.png" width="8%" height="8%" />
+                                <p> @Translation["NoGridInfo"]</p>
+                            </NoDataTemplate>
+                        </TelerikGrid>
+                    }
+                    else
+                    {
+                        <TelerikGrid Data=@docToGraphList
+                                     Pageable="true"
+                                     FilterMode="GridFilterMode.FilterMenu"
+                                     Resizable="true"
+                                     PageSize="10"
+                                     Navigable="true">
+                            <GridColumns>
+                                <GridColumn Field="name"
+                                            Title=@Translation["Name"]
+                                            Width="150px"
+                                            Filterable="false"
+                                            TextAlign="ColumnTextAlign.Center"
+                                            HeaderClass="center-wrap" />
+                                <GridColumn Field="createdDateTime"
+                                            Title=@Translation["CreationDate"]
+                                            Width="150px"
+                                            Filterable="false"
+                                            TextAlign="ColumnTextAlign.Center"
+                                            HeaderClass="center-wrap" />
+@*                                 <GridColumn Title=@Translation["UploadTemplate"] Width="80px" HeaderClass="center-wrap">
+                                    <Template>
+                                        @{
+                                            var item = (Value)context;
+                                            <div class="d-flex justify-content-around">
+                                                <a href="@item.webUrl" target="_blank" class="btn btn-link">
+                                                    <i class="fas fa-external-link-alt"></i>
+                                                </a>
+                                            </div>
+                                        }
+                                    </Template>
+                                </GridColumn> *@
+                                <GridCommandColumn Width="80px" Title=@Translation["UploadTemplate"] HeaderClass="center-wrap" Visible="true">
+                                    <div class="d-flex justify-content-around">
+                                        <GridCommandButton Icon="@SvgIcon.Upload" Title=@Translation["Upload"] Class="upload-button" OnClick="@((args)=> LoadFileWordAsync((Value)args.Item))"></GridCommandButton>
+                                    </div>
+                                </GridCommandColumn>
+                            </GridColumns>
+                            <NoDataTemplate>
+                                <img src="../img/noDataFound.png" width="8%" height="8%" />
+                                <p> @Translation["NoGridInfo"]</p>
+                            </NoDataTemplate>
+                        </TelerikGrid>
+                    }
+
+                </div>
+                <NewPaginationComponent @ref="paginationComponent" T="TemplateDocumentDtoResponse" M="TemplateFilterDtoRequest" Filter="@filter" Uri="@UriFilterTemplate" PaginationInfo="@paginationInfo" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+                <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>
+
+

@@ -1,0 +1,95 @@
+﻿<div class="my-modal">
+    <TelerikRootComponent>
+        <GenericModalComponent Title=@(Translation["Administration"] + " - " + Translation["ManagementActions"]) IsVisible="modalStatus" OnModalClosed="HandleModalClosed" Width="70%">
+            <ChildContent>
+                <EditForm Model="@NoWorkDaysDtoRequest" OnValidSubmit="HandleValidSubmit">
+                    
+                    <div class="py-2 px-4">
+                        <div class="row">
+                            <div class="col-md-4 d-flex align-items-end form-group">
+                                <div class="w-100">
+                                    <label class="mb-2">@Translation["Motive"]:<span class="red">*</span></label>
+                                    <TelerikDropDownList Data="@ReasonNoWorkDays"
+                                                         Value="@NoWorkDaysDtoRequest.Reason"
+                                                         ValueChanged="@( (string? newValue) => EnablePanels(newValue) )"
+                                                         ValueExpression="() => NoWorkDaysDtoRequest.Reason"
+                                                         Id="GR_TipoDoc"
+                                                         DefaultText=@Translation["SelectAnOption"]
+                                                         TextField="Value"
+                                                         ValueField="Code"
+                                                         Filterable="true"
+                                                         Enabled="@IsEnableToUpdate">
+                                    </TelerikDropDownList>
+                                </div>
+                                
+                            </div>
+                            <div class="col-md-6 mt-sm-3 @QuestionRangeClass d-flex flex-column justify-content-between ">
+                                <label class="titulo-azul">
+                                    @Translation["MassiveNoWorkDays"]
+                                </label>
+                                <div class="k-form k-form-md k-form-vertical">
+                                    <div class="k-form-field">
+
+                                        <div class="k-form-field-wrap">
+                                            <TelerikRadioGroup Data="@optionsRecordClosed"
+                                                               Value="@ResponseRecordClosed"
+                                                               ValueChanged="@( (string newValue) => OnValueChangedRecordClosed(newValue) )"
+                                                               ValueExpression="() => ResponseRecordClosed"
+                                                               Layout="@RadioGroupLayout.Horizontal">
+                                            </TelerikRadioGroup>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4 mt-sm-3">
+                                <label class="mb-2">@DateText:<span class="red">*</span></label>
+                                <TelerikDatePicker Value="@NoWorkDaysDtoRequest.NoWorkDay1"
+                                                   ValueChanged="@((DateTime? Value) => DatesFilterMethod(Value, "StartDate"))"
+                                                   ValueExpression="() => NoWorkDaysDtoRequest.NoWorkDay1"
+                                                   Format="dd MMMM yyyy"
+                                                   Class="DisabledInput"
+                                                   Min="@Min" Max="@Max"
+                                                   Enabled="@IsEnableToUpdate">
+                                </TelerikDatePicker>
+                            </div>
+                            <div class="col-md-4 @EndDateClass mt-sm-3">
+                                <label class="mb-2">@Translation["EndDate"]:<span class="red">*</span></label>
+                                <TelerikDatePicker Value="@NoWorkDaysDtoRequest.EndDate"
+                                                   ValueChanged="@((DateTime? Value) => DatesFilterMethod(Value, "EndDate"))"
+                                                   ValueExpression="() => NoWorkDaysDtoRequest.EndDate"
+                                                   Class="DisabledInput"
+                                                   Format="dd MMMM yyyy"
+                                                   Min="@Min" Max="@Max">
+                                </TelerikDatePicker>
+                            </div>
+                            <div class="col-md-4 mt-sm-3 d-flex align-items-end justify-content-center">
+                                <div class="px-2">
+                                    <TelerikSwitch @bind-Value="@NoWorkDaysDtoRequest.ActiveState" />
+                                </div>
+                                <div class="px-2">
+                                    @(NoWorkDaysDtoRequest.ActiveState ? Translation["Enabled"] : Translation["Disabled"])
+                                </div>
+
+                            </div>
+
+                        </div>
+                        <div class="row mt-sm-3">
+                            
+
+                        </div>
+
+                        <div class="row">
+                            <div class="from-group from-group--margin-top justify-content-center">
+                                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="ResetFormAsync"></ButtonComponent>
+                                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="submit" BtnDisabled="@enableButton" BtnIcon="fa-solid fa-floppy-disk"></ButtonComponent>
+                            </div>
+                        </div>
+                    </div>
+                </EditForm>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>
+
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>

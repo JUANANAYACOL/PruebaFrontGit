@@ -1,0 +1,243 @@
+﻿<TelerikRootComponent>
+
+    <GenericModalComponent Title=@(Translation["OverrideTray"] + " - " + Translation["NewRequest"]) IsVisible="modalStatus" OnModalClosed="HandleModalClosed" Width="70%">
+        <ChildContent>
+            @if (IsAdmin)
+            {
+                <div class="row titulo mt-3">
+                    <div class="col-4 mb-2">
+                        <label>@Translation["ManagementType"]<span class="darkred">*</span></label>
+                        <TelerikDropDownList Data="@ReasonAdminCodeList"
+                                             Value="@TypeRequestAdminCode"
+                                             TextField="Value"
+                                             ValueField="Code"
+                                             DefaultText="@DTTReasonCode"
+                                             Filterable="true"
+                                             ValueChanged="@((string value) => BindTypeRequestAdminCode(value))"
+                                             FilterOperator="StringFilterOperator.Contains">
+                        </TelerikDropDownList>
+                    </div>
+                    @if (TypeRequestAdminCode.Equals("TEA,RE"))
+                    {
+                        <div class="col-4 mb-2">
+                            <label class="mb-1 d-block">@Translation["RejectionReason"]<span class="red">* </span><span class="span-gray">@string.Format(Translation["CharactersOutOf"], contadorcaracAdmin, "100")</span></label>
+                            <textarea @bind="descriptionAdminInput" class="w-100 custom-textarea" id="DT_Asunto" required placeholder=@string.Format(Translation["CharactersOutOf"], contadorcaracAdmin, "100") maxlength="100" @oninput="(e) => ContarCaracteres(e, 2)"></textarea>
+                        </div>
+                    }
+                    <div class="col-4 mt-4">
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnIcon="fa-solid fa-floppy-disk" BtnDisabled="enableButtonAdmin" BtnOnClick="UpdateRequest"></ButtonComponent>
+                    </div>
+                </div>
+            }
+
+            <div class="row">
+                <div class="col-4">
+                    <label>@Translation["RequestType"]<span class="darkred">*</span></label>
+                    <TelerikDropDownList Data="@TypeCodeList"
+                                         Value="@typecode"
+                                         TextField="Value"
+                                         ValueField="Code"
+                                         DefaultText="@DTTypeCode"
+                                         Filterable="true"
+                                         ValueChanged="@((string value) => GetReason(value))"
+                                         Enabled="tipyCodeEnabled"
+                                         FilterOperator="StringFilterOperator.Contains">
+                    </TelerikDropDownList>
+                </div>
+                <div class="col-4">
+                    <label>@Translation["CancellationType"]<span class="darkred">*</span></label>
+                    <TelerikDropDownList Data="@ReasonCodeList"
+                                         Value="@TypeRequestCode"
+                                         TextField="Value"
+                                         ValueField="Code"
+                                         DefaultText="@DTTReasonCode"
+                                         Filterable="true"
+                                         ValueChanged="@((string value) => validLabel(value))"
+                                         Enabled="typeRequestCodeEnabled"
+                                         FilterOperator="StringFilterOperator.Contains">
+                    </TelerikDropDownList>
+                </div>
+                <div class="col-4">
+                    <label>@Translation["CancellationReason"]<span class="darkred">*</span></label>
+                    <TelerikDropDownList Data="@overrideTrayReasons"
+                                         Value="@Reason"
+                                         TextField="NameReason"
+                                         ValueField="CancelationReasonId"
+                                         DefaultText="@DTTReason"
+                                         Filterable="true"
+                                         ValueChanged="@((int newValue) => BindReason(newValue))"
+                                         Enabled="reasonEnabled"
+                                         FilterOperator="StringFilterOperator.Contains">
+                    </TelerikDropDownList>
+                </div>
+            </div>
+            <div class="row mt-3 m-0">
+                <div class="card col-6">
+                    <label class="mt-2"><b>@txtAInformation</b></label>
+                    <div class="col-12 d-flex flex-column justify-content-around">
+                        <label><b>@Translation["Manager"]:</b> @cancelationManager.FullName</label>
+                        <label><b>@Translation["Position"]:</b> @cancelationManager.Charge</label>
+                        <label><b>@Translation["AdministrativeUnit"]:</b> @cancelationManager.AdministrativeUnitName</label>
+                        <label><b>@Translation["ProductionOffice"]:</b> @cancelationManager.ProductionOfficeName</label>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <label class="mb-1 d-block">@Translation["Reason"]: @labelDescription<span class="red">* </span><span class="span-gray">@string.Format(Translation["CharactersOutOf"], contadorcarac, "100")</span></label>
+                    <textarea @bind="descriptionInput" disabled="@textAreaDisabled" class="w-100 custom-textarea" id="DT_Asunto" required placeholder=@string.Format(Translation["CharactersOutOf"], contadorcarac, "100") maxlength="100" @oninput="(e) => ContarCaracteres(e, 1)"></textarea>
+                </div>
+            </div>
+
+            @if (!IsAdmin)
+            {
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <label>@Translation["AnnulationProve"]</label>
+                        <DragAndDropTemplateComponent IdInputElement="OverrideTray" FileInfos="fileInfoDatas" OnFileListChanged="HandleFilesList" MaxFileSizeMB="100" MaxFileCount="5"></DragAndDropTemplateComponent>
+                    </div>
+                </div>
+                <div class="col-md-4 mt-3">
+                    <label class="input-container">@Translation["ComunicationClass"]<span class="red">*</span></label>
+                    <TelerikDropDownList Data="@systemFieldsCLList"
+                                         Value="@systemParamCL"
+                                         ValueField="Code"
+                                         TextField="Value"
+                                         Filterable="true"
+                                         Enabled="systemParamCLEnabled"
+                                         DefaultText=@Translation["SelectComuClass"]
+                                         ValueChanged="@((string value) => validInput(value))">
+                    </TelerikDropDownList>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-6 mt-3">
+                        <InputModalComponent IsRequired="true" LabelText=@Translation["FilingNumber"] IsDisabled="@IsDisabledCode" InputMaxLength="20" Placeholder="@PHInput" @bind-InputValue="@filingCode" MethodValueChanged="CaptureIdControl" />
+                    </div>
+                    <div class="col-md-6 mt-5">
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnDisabled="@BtnVerificarDisabled" BtnType="button" BtnText=@Translation["Verify"] BtnIcon="fa fa-check-circle" BtnOnClick="NewModalValidationAsync"></ButtonComponent>
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnDisabled="@BtnAddFilingCode" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Add"] BtnIcon="fa fa-plus " BtnOnClick="AddListControlId"></ButtonComponent>
+                    </div>
+                </div>
+                <div class="col-lg-12 mt-3 @ShowTable">
+                    <div class="table-responsive custom-table-container">
+                        <table class="table custom-table">
+                            <thead>
+                                <tr>
+                                    <th>@Translation["Delete"]</th>
+                                    <th>@Translation["FilingNumber"]</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var id in filigCodeList)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex justify-content-center table-content">
+                                                <i @onclick="@(() => DeleteControlID(id))" class="fa-solid fa-trash-can delete-button"></i>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <label>@id</label>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="row align-self-center mt-5">
+                    <!-- Parte Derecha: Dos Botones -->
+                    <div class="col">
+                        <div class="text-center">
+                            <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="reset"></ButtonComponent>
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnIcon="fa-solid fa-floppy-disk" BtnDisabled="enableButton" BtnOnClick="PostRequest"></ButtonComponent>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="row mb-5">
+                    <label class="noti-2 mt-2">@Translation["Evidence"]</label>
+                    <div class="col-lg-12 mb-2">
+                        <div class="table-responsive custom-table-container">
+                            <table class="table custom-table">
+                                <thead>
+                                    <tr>
+                                        <th>@Translation["ViewFile"]</th>
+                                        <th>@Translation["Name"]</th>
+                                        <th>@Translation["Extension"]</th>
+                                        <th>@Translation["Date"]</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in attachmentList)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex justify-content-center table-content">
+                                                    <i @onclick="@(() => HandleViewAttachment(item))" class="fa-solid fa-file delete-button"></i>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <label>@item.ArchiveName</label>
+                                            </td>
+                                            <td>
+                                                <label>@item.ArchiveExt</label>
+                                            </td>
+                                            <td>
+                                                <label>@item.CreateDate</label>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <label class="noti-2 mt-2">@Translation["SelectedDocuments"]</label>
+                    <div class="col-lg-12 mb-4">
+                        <div class="table-responsive custom-table-container">
+                            <table class="table custom-table">
+                                <thead>
+                                    <tr>
+                                        <th>@Translation["ViewAttachments"]</th>
+                                        <th>@Translation["SeeDocument"]</th>
+                                        <th>@Translation["FilingNumber"]</th>
+                                        <th>@Translation["Date"]</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in documentsList)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex justify-content-center table-content">
+                                                    <i @onclick="@(() => ViewAttachmentList(item))" class="fa-solid fa-folder-open delete-button"></i>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex justify-content-center table-content">
+                                                    <i @onclick="@(() => HandleViewDocument(item))" class="fa-solid fa-file delete-button"></i>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <label>@item.FilingCode</label>
+                                            </td>
+                                            <td>
+                                                <label>@item.CreateDate</label>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+        </ChildContent>
+    </GenericModalComponent>
+</TelerikRootComponent>
+<GeneralInformationModal @ref="generalInformationModal" docTask="false"></GeneralInformationModal>
+<ValidateDocumentGeneralInfoModal @ref="validateDocumentInfo"></ValidateDocumentGeneralInfoModal>
+<ViewDocumentModal @ref="viewDocumentModal"></ViewDocumentModal>
+<AttachmentTrayModal @ref="attachmentTrayModal" IsDocumentAttachment="true"></AttachmentTrayModal>

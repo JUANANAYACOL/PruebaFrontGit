@@ -1,0 +1,86 @@
+﻿
+<div class="my-modal">
+
+    <TelerikRootComponent>
+        <GenericModalComponent Title=@(Translation["Administration"] + " - " + Translation["ProductionOffices"]) IsVisible="modalStatus" OnModalClosed="HandleModalClosed" width="70%">
+            <ChildContent>
+                <div class="row p-2">
+                    <!-- Parte Izquierda: Input y Label -->
+                    <div class="col-md-4 mt-1">
+                        <label for="input2" class="mb-2">@Translation["DocumentaryVersions"]:<span class="red">*</span></label>
+                        <TelerikDropDownList Data="@documentalVersionsList"
+                                             Id="DocTypeJ"
+                                             DefaultText="@Translation["SelectAType"]"
+                                             TextField="Code"
+                                             ValueField="DocumentalVersionId"
+                                             Value="@IdDocumental"
+                                             ValueChanged="@( (int newValue) => GetAdministrativeUnits(newValue) )"
+                                             Filterable="true"
+                                             FilterOperator="StringFilterOperator.Contains">
+                        </TelerikDropDownList>
+                    </div>
+                    <div class="col-md-4 mt-1">
+                        <label for="input2" class="mb-2">@Translation["AdministrativeUnits"]:<span class="red">*</span></label>
+                        <TelerikDropDownList Data="@administrativeUnitsList"
+                                             DefaultText="@Translation["SelectAType"]"
+                                             TextField="Name"
+                                             ValueField="AdministrativeUnitId"
+                                             @bind-Value="IdAdUnit"
+                                             OnChange="EnableSaveButton"
+                                             Enabled="@administrativeUnitEnable"
+                                             Filterable="true"
+                                             FilterOperator="StringFilterOperator.Contains">
+                        </TelerikDropDownList>
+                    </div>
+                    <div class="col-md-4 mt-4 mt-1">
+                        <div class="from-group mt-3 d-flex align-items-end justify-content-end">
+
+
+                            <div class="px-2">
+                                <TelerikSwitch @bind-Value="@activeState" />
+                            </div>
+                            <div class="px-2">
+                                @(activeState ? Translation["Enabled"] : Translation["Disabled"])
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row p-2">
+                    <div class="col-md-2 mb-2">
+                        <InputModalComponent @ref="inputCode" @bind-InputValue="ProductionOfficeRequest.Code" MethodValueChanged="EnableSaveButton" IsRequired="true" InputMaxLength="5" LabelText=@(Translation["Code"]+":") Placeholder=@Translation["Code"] FieldType="InputModalTypeEnum.Code" />
+
+
+                    </div>
+                    <div class="col-md-5 mb-2">
+                        <InputModalComponent @ref="inputName" @bind-InputValue="ProductionOfficeRequest.Name" MethodValueChanged="EnableSaveButton" IsRequired="true" LabelText=@(Translation["Name"]+":") Placeholder=@Translation["Name"] FieldType="InputModalTypeEnum.NotEmpty" InputMaxLength="50" />
+
+                    </div>
+                    <div class=" col-md-5 mb-2">
+                        <ButtonGroupComponent LabelText=@(Translation["Boss"]+":") InputPlaceholder=@Translation["AddName"] BtnTitle=@Translation["BossName"] @ref="inputBoss" @bind-InputValue="bossName" InputRequired="false" BtnClassColor="btnStyle--primary" BtnClassModifiers="" BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="@OpenNewModal"></ButtonGroupComponent>
+
+
+
+                    </div>
+                </div>
+                <div class="row p-2">
+                    <div class="mb-2">
+                        <label class="mb-2">@(Translation["Description"] + ":") <span style="color:gray">@string.Format(Translation["CharactersOutOf"], CharacterCounter, "200")</span> </label>
+                        <textarea @bind="@ProductionOfficeRequest.Description" class="w-100 custom-textarea" id="GR_Asunto" placeholder="" maxlength="200" @oninput="CountCharacters"></textarea>
+                    </div>
+
+
+                </div>
+                <div class="row">
+
+                    <div class="from-group from-group--margin-top justify-content-center">
+                        <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="ResetFormAsync"></ButtonComponent>
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Save"] BtnIcon="fa-solid fa-floppy-disk" BtnDisabled="saveIsDisable" BtnOnClick="HandleValidSubmit"></ButtonComponent>
+                    </div>
+                </div>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+    <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+</div>

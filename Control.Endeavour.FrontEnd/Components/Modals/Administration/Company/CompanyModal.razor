@@ -1,0 +1,124 @@
+﻿
+<div class="my-modal">
+    <TelerikRootComponent>
+
+        <GenericModalComponent Title=@(Translation["Administration"] + " - " + Translation["OrganizationData"]) IsVisible="modalStatus" OnModalClosed="HandleModalClosed" Width="60%">
+            <ChildContent>
+                <div class="container-fluid">
+
+                    <div class="container mt-1">
+                        <div class="row">
+                            <div class="col-lg-4 mt-1">
+                                <label for="input2" class="mb-2">@Translation["OrganizationLogo"]:</label>
+                                <DragAndDropImageComponent @ref="logoDADComponent" IdInputElement="logo-picture" AllowedExtensions="@AllowedExtensionsLogo" MaxFileSizeMB="@FileSize"
+                                                           MaxFileCount="1" TypeOfFiles="TypeOfFilesEnum.Logo" FileInfos="logoFileInfoData" OnFileListChanged="HandleLogoPicture"></DragAndDropImageComponent>
+                            </div>
+                            <div class="col-lg-4 mt-1">
+                                <label for="input2" class="mb-2">@Translation["OrganizationBanner"]:</label>
+                                <DragAndDropImageComponent @ref="bannerDADComponent" IdInputElement="banner-picture" Width="216px" AllowedExtensions="@AllowedExtensions" MaxFileSizeMB="@FileSize"
+                                                           MaxFileCount="1" TypeOfFiles="TypeOfFilesEnum.Banner" FileInfos="bannerFileInfoData" OnFileListChanged="HandleBannerPicture"></DragAndDropImageComponent>
+                            </div>
+                            <div class="col-lg-4 mt-1">
+                                <label for="input2" class="mb-2">@Translation["OrganizationMobileBanner"]:</label>
+                                <DragAndDropImageComponent @ref="mobileBannerDADComponent" IdInputElement="mobileBanner-picture" Width="216px" AllowedExtensions="@AllowedExtensions" MaxFileSizeMB="@FileSize"
+                                                           MaxFileCount="1" TypeOfFiles="TypeOfFilesEnum.Banner" FileInfos="mobileBannerFileInfoData" OnFileListChanged="HandleMobileBannerPicture"></DragAndDropImageComponent>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="container mt-1">
+                        <!-- Sección 1 -->
+                        <div class="row">
+                            <div class="col-lg-12 container">
+                                <div class="row mt-3">
+                                    <div class="col-lg-4 mt-1">
+                                        <label for="input2" class="mb-2">@Translation["DocumentType"]<span class="red">*</span></label>
+                                        <TelerikDropDownList Data="@documentTypeTDIJ"
+                                                             DefaultText=@Translation["SelectAnOption"]
+                                                             TextField="Value"
+                                                             ValueField="Code"
+                                                             @bind-Value="identificationType"
+                                                             Filterable="true"
+                                                             FilterOperator="StringFilterOperator.Contains"
+                                                             OnChange="ValidateEnableButton">
+                                        </TelerikDropDownList>
+                                    </div>
+
+                                    <div class="col-lg-4 mt-1">
+                                        <InputModalComponent MethodValueChanged="ValidateEnableButton" @ref="NIT" @bind-InputValue="@CompaniesFormResponse.Identification" IsRequired="true" LabelText=@Translation["TIN"] Placeholder=@Translation["TINCode"] FieldType="InputModalTypeEnum.NumbersOnly" />
+                                    </div>
+
+                                    <div class="col-lg-4 mt-1">
+                                        <InputModalComponent MethodValueChanged="ValidateEnableButton" @ref="namebussiness" @bind-InputValue="@CompaniesFormResponse.BusinessName" IsRequired="true" LabelText=@Translation["BusinessName"] Placeholder=@Translation["BusinessName"] FieldType="InputModalTypeEnum.NotEmpty" InputMaxLength="200" />
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-lg-4 mt-1">
+                                        <InputModalComponent MethodValueChanged="ValidateEnableButton" @ref="phone" @bind-InputValue="@CompaniesFormResponse.PhoneNumber" IsRequired="true" LabelText=@Translation["Phone"] Placeholder=@Translation["Phone"] FieldType="InputModalTypeEnum.NumbersOnly" />
+                                    </div>
+
+                                    <div class="col-lg-4 mt-1">
+                                        <InputModalComponent MethodValueChanged="ValidateEnableButton" @ref="email" @bind-InputValue="@CompaniesFormResponse.Email" IsRequired="true" LabelText=@Translation["Email"] Placeholder=@Translation["Email"] FieldType="InputModalTypeEnum.Email" InputType="email" />
+                                    </div>
+
+                                    <div class="col-lg-4 mt-1">
+                                        <InputModalComponent @ref="web" @bind-InputValue="@CompaniesFormResponse.WebAddress" LabelText=@Translation["Website"] Placeholder=@Translation["Website"] FieldType="InputModalTypeEnum.Website" />
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-lg-8 mt-1">
+                                        <div class="row">
+                                            <ButtonGroupComponent LabelText=@Translation["Address"] InputPlaceholder=@Translation["EnterAddress"] BtnTitle=@Translation["EnterAddress"] @bind-InputValue="textAddress" InputRequired="true" BtnClassColor="btnStyle--primary" BtnClassModifiers="" BtnIcon="fa-solid fa-plus" BtnOnClick="OpenNewModal"></ButtonGroupComponent>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sección 2 -->
+                        <div class="row mt-5">
+                            <h3>@Translation["LegalRepresentativeInformation"]</h3>
+                            <div class="col-lg-12 container mt-3">
+                                <div class="row">
+                                    <div class="col-lg-4 mt-1">
+                                        <label for="input2" class="mb-2">@Translation["DocumentType"]</label>
+                                        <TelerikDropDownList Data="@documentTypeTDIN"
+                                                             DefaultText=@Translation["SelectAnOption"]
+                                                             TextField="Value"
+                                                             ValueField="Code"
+                                                             @bind-Value="legalAgentIdType"
+                                                             Filterable="true"
+                                                             FilterOperator="StringFilterOperator.Contains"
+                                                             OnChange="ValidateEnableButton">
+                                        </TelerikDropDownList>
+                                    </div>
+
+                                    <div class="col-lg-4 mt-1">
+                                        <InputModalComponent MethodValueChanged="ValidateEnableButton" @ref="identification" @bind-InputValue="@CompaniesFormResponse.LegalAgentId" IsRequired="false" LabelText=@Translation["IdentificationNumber"] Placeholder=@Translation["IdentificationNumber"] FieldType="InputModalTypeEnum.NumbersOnly" />
+                                    </div>
+
+                                    <div class="col-lg-4 mt-1">
+                                        <InputModalComponent MethodValueChanged="ValidateEnableButton" @ref="nameAgentLegal" @bind-InputValue="@CompaniesFormResponse.LegalAgentFullName" IsRequired="false" LabelText=@Translation["FullName"] Placeholder=@Translation["FullName"] FieldType="InputModalTypeEnum.None" />
+                                    </div>
+                                </div>
+                                <div class="row mt-3">
+                                    <div class="col-lg-4 mt-1">
+                                        <InputModalComponent MethodValueChanged="ValidateEnableButton" @ref="cellphone" @bind-InputValue="@CompaniesFormResponse.CellPhoneNumber" IsRequired="false" LabelText=@Translation["CellPhone"] Placeholder=@Translation["CellPhoneNumber"] FieldType="InputModalTypeEnum.NumbersOnly" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="from-group from-group--margin-top justify-content-center">
+                            <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="ResetFormAsync"></ButtonComponent>
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnIcon="fa-solid fa-floppy-disk" BtnDisabled="@enableButton" BtnOnClick="HandleValidSubmit"></ButtonComponent>
+                        </div>
+                    </div>
+                </div>
+                <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>

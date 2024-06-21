@@ -1,0 +1,29 @@
+﻿@if (IsVisible)
+{
+    @if (!string.IsNullOrEmpty(LabelText))
+    {
+        <div class="input-container">
+            <label class="mb-2" for="inputField">
+                @LabelText
+                @if (IsRequired)
+                {
+                    <span class="red"> *</span>
+                }
+            </label>
+        </div>
+    }
+    <div class="input-container">
+        @if (InputType == "date")
+        {
+            <input @attributes="GetInputAttributes()" @bind-value="InputValue" @bind-value:event="oninput" type="@InputType" style="@Style" maxlength="@InputMaxLength" min="1900-01-01" />
+        }
+        else if (InputType == "number" && FieldType == InputModalTypeEnum.Filing)
+        {
+            <input @attributes="GetInputAttributes()" @bind-value="InputValue" @bind-value:event="oninput" type="@InputType" maxlength="@InputMaxLength" min="@InputMinValue" max="@InputMaxNumberValue" />
+        }
+        else
+        {
+            <input @attributes="GetInputAttributes()" @bind-value="InputValue" @bind-value:event="oninput" type="@InputType" style="@Style" maxlength="@InputMaxLength" />
+        }
+    </div>
+}

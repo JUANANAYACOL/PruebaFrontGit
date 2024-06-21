@@ -1,0 +1,326 @@
+﻿@using Control.Endeavour.FrontEnd.Models.Models.Administration.AdministracionTRD.Request
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.AdministracionTRD.Response
+
+<RetentionsModal @ref="modalRetentions" OnStatusChanged2="HandleTRDSelectedChanged"></RetentionsModal>
+<GenericSearchModal OnStatusUserChanged="HandleGenericSearchStatusChanged"
+                    OnStatusMultipleUsersChanged="HandleGenericMultipleSearchStatusChanged"
+                    @ref="genericSearchModal"
+                    ConfigurationInUse="1"
+                    multipleSelection=multipleSelectionManager
+                    OnModalClosed="HandleClosed"
+                    showCopiesColumn=false
+                    Title=@(Translation["Administration"] + " - " + Translation["DocumentarySubSeries"] + " - " + Translation["UserSearch"])></GenericSearchModal>
+<div class="my-modal">
+    <TelerikRootComponent>
+        <GenericModalComponent Title=@(Translation["Administration"] + " - " + Translation["DocumentarySubSeries"]) Width="60%" IsVisible="modalStatus" OnModalClosed="HandleModalClosedAsync">
+            <ChildContent>
+
+                <div class="row p-2">
+                    <div class="col-lg-4 mt-3">
+                        <label for="input2" class="mb-2">@Translation["DocumentaryVersions"]:<span class="red">*</span></label>
+                        <TelerikDropDownList Data="@documentalVersionsList"
+                                             Id="DocTypeJ"
+                                             DefaultText="@Translation["SelectAType"]"
+                                             TextField="Code"
+                                             ValueField="DocumentalVersionId"
+                                             Value="@IdDocumental"
+                                             ValueChanged="@( (int newValue) => GetAdministrativeUnits(newValue) )"
+                                             Filterable="true"
+                                             OnChange="EnableSaveButton"
+                                             FilterOperator="StringFilterOperator.Contains">
+                        </TelerikDropDownList>
+                    </div>
+
+                    <div class="col-lg-4 mt-3">
+                        <label for="input2" class="mb-2">@Translation["AdministrativeUnits"]:<span class="red">*</span></label>
+                        <TelerikDropDownList Data="@administrativeUnitsList"
+                                             DefaultText="@Translation["SelectAType"]"
+                                             TextField="Name"
+                                             ValueField="AdministrativeUnitId"
+                                             Value="@idAdUnit"
+                                             ValueChanged="@( (int newValue) => GetProductionOffices(newValue) )"
+                                             Filterable="true"
+                                             OnChange="EnableSaveButton"
+                                             Enabled="@administrativeUnitEnable"
+                                             FilterOperator="StringFilterOperator.Contains">
+                        </TelerikDropDownList>
+                    </div>
+
+                    <div class="col-lg-4 mt-3">
+                        <label for="input2" class="mb-2">@Translation["ProductionOffices"]:<span class="red">*</span></label>
+                        <TelerikDropDownList Data="@productionOfficesList"
+                                             DefaultText="@Translation["SelectAType"]"
+                                             TextField="Name"
+                                             ValueField="ProductionOfficeId"
+                                             Value="@IdproOffice"
+                                             ValueChanged="@( (int newValue) => GetSeries(newValue) )"
+                                             Filterable="true"
+                                             OnChange="EnableSaveButton"
+                                             Enabled="@productionOfficeEnable"
+                                             FilterOperator="StringFilterOperator.Contains">
+                        </TelerikDropDownList>
+                    </div>
+
+                    <!-- Parte Izquierda: Input y Label -->
+                    <div class="col-lg-4 mt-3">
+                        <label for="input2" class="mb-2">@Translation["DocumentarySeries"]:<span class="red">*</span></label>
+                        <TelerikDropDownList Data="@seriesList"
+                                             DefaultText="@Translation["SelectAType"]"
+                                             TextField="Name"
+                                             ValueField="SeriesId"
+                                             @bind-Value="IdSerie"
+                                             OnChange="EnableSaveButton"
+                                             Filterable="true"
+                                             Enabled="@serieEnable"
+                                             FilterOperator="StringFilterOperator.Contains">
+                        </TelerikDropDownList>
+                    </div>
+                    <div class="col-lg-4 mt-3 d-flex align-items-end justify-content-end">
+                        <div class="from-group">
+                            <div class="px-2">
+                                <TelerikSwitch @bind-Value="@activeState" />
+                            </div>
+                            <div class="px-2">
+                                @(activeState ? Translation["Enabled"] : Translation["Disabled"])
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row p-2 mt-1">
+                    <div class="col-md-6 mb-2">
+                        <InputModalComponent IsRequired="true" @bind-InputValue="@subSerieDtoRequest.Code" MethodValueChanged="EnableSaveButton" LabelText=@(Translation["Code"]+":") Placeholder=@Translation["EnterCode"] FieldType="InputModalTypeEnum.Code" @ref="codeInput" InputMaxLength="5" />
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <InputModalComponent IsRequired="true" @bind-InputValue="@subSerieDtoRequest.Name" MethodValueChanged="EnableSaveButton" LabelText=@(Translation["Name"]+":") Placeholder=@Translation["EnterName"] FieldType="InputModalTypeEnum.Name" @ref="nameInput" InputMaxLength="50" />
+                    </div>
+
+                </div>
+
+                <div class="row p-2">
+                    <!-- Parte Izquierda: Input y Label -->
+                    <div class="col-lg-4 mt-1">
+                        <label for="input2" class="mb-2">@Translation["SerieClass"]:<span class="red">*</span></label>
+                        <TelerikDropDownList Data="@seriesClassList"
+                                             DefaultText="@Translation["SelectAnOption"]"
+                                             TextField="Value"
+                                             ValueField="Code"
+                                             @bind-Value="seriesClass"
+                                             OnChange="EnableSaveButton"
+                                             Filterable="true"
+                                             FilterOperator="StringFilterOperator.Contains">
+                        </TelerikDropDownList>
+                    </div>
+
+                    <div class="col-lg-4 mt-1">
+                        <label for="input2" class="mb-2">@Translation["SecurityLevel"]:<span class="red">*</span></label>
+                        <TelerikDropDownList Data="@securityLevelsList"
+                                             DefaultText="@Translation["SelectAnOption"]"
+                                             TextField="Value"
+                                             ValueField="Code"
+                                             @bind-Value="securityLevel"
+                                             OnChange="EnableSaveButton"
+                                             Filterable="true"
+                                             FilterOperator="StringFilterOperator.Contains">
+                        </TelerikDropDownList>
+                    </div>
+
+                    @if (IsEditForm && docTypoExist && !string.IsNullOrEmpty(securityLevel) && !securityLevel.Contains("PUBL"))
+                    {
+                        <div class="col-lg-4 mt-2">
+                            <div class="row mb-2">
+                                <label class="text-filter" for="identification">@Translation["SecurityLevelBy"]:</label>
+                            </div>
+
+                            <div class="row">
+                                <div class="k-form k-form-md k-form-vertical">
+                                    <div class="k-form-field">
+                                        <div class="k-form-field-wrap">
+                                            <TelerikRadioGroup Data="@optionsSecurityLevel"
+                                                               Value="@selectedOptionSecurityLevel"
+                                                               Layout="@RadioGroupLayout.Horizontal"
+                                                               OnChange="EnableSaveButton"
+                                                               ValueChanged="@((string selectedValue) => OnValueChangedRecordClosed(selectedValue))">
+                                            </TelerikRadioGroup>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+                @if (IsEditForm && docTypoExist && !string.IsNullOrEmpty(securityLevel) && !securityLevel.Contains("PUBL"))
+                {
+                    if (currentOptionSecurityLevel)
+                    {
+                        <div class="row p-2">
+                            <!-- Parte Izquierda: Input y Label -->
+                            <div class="col-lg-4 mt-1">
+                                <label for="input2" class="mb-2">@Translation["DocumentaryVersions"]:<span class="red">*</span></label>
+                                <TelerikDropDownList Data="@documentalVersionsList"
+                                                     Id="DocTypeJ"
+                                                     DefaultText="@Translation["SelectAType"]"
+                                                     TextField="Code"
+                                                     ValueField="DocumentalVersionId"
+                                                     Value="@IdDocumentalSL"
+                                                     ValueChanged="@( (int newValue) => GetAdministrativeUnitsSL(newValue) )"
+                                                     OnChange="EnableSaveButton"
+                                                     Filterable="true"
+                                                     FilterOperator="StringFilterOperator.Contains">
+                                </TelerikDropDownList>
+                            </div>
+
+                            <div class="col-lg-4 mt-1">
+                                <label for="input2" class="mb-2">@Translation["AdministrativeUnits"]:<span class="red">*</span></label>
+                                <TelerikDropDownList Data="@administrativeUnitsListSL"
+                                                     DefaultText="@Translation["SelectAType"]"
+                                                     TextField="Name"
+                                                     ValueField="AdministrativeUnitId"
+                                                     Value="@idAdUnitSL"
+                                                     ValueChanged="@( (int newValue) => GetProductionOfficesSL(newValue) )"
+                                                     OnChange="EnableSaveButton"
+                                                     Filterable="true"
+                                                     Enabled="@administrativeUnitEnableSL"
+                                                     FilterOperator="StringFilterOperator.Contains">
+                                </TelerikDropDownList>
+                            </div>
+
+                            <div class="col-lg-4 mt-1">
+                                <label for="input2" class="mb-2">@Translation["ProductionOffices"]:<span class="red">*</span></label>
+                                <TelerikDropDownList Data="@productionOfficesListSL"
+                                                     DefaultText="@Translation["SelectAType"]"
+                                                     TextField="Name"
+                                                     ValueField="ProductionOfficeId"
+                                                     @bind-Value="IdproOfficeSL"
+                                                     OnChange="EnableSaveButton"
+                                                     Filterable="true"
+                                                     Enabled="@productionOfficeEnableSL"
+                                                     FilterOperator="StringFilterOperator.Contains">
+                                </TelerikDropDownList>
+                            </div>
+
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="row mt-4">
+                            <div class="col">
+                                <TelerikTabStrip>
+
+                                    <TabStripTab Title=@Translation["ChosenUsers"]>
+                                        <div class="row p-2">
+                                            <div class="mb-2">
+                                                <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["AddUser"] BtnIcon="fa-solid fa-user-plus" BtnOnClick="@(()=>OpenLeaderManager(true,true))"></ButtonComponent>
+                                                <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["DeleteSelectedUsers"] BtnIcon="fa-solid fa-trash" BtnOnClick="HandleRecordToDelete" BtnDisabled="!(securityLevelsSeriesNewList.Any() && selectedUsers.Any())"></ButtonComponent>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mt-4 mb-2">
+                                            <div class="col">
+                                                <TelerikGrid Data="@securityLevelsSeriesNewList" PageSize="50"
+                                                             Sortable="true"
+                                                             FilterMode="GridFilterMode.FilterMenu"
+                                                             Resizable="true"
+                                                             Reorderable="true"
+                                                             EditMode="GridEditMode.Popup"
+                                                             ScrollMode="@GridScrollMode.Scrollable"
+                                                             Height="460px"
+                                                             RowHeight="60"
+                                                             SelectionMode="GridSelectionMode.None">
+                                                    <GridColumns>
+                                                        <GridColumn Width="14%" TextAlign="ColumnTextAlign.Center" HeaderClass="center-wrap">
+                                                            <HeaderTemplate>
+                                                                @{
+                                                                    <TelerikCheckBox class="mr-1" @bind-Value="@selectAllManager" OnChange="ChangeAllStateManager" Enabled="securityLevelsSeriesNewList.Any()"></TelerikCheckBox>
+                                                                    <label> @Translation["Grid_Select"] </label>
+                                                                }
+                                                            </HeaderTemplate>
+                                                            <Template>
+                                                                @{
+                                                                    var userSelected = (SecurityLevelDtoResponse)context;
+                                                                    <TelerikCheckBox Value="@userSelected.Selected" OnChange="@(() => ChangeStateManager(userSelected))"></TelerikCheckBox>
+                                                                }
+                                                            </Template>
+                                                        </GridColumn>
+                                                        <GridColumn Field=@nameof(SecurityLevelDtoResponse.FullName) Title=@Translation["Name"] Width="100px" Filterable="false" TextAlign="ColumnTextAlign.Left" />
+                                                        <GridColumn Field=@nameof(SecurityLevelDtoResponse.ProductionOfficeName) Title=@Translation["ProductionOffice"] Width="100px" Filterable="false" />
+                                                    </GridColumns>
+                                                    <NoDataTemplate>
+                                                        <img src="../img/noDataFound.png" width="8%" height="8%" />
+                                                        <p> @Translation["NoGridInfo"]</p>
+                                                    </NoDataTemplate>
+                                                </TelerikGrid>
+                                            </div>
+                                        </div>
+                                    </TabStripTab>
+
+                                    <TabStripTab Title=@Translation["SavedUsers"]>
+
+                                        <div class="row mt-4 mb-2">
+                                            <div class="col">
+                                                <TelerikGrid Data="@securityLevelsSeriesList" PageSize="10"
+                                                             Sortable="true"
+                                                             FilterMode="GridFilterMode.FilterMenu"
+                                                             Resizable="true"
+                                                             Reorderable="true"
+                                                             EditMode="GridEditMode.Popup"
+                                                             ScrollMode="@GridScrollMode.Scrollable"
+                                                             Height="460px"
+                                                             RowHeight="60"
+                                                             SelectionMode="GridSelectionMode.None">
+                                                    <GridColumns>
+                                                        <GridColumn Field=@nameof(SecurityLevelDtoResponse.FullName) Title=@Translation["Name"] Width="100px" Filterable="false" TextAlign="ColumnTextAlign.Left" />
+                                                        <GridColumn Field=@nameof(SecurityLevelDtoResponse.ProductionOfficeName) Title=@Translation["ProductionOffice"] Width="100px" Filterable="false" />
+                                                    </GridColumns>
+                                                    <NoDataTemplate>
+                                                        <img src="../img/noDataFound.png" width="8%" height="8%" />
+                                                        <p> @Translation["NoGridInfo"]</p>
+                                                    </NoDataTemplate>
+                                                </TelerikGrid>
+                                            </div>
+                                        </div>
+                                        @if (dataChargue)
+                                        {
+                                            <div class="row mt-4">
+                                                <NewPaginationComponent @ref="paginationComponent" T="SecurityLevelDtoResponse" M="SecurityLevelFilterDtoRequest" Uri="@uriFilterSecurityLevels" Filter="@securityLevelFilterDtoRequest" PaginationInfo="@paginationInfo" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+                                            </div>
+                                        }
+                                    </TabStripTab>
+                                </TelerikTabStrip>
+                            </div>
+                        </div>
+
+                    }
+                }
+                <div class="row p-2 mt-1">
+                    <div class="mb-2">
+                        <label class="mb-2">@(Translation["Description"] + ":") <span style="color:gray">@string.Format(Translation["CharactersOutOf"], CharacterCounter, "200")</span></label>
+                        <textarea @bind="@subSerieDtoRequest.Description" class="w-100 custom-textarea" id="GR_Asunto" placeholder="" maxlength="200" @oninput="CountCharacters"></textarea>
+                    </div>
+
+
+                </div>
+
+                <div class="row p-2">
+                    <div class="mb-2">
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Retention"] BtnIcon="fa fa-sign-out" BtnOnClick="ShowModalCreate"></ButtonComponent>
+                    </div>
+                </div>
+
+                <div class="row">
+
+                    <div class="from-group from-group--margin-top justify-content-center">
+                        <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="ResetFormAsync"></ButtonComponent>
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnIcon="fa-solid fa-floppy-disk" BtnDisabled="saveIsDisable" BtnOnClick="HandleValidSubmit"></ButtonComponent>
+                    </div>
+                </div>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+    <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+</div>

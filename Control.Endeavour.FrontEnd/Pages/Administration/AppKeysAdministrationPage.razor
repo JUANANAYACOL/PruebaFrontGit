@@ -1,0 +1,188 @@
+﻿@page "/AppKeysAdministration" 
+
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.SystemConfiguration.Response
+@layout MainLayout;
+
+
+<Control.Endeavour.FrontEnd.Components.Modals.SystemConfiguration.AppKeysModal @ref="modalAppKeys" OnChangeData="HandleRefreshGridDatasystemFieldsAsync"></Control.Endeavour.FrontEnd.Components.Modals.SystemConfiguration.AppKeysModal>
+<div class="container-fluid mt-1">
+
+    <div class="row">
+        <div class="@Panel1Class">
+            <div class="row titulo">
+                <h4>@(Translation["Administration"] + " - " + Translation["SystemFunctions"])</h4>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <h6 class="titulo-azul"> @Translation["SearchByFilters"]:</h6>
+                </div>
+                <div class="col-md-6">
+                    <InputModalComponent @bind-InputValue=AppFunctionFilter.FunctionName LabelText=@(Translation["Name"]+":") Placeholder=@Translation["SearchByName"] FieldType="InputModalTypeEnum.Code" InputMaxLength="100"></InputModalComponent>
+                </div>
+                <div class="col-md-6">
+                    <InputModalComponent @bind-InputValue=AppFunctionFilter.Description LabelText=@(Translation["Description"]+":") Placeholder=@Translation["Description"] FieldType="InputModalTypeEnum.Name" InputMaxLength="100"></InputModalComponent>
+                </div>
+                <div class="col-md-12 d-flex align-items-end justify-content-end mt-3">
+                    <div class="text-md-end">
+                        <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="CleanFilter"></ButtonComponent>
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Search"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="SearchByFilter"></ButtonComponent>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <TelerikGrid Data="LstAppFunctions"
+                             ScrollMode="@GridScrollMode.Scrollable"
+                             Height="680px" RowHeight="60" PageSize="@pageSizeAppFunctions"
+                             Sortable="true">
+                    <GridColumns>
+
+                        <GridCommandColumn Width="80px" Title=@Translation["Actions"] HeaderClass="center-wrap" Visible="true">
+                            <div class="custom-style-grid">
+                                <GridCommandButton Icon="@SvgIcon.Search" OnClick="@((args)=> ShowAppKeys((AppFunctionDtoResponse)args.Item))"></GridCommandButton>
+                            </div>
+                        </GridCommandColumn>
+                        <GridColumn Field="FunctionName"
+                                    Title=@Translation["Name"]
+                                    Width="150px"
+                                    Filterable="true"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap" />
+                        <GridColumn Field="Description"
+                                    Title=@Translation["Description"]
+                                    Width="150px"
+                                    Filterable="true"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap" />
+                        <GridColumn Field="CreateUser"
+                                    Title=@Translation["UserRecorded"]
+                                    Width="200px"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    Filterable="false" HeaderClass="center-wrap" />
+                        <GridColumn Field="CreateDate"
+                                    Title=@Translation["DateRecorded"]
+                                    Width="200px"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    Filterable="false" HeaderClass="center-wrap" />
+                        <GridColumn Field="UpdateUser"
+                                    Title=@Translation["UserUpdated"]
+                                    Width="200px"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    Filterable="false" HeaderClass="center-wrap" />
+                        <GridColumn Field="UpdateDate"
+                                    Title=@Translation["DateUpdated"]
+                                    Width="200px"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    Filterable="false" HeaderClass="center-wrap" />
+
+                    </GridColumns>
+                </TelerikGrid>
+
+            </div>
+        </div>
+        <div class="col-md-6 flex-md-column @Panel2Class">
+            <div class="row titulo">
+                <div class="col-md-8">
+                    <h4> @Translation["KeyValues"]: @FunctionName</h4>
+                </div>
+                <div class="col-md-4 text-end">
+                    <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers=" ml-10" BtnType="button" BtnText=@Translation["Create"] BtnOnClick="ShowModal" BtnIcon="fa-solid fa-plus"></ButtonComponent>
+                </div>
+            </div>
+            <div class="row mt-3">
+
+                <TelerikGrid Data="LstAppKeys"
+                             ScrollMode="@GridScrollMode.Scrollable"
+                             Height="680px"
+                             RowHeight="60" PageSize="@pageSizeAppKeys"
+                             Sortable="true">
+                    <GridColumns>
+                        <GridCommandColumn Width="80px" Title=@Translation["Edit"] HeaderClass="center-wrap" Visible="true">
+                            <div class="custom-style-grid">
+                                <GridCommandButton Title=@Translation["Edit"] Icon="@SvgIcon.Pencil" OnClick="@((args)=> ShowModalAppkeys((AppKeysDtoResponse)args.Item))"></GridCommandButton>
+                            </div>
+                        </GridCommandColumn>
+                        @* <GridCommandColumn Width="80px" Title=@Translation["Delete"] HeaderClass="center-wrap" Visible="true">
+                            <div class="d-flex justify-content-around">
+                                 <GridCommandButton Title=@Translation["Delete"] Icon="@SvgIcon.Trash" OnClick="@((args)=> ShowModalDeleteAppkeys((AppKeysDtoResponse)args.Item))"></GridCommandButton>
+                            </div>
+                        </GridCommandColumn> *@
+                        <GridColumn Field="KeyName"
+                                    Title=@Translation["Name"]
+                                    Width="150px"
+                                    Filterable="true"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap" />
+                        <GridColumn Field="ActiveState"
+                                    Title=@Translation["Status"]
+                                    Width="150px"
+                                    Filterable="true"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap">
+                            <Template>
+                                @{
+                                    AppKeysDtoResponse rowData = (AppKeysDtoResponse)context;
+                                    if (rowData != null)
+                                    {
+                                        bool activeState = (bool)rowData.ActiveState!;
+                                        string active = activeState ? Translation["Enabled"] : Translation["Disabled"];
+                                        @active
+                                    }
+                                }
+                            </Template>
+                        </GridColumn>
+                        <GridColumn Field="Value1"
+                                    Title=@(Translation["Filter_Value"] + " 1")
+                                    Width="150px"
+                                    Filterable="true"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap" />
+                        <GridColumn Field="Value2"
+                                    Title=@(Translation["Filter_Value"] + " 2")
+                                    Width="150px"
+                                    Filterable="true"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap" />
+                        <GridColumn Field="Value3"
+                                    Title=@(Translation["Filter_Value"] + " 3")
+                                    Width="150px"
+                                    Filterable="true"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap" />
+                        <GridColumn Field="Value4"
+                                    Title=@(Translation["Filter_Value"] + " 4")
+                                    Width="150px"
+                                    Filterable="true"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    HeaderClass="center-wrap" />
+                        <GridColumn Field="CreateUser"
+                                    Title=@Translation["UserRecorded"]
+                                    Width="200px"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    Filterable="false" HeaderClass="center-wrap" />
+                        <GridColumn Field="CreateDate"
+                                    Title=@Translation["DateRecorded"]
+                                    Width="200px"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    Filterable="false" HeaderClass="center-wrap" />
+                        <GridColumn Field="UpdateUser"
+                                    Title=@Translation["UserUpdated"]
+                                    Width="200px"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    Filterable="false" HeaderClass="center-wrap" />
+                        <GridColumn Field="UpdateDate"
+                                    Title=@Translation["DateUpdated"]
+                                    Width="200px"
+                                    TextAlign="ColumnTextAlign.Center"
+                                    Filterable="false" HeaderClass="center-wrap" />
+
+                    </GridColumns>
+                </TelerikGrid>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose">
+
+</NotificationsComponentModal>

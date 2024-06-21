@@ -1,0 +1,114 @@
+﻿@page "/UserTraceability"
+@layout MainLayout
+
+<h3>@(Translation["Security"] + " - " + Translation["UserTraceability"])</h3>
+
+<div class="row d-flex flex-lg-row flex-column">
+    <div class="col-xl-3 mt-4">
+        <ButtonGroupComponent LabelText=@Translation["User"] InputPlaceholder="Seleccione usuario" BtnTitle=@Translation["SearchRecipients"] @bind-InputValue="@vUserSelected.UserName" BtnClassColor="btnStyle--primary"
+                              BtnClassModifiers="" BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="ShowUsersModal"></ButtonGroupComponent>
+    </div>
+    <div class="col-xl-2 mt-5">
+        <div class="col-md-8 d-flex flex-column justify-content-between ">
+            <label class="titulo-azul">Documentos gestión</label>
+            <div class="k-form k-form-md k-form-vertical">
+                <div class="k-form-field">
+                    <div class="k-form-field-wrap">
+                        <TelerikRadioGroup Data="@optionsRecordClosed"
+                                           Value="@ResponseRecordClosed"
+                                           Layout="@RadioGroupLayout.Horizontal"
+                                           ValueChanged="@( (string newValue) => OnValueChangedprocessDocument(newValue) )">
+                        </TelerikRadioGroup>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 button-pdt">
+        <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="Reset"></ButtonComponent>
+        <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Search"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="GetInformationDocumentUser"></ButtonComponent>
+    </div>
+</div>
+@if (viewUser)
+{
+    <div class="row mt-3 m-0">
+        <div class="card col-6">
+            <div class="col-12 d-flex mb-2 flex-column justify-content-around">
+                <label class="mt-2"><b>@Translation["User"]</b></label>
+                <label><b>@Translation["Manager"]:</b> @vUserSelected.UserName</label>
+                <label><b>@Translation["Position"]:</b> @vUserSelected.UserPosition</label>
+                <label><b>@Translation["AdministrativeUnit"]:</b> @vUserSelected.UserAdministrativeUnitName</label>
+                <label><b>@Translation["ProductionOffice"]:</b> @vUserSelected.UserProductionOfficeName</label>
+            </div>
+        </div>
+    </div>
+}
+
+@if (viewList)
+{
+    <div class="row mt-3 m-0">
+@*         <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText="Exportar a excel" BtnIcon="fa-solid fa-file-csv" BtnOnClick="ExportExel"></ButtonComponent> *@
+        <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText="Descargar documentos" BtnIcon="fa-regular fa-file-zipper" BtnOnClick="ExportDocumentsZip"></ButtonComponent>
+    </div>
+    <div class="row mt-3">
+        <TelerikGrid Data="documentList" PageSize="10"
+                     Resizable="true"
+                     SelectionMode="GridSelectionMode.None">
+            <GridToolBarTemplate>
+                <GridCommandButton Command="ExcelExport" Icon="@SvgIcon.FileExcel">@Translation["ExportToExcel"]</GridCommandButton>
+                <label class="k-checkbox-label"><TelerikCheckBox @bind-Value="@ExportAllPages" /> @Translation["ExportAllPages"]</label>
+            </GridToolBarTemplate>
+            <GridExport>
+                <GridExcelExport FileName="telerik-grid-export" AllPages="@ExportAllPages" OnBeforeExport="@OnBeforeExcelExport" />
+            </GridExport>
+            <GridColumns>
+                <GridCommandColumn Width="80px" Title=@Translation["File"] HeaderClass="center-wrap" Visible="true">
+                    <div class="d-flex justify-content-around">
+                        <GridCommandButton Icon="@SvgIcon.FileTxt" Title=@Translation["File"] OnClick="@((args)=> DownloadFile((DocumentDtoResponse)args.Item))"></GridCommandButton>
+                    </div>
+                </GridCommandColumn>
+                <GridColumn Field="ControlId"
+                            Title=@Translation["ControlID"]
+                            Width="150px"
+                            Filterable="true"
+                            TextAlign="ColumnTextAlign.Center"
+                            HeaderClass="center-wrap" />
+                <GridColumn Field="FilingCode"
+                            Title=@Translation["FilingNumber"]
+                            Width="150px"
+                            Filterable="true"
+                            TextAlign="ColumnTextAlign.Center"
+                            HeaderClass="center-wrap" />
+                <GridColumn Field="CreateDate"
+                            Title=@Translation["FilingDate"]
+                            Width="150px"
+                            Filterable="true"
+                            TextAlign="ColumnTextAlign.Center"
+                            HeaderClass="center-wrap" />
+                <GridColumn Field="DocDescription"
+                            Title=@Translation["Subject"]
+                            Width="150px"
+                            Filterable="true"
+                            TextAlign="ColumnTextAlign.Center"
+                            HeaderClass="center-wrap" />
+            </GridColumns>
+            <NoDataTemplate>
+                <img src="../img/noDataFound.png" width="8%" height="8%" />
+                <p> @Translation["NoGridInfo"]</p>
+            </NoDataTemplate>
+        </TelerikGrid>
+        <NewPaginationComponent @ref="paginationComponent" T="DocumentDtoResponse" M="DocumentUserQueryFilter" Filter="@filtro" Uri="@UriFilterDocs" PaginationInfo="@paginationInfo" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+    </div>
+}
+<NotificationsComponentModal @ref="notificationModal"></NotificationsComponentModal>
+@* <GenericSearchModal @ref="genericSearchModal" ConfigurationInUse="1" multipleSelection="false" showCopiesColumn="false"
+                    Title=@Translation["UserFinder"] OnStatusUserChanged="HandleUserSelectedChanged"></GenericSearchModal> *@
+<GenericUserSearchModal @ref="genericUserSearch" Title="@Translation["UserFinder"]" IsVisible="UserModalStatus"
+                        OnSelectedUserData="HandleUserChanged"
+                        TypeOfSearch="1"
+                        OnModalClosed="HandleModalUserClosed" Width="90%"
+                        AllowMultipleSelection="@false"
+                        IsValidateReplacements="@true"
+                        AllowToCheckReplament="@false"
+                        AllowCopiesSelection="@false">
+</GenericUserSearchModal>

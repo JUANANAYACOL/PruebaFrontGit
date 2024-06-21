@@ -1,0 +1,255 @@
+﻿
+.card-shadow {
+    border-radius: 5px;
+    background: #FFF;
+    box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.50) !important;
+    width: 100%;
+}
+
+.card-shadow-info {
+    border-radius: 8px;
+    background: #FFF;
+    box-shadow: 0px 4px 10px 0px rgba(0, 0, 0, 0.25);
+    box-sizing: border-box
+}
+
+.card-border-color-st {
+    border-left-color: #AB2222;
+    border-left-width: 10px;
+}
+
+.style-st {
+    color: #AB2222;
+    font-family: Roboto;
+    font-size: 42px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 30px;
+}
+
+.card-border-color-et {
+    border-left-color: #EAD519;
+    border-left-width: 10px;
+}
+
+.style-et {
+    color: #EAD519;
+    font-family: Roboto;
+    font-size: 42px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 30px;
+}
+
+.card-border-color-ep {
+    border-left-color: #41BAEA;
+    border-left-width: 10px;
+}
+
+.style-ep {
+    color: #41BAEA;
+    font-family: Roboto;
+    font-size: 42px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 30px;
+}
+
+.card-border-color-ge {
+    border-left-color: #82A738;
+    border-left-width: 10px;
+}
+
+.style-ge {
+    color: #82A738;
+    font-family: Roboto;
+    font-size: 42px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 30px;
+}
+
+.style-bg {
+    color: #636363;
+    font-family: Roboto;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 24px;
+    letter-spacing: -0.4px;
+}
+
+.Color-svg {
+    fill: #9D9D9C;
+}
+
+.card-border-color-st:hover {
+    border-radius: 8px;
+    background: #AB2222;
+    color: #FFF !important;
+}
+
+.style-st {
+    color: #FFF !important;
+}
+
+
+.Color-svg {
+    fill: #FFF !important;
+}
+
+}
+
+.card-border-color-et:hover {
+    border-radius: 8px;
+    background: #EAD519;
+    color: #FFF !important;
+}
+
+.style-et {
+    color: #FFF !important;
+}
+
+.Color-svg {
+    fill: #FFF !important;
+}
+
+}
+
+.card-border-color-ep:hover {
+    border-radius: 8px;
+    background: #41BAEA;
+    color: #FFF !important;
+}
+
+.style-ep {
+    color: #FFF !important;
+}
+
+.Color-svg {
+    fill: #FFF !important;
+}
+
+}
+
+.card-border-color-ge:hover {
+    border-radius: 8px;
+    background: #82A738;
+    color: #FFF !important;
+}
+
+.style-ge {
+    color: #FFF !important;
+}
+
+.Color-svg {
+    fill: #FFF !important;
+}
+
+}
+
+.card-border-color-dg-dc {
+    border-left-color: #AB2222;
+    border-left-width: 10px;
+}
+
+    .card-border-color-dg-dc:hover {
+        box-shadow: 0px 4px 10px 0px #CB4A33;
+        transform-origin: center center;
+        transform: scale(1.1);
+    }
+
+.style-dg-dc {
+    color: #CB4A33;
+    font-family: Roboto;
+    font-size: 42px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 30px;
+}
+
+
+
+.card-border-color-dg-dr {
+    border-left-color: #01B0B2;
+    border-left-width: 10px;
+}
+
+    .card-border-color-dg-dr:hover {
+        box-shadow: 0px 4px 10px 0px #01B0B2;
+        transform-origin: center center;
+        transform: scale(1.1);
+    }
+
+.style-dg-dr {
+    color: #01B0B2;
+    font-family: Roboto;
+    font-size: 42px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 30px;
+}
+
+.card-border-color-dg-da {
+    border-left-color: #92376F;
+    border-left-width: 10px;
+}
+
+    .card-border-color-dg-da:hover {
+        box-shadow: 0px 4px 10px 0px #92376F;
+        transform-origin: center center;
+        transform: scale(1.1);
+    }
+
+.style-dg-da {
+    color: #92376F;
+    font-family: Roboto;
+    font-size: 42px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 30px;
+}
+
+.card-border-color-dg-df {
+    border-left-color: #B8364F;
+    border-left-width: 10px;
+}
+
+    .card-border-color-dg-df:hover {
+        box-shadow: 0px 4px 10px 0px #B8364F;
+        transform-origin: center center;
+        transform: scale(1.1);
+    }
+
+.style-dg-df {
+    color: #B8364F;
+    font-family: Roboto;
+    font-size: 42px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 30px;
+}
+
+.card-border-color-dg-dfd {
+    border-left-color: #12A955;
+    border-left-width: 10px;
+}
+
+    .card-border-color-dg-dfd:hover {
+        box-shadow: 0px 4px 10px 0px #12A955;
+        transform-origin: center center;
+        transform: scale(1.1);
+    }
+
+.style-dg-dfd {
+    color: #12A955;
+    font-family: Roboto;
+    font-size: 42px;
+    font-style: normal;
+    font-weight: 700;
+    line-height: 30px;
+}
+
+.text-aend {
+    text-align: end !important;
+}

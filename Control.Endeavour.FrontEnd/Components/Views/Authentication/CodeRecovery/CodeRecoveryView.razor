@@ -1,0 +1,34 @@
+﻿<EditForm Model="@FormModel" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <NotificationsComponentModal @ref="NotificationModal"></NotificationsComponentModal>
+
+    <div class="row">
+        <div class="form-group mb-5 text-center col-12">
+            <LabelComponent KeyName=@Translation["VerificationCode"] For="name-field" FontSize="24px" IsBold="true" IsCentered="true" />
+        </div>
+        <div class="col-12 form-group mb-5">
+            <LabelComponent KeyName=@Translation["Code"] For="name-field" IsCentered="true" />
+        </div>
+    </div>
+
+    <div class="col-12 form-group text-center ">
+        <CodeInputComponent @ref="CodeInputComponent"></CodeInputComponent>
+    </div>
+    <TimerComponent TimeDuration="@(TimeSpan.FromSeconds(60))" ResendButtonText=@Translation["ResendCode"]  ReSenderCode="HandleOperationExcuted" />
+    <div class="row button-container">
+        <div class="col-12 text-center mt-5">
+            <button class="btnStyle btnStyle--ligthInLine btnStyle--h50 w-50" type="submit">@Translation["Send"]</button>
+        </div>
+    </div>
+    <div class="row login-prompt">
+        <div class="col-12 text-center">
+            <span class="login-text">@Translation["AlreadyHaveAccount"]</span>
+            <a href="#" class="login-link" onclick="@(() => ReturnLogin())">@Translation["GoBack"]</a>
+        </div>
+    </div>
+    <div class="col-12 text-center mt-5 mb-5">
+        <a href="/" class="btn rounded-pill text-white border border-white position-relative" style="background-color: transparent;" onclick="@(() => ReturnLogin())">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+</EditForm>

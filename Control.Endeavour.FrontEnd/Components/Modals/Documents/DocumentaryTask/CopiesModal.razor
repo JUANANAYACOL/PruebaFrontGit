@@ -1,0 +1,116 @@
+﻿<div class="my-modal">
+    <TelerikRootComponent>
+        <GenericModalComponent Title=@Translation["Copies"] IsVisible="modalStatus" Width="65%" OnModalClosed="HandleModalClosed">
+            <ChildContent>
+                <div class="row">
+                    <TelerikTabStrip PersistTabContent="true" @bind-ActiveTabIndex="@ActiveTabIndex">
+                        <TabStripTab Title=@Translation["Users"]>
+                            <div class="col-2">
+                                <div class="d-flex flex-column">
+                                    <ButtonComponent BtnDisabled="@seenCopys" BtnClassColor="btnStyle--primary" BtnIcon="fa-solid fa-user-plus" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["AddUser"] BtnOnClick="OpenNewModalUser"></ButtonComponent>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col">
+                                    <TelerikGrid Data="@userList" PageSize="@userList.Count()"
+                                                 Resizable="true"
+                                                 ScrollMode="@GridScrollMode.Scrollable"
+                                                 Height="460px"
+                                                 RowHeight="60"
+                                                 SelectionMode="GridSelectionMode.None">
+                                        <GridColumns>
+                                            <GridCommandColumn Width="110px" Title=@Translation["Delete"] HeaderClass="center-wrap" Visible="!seenCopys">
+                                                @{
+                                                    <div class="custom-style-grid d-flex justify-content-around">
+                                                        <GridCommandButton Title=@Translation["Delete"] Icon="@SvgIcon.Trash" OnClick="@((args)=> DeleteUser((UserClasification)args.Item))"></GridCommandButton>
+                                                    </div>
+                                                }
+                                            </GridCommandColumn>
+                                            <GridColumn>
+                                                <HeaderTemplate>
+                                                    <label> @Translation["User"] </label>
+                                                </HeaderTemplate>
+                                                <Template>
+                                                    @{
+                                                        var fileInfo = (UserClasification)context;
+                                                        <UserCardComponent FullName="@fileInfo?.FullName"
+                                                                           AdministrativeUnitName="@fileInfo?.AdministrativeUnitName" 
+                                                                           Positionname="@fileInfo?.Charge"
+                                                                           ProductionOfficeName="@fileInfo?.ProductionOfficeName">
+                                                        </UserCardComponent>
+                                                    }
+                                                </Template>
+                                            </GridColumn>
+                                        </GridColumns>
+                                    </TelerikGrid>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="d-flex flex-row justify-content-center mt-4">
+                                    <ButtonComponent BtnDisabled="@seenCopys" BtnClassColor="btnStyle--primary" BtnIcon="fa-solid fa-plus" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Add"] BtnOnClick="HandleCopys"></ButtonComponent>
+                                </div>
+                            </div>
+                        </TabStripTab>
+                        <TabStripTab Title=@Translation["Entities"]>
+                            <div class="col-2">
+                                <div class="d-flex flex-column">
+                                    <ButtonComponent BtnDisabled="@seenCopys" BtnClassColor="btnStyle--primary" BtnIcon="fa-solid fa-user-plus" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["AddEntity"] BtnOnClick="OpenNewModalUser"></ButtonComponent>
+                                </div>
+                            </div>
+                            <div class="row mt-4">
+                                <div class="col">
+                                    <TelerikGrid Data="@thirdList" PageSize="@thirdList.Count()"
+                                                 Resizable="true"
+                                                 ScrollMode="@GridScrollMode.Scrollable"
+                                                 Height="460px"
+                                                 RowHeight="60"
+                                                 SelectionMode="GridSelectionMode.None">
+                                        <GridColumns>
+                                            <GridCommandColumn Width="110px" Title=@Translation["Delete"] HeaderClass="center-wrap" Visible="!seenCopys">
+                                                @{
+                                                    <div class="custom-style-grid d-flex justify-content-around">
+                                                        <GridCommandButton Title=@Translation["Delete"] Icon="@SvgIcon.Trash" OnClick="@((args)=> DeleteThirdParty((AdministrationUsers)args.Item))"></GridCommandButton>
+                                                    </div>
+                                                }
+                                            </GridCommandColumn>
+                                            <GridColumn>
+                                                <HeaderTemplate>
+                                                    <label> @Translation["User"] </label>
+                                                </HeaderTemplate>
+                                                <Template>
+                                                    @{
+                                                        var fileInfo = (AdministrationUsers)context;
+                                                        <ThirdCardComponent IdentificationNumber="@fileInfo?.IdentificationNumber"
+                                                                            Names="@fileInfo?.FullName"
+                                                                            CompanyName="@fileInfo?.CompanyName"
+                                                                            Email="@fileInfo?.Email">
+                                                        </ThirdCardComponent>
+                                                    }
+                                                </Template>
+                                            </GridColumn>
+                                        </GridColumns>
+                                    </TelerikGrid>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="d-flex flex-row justify-content-center mt-4">
+                                    <ButtonComponent BtnDisabled="@seenCopys" BtnClassColor="btnStyle--primary" BtnIcon="fa-solid fa-plus" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Add"] BtnOnClick="HandleCopys"></ButtonComponent>
+                                </div>
+                            </div>
+                        </TabStripTab>
+                    </TelerikTabStrip>
+                </div>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+    <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+</div>
+@* <GenericSearchModal @ref="genericSearchModal" ConfigurationInUse=changeModal
+                    multipleSelection=true showCopiesColumn=false Title="@modalTitle" OnStatusMultipleUsersChanged="HandleUsersChanged"
+                    OnStatusChangedMultipleSelection="HandleThirdPartyChanged"></GenericSearchModal> *@
+<GenericUserSearchModal @ref="genericUserSearch" Title="@modalTitle" IsVisible="UserModalStatus"
+                        OnSelectedUserData="HandleSelectedUserData"
+                        TypeOfSearch="@changeModal"
+                        OnModalClosed="HandleModalUserClosed" Width="90%"
+                        AllowMultipleSelection="@true">
+</GenericUserSearchModal>

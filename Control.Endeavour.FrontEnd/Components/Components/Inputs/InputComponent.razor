@@ -1,0 +1,29 @@
+﻿@if (InputType == InputTypeEnum.Password || InputType == InputTypeEnum.UpdatePassword)
+{
+    <div class="input-group mb-3">
+        <input type="@inputType" @bind="inputValue" @oninput="OnInput" placeholder="@Translation[Placeholder]" class="form-control custom-input" @onfocus="ResetValidation" maxlength="@Length" required />
+        <span class="input-group-text password-toggle-container align-items-center span-custom-class">
+            <i class="@iconClass" @onclick="TogglePasswordVisibility"></i>
+        </span>
+    </div>
+}
+else
+{
+    <div class="input-group white-border py-1 rounded-3">
+        <input type="@InputType" @bind="inputValue" @oninput="OnInput" placeholder="@Translation[Placeholder]" class="form-control custom-input" @onfocus="ResetValidation" maxlength="@Length" required />
+    </div>
+}
+@if (ShowErrors && InputType != InputTypeEnum.UpdatePassword)
+{
+    <span class="red">@Translation[ErrorMessage]</span>
+}
+else if (ShowErrors && InputType == InputTypeEnum.UpdatePassword)
+{
+    <div class="text-white">
+        @Translation["PasswordMustContain"]
+        <p class="@mayus mb-1">@Translation["OneCapitalLetter"]</p>
+        <p class="@number mb-1">@Translation["OneNumber"]</p>
+        <p class="@specialC mb-1">@Translation["OneSpecialCharacter"] /-*.</p>
+        <p class="@lenghtC mb-1">@Translation["MinimumCharacters"]</p>
+    </div>
+}

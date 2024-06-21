@@ -1,0 +1,61 @@
+﻿.custom-input {
+    background-color: transparent !important;
+    border: 3px solid #fff !important;
+    color: #fff;
+    transition: border-color 0.3s ease-in-out;
+    box-shadow: none;
+}
+
+    .custom-input:required:invalid {
+        border-color: #FF7A00 !important;
+    }
+
+    .custom-input:focus {
+        border-color: #fff !important; /* Cambia el color del borde de nuevo a blanco cuando el campo está enfocado */
+    }
+
+
+.custom-input-container {
+    position: relative;
+    margin-bottom: 1rem; /* Espacio entre contenedores */
+}
+
+/* Aplica bordes curvos a todos los elementos de formulario */
+.form-control {
+    border-radius: 12px !important; /* Borde curvo */
+}
+
+/* Estilos para el botón de alternar contraseña */
+.password-toggle-container {
+    position: absolute;
+    right: 6px;
+    top: 7px;
+    background: transparent;
+    color: white;
+    border: none;
+}
+
+    .password-toggle-container i {
+        cursor: pointer;
+        background-color: transparent;
+    }
+
+.span-custom-class {
+    background: transparent;
+    color: white;
+    border: none;
+    position: absolute;
+    right: 6px;
+    top: 7px;
+}
+
+input {
+    margin: 0px !important;
+    width: 100% !important;
+}
+
+.password-toggle-container i {
+    cursor: pointer;
+    background-color: transparent;
+    z-index: 1000;
+}

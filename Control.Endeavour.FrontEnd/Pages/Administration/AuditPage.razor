@@ -1,0 +1,149 @@
+﻿@page "/Audit"
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.Audit.Request;
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.Audit.Response;
+@layout MainLayout;
+
+<div class="container-fluid mt-5">
+    <!-- Parte 1: Título y Contenido alineado a la izquierda -->
+    <div class="row">
+        <div class="col-8">
+            <h1>@(Translation["Administration"] + " - " + Translation["AuditorControldoc"])</h1>
+        </div>
+    </div>
+    <div class="row titulo">
+
+        <div class="col-lg-12">
+            <h6 class="titulo-azul"> @Translation["SearchByFilters"]:</h6>
+        </div>
+
+        <div class="col-lg-3">
+            <InputModalComponent @ref="detailInput" @bind-InputValue="detail" LabelText=@Translation["Filter_StringContains"] Placeholder=@Translation["Content"] />
+        </div>
+        <div class="col-lg-3">
+            <label class="mb-2">@Translation["Since"]</label>
+            <TelerikDatePicker @bind-Value="@from"
+                               Format="MM/dd/yyyy"
+                               ShowWeekNumbers="false">
+
+            </TelerikDatePicker>
+        </div>
+        <div class="col-lg-3">
+            <label class="mb-2">@Translation["To"]</label>
+            <TelerikDatePicker @bind-Value="@to"
+                               Format="MM/dd/yyyy"
+                               ShowWeekNumbers="false">
+
+            </TelerikDatePicker>
+        </div>
+        <div class="col-lg-3">
+            <div class="from-group from-group--margin-top justify-content-center">
+
+                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="OnClickReset"></ButtonComponent>
+                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Search"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="OnClickSearch"></ButtonComponent>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Parte 3: Grilla -->
+    <div class="row mt-4">
+        <div class="col">
+
+
+            <TelerikGrid Data="vWLogsAuditDtoBugList" PageSize="10"
+                         Sortable="true"
+                         FilterMode="GridFilterMode.FilterMenu"
+                         Resizable="true"
+                         Reorderable="false"
+                         EditMode="GridEditMode.Popup"
+                         SelectionMode="GridSelectionMode.None">
+                <GridColumns>
+                    <GridColumn Field="Date"
+                                Title=@Translation["Date"]
+                                Width="170px"
+                                Filterable="true"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="UserName"
+                                Title=@Translation["User"]
+                                Width="170px"
+                                Filterable="true"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="LogType"
+                                Title=@Translation["AuditType"]
+                                Width="150px"
+                                Filterable="true"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="Ip"
+                                Title="LAN"
+                                Width="150px"
+                                Filterable="true"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="Script"
+                                Title="SQL"
+                                Width="150px"
+                                Filterable="true"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="Params"
+                                Title=@Translation["Parameters"]
+                                Width="150px"
+                                Filterable="true"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="Method"
+                                Title=@Translation["Method"]
+                                Width="150px"
+                                Filterable="true"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="Message"
+                                Title=@Translation["Comment"]
+                                Width="210px"
+                                Filterable="true"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="Detail"
+                                Title=@Translation["Content"]
+                                Width="150px"
+                                Filterable="true"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="MessageError"
+                                Title=@Translation["ErrorMessage"]
+                                Width="150px"
+                                Filterable="true"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="ErrorType"
+                                Title=@Translation["ErrorType"]
+                                Width="150px"
+                                Filterable="true"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="Exception"
+                                Title=@Translation["Exception"]
+                                Width="150px"
+                                Filterable="true"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                </GridColumns>
+
+                <NoDataTemplate>
+                    <img src="../img/noDataFound.png" width="8%" height="8%" />
+                    <p> @Translation["NoGridInfo"]</p>
+                </NoDataTemplate>
+            </TelerikGrid>
+        </div>
+    </div>
+
+
+    <!-- Parte 4: Botones en la izquierda, centro y derecha -->
+        @if (dataChargue)
+    {
+        <NewPaginationComponent @ref="paginationComponent" T="VWLogsAuditDtoBugResponse" M="LogByFilterDtoRequest" Uri="@UriFilterLogs" Filter="@auditFilterDtoRequest" PaginationInfo="@paginationInfo" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+    }
+</div>

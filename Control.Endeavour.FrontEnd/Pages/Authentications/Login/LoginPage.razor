@@ -1,0 +1,40 @@
+﻿@page "/"
+@layout LoginLayout
+
+@switch (AuthenticationStateContainer?.SelectedComponent)
+{
+    case "Login":
+        <LoginView/>
+        break;
+
+    case "ChangePassword":
+        <ChangePasswordView>
+
+        </ChangePasswordView> 
+        break;
+    case "CodeRecovery":
+        <CodeRecoveryView>
+
+        </CodeRecoveryView> 
+        break;
+    case "Register":
+@*         <Register>
+
+        </Register> *@
+        break;
+    case "PasswordRecovery":
+         <PasswordRecoveryView>
+
+        </PasswordRecoveryView> 
+        break;
+
+    case "Multisession":
+        <MultisessionView>
+
+        </MultisessionView> 
+        break;
+    default:
+        <LoginView/>
+        break;
+}
+

@@ -1,0 +1,18 @@
+﻿<div class="d-flex flex-column align-items-center timer">
+    @if (isButtonDisabled)
+    {
+        <span class="time">
+            @Translation["RequestAnotherCodeIn"]
+            @timeLeft.ToString(@"mm\:ss")
+        </span>
+    }
+    else
+    {
+        <a href="" @onclick:preventDefault @onclick="ReSendTaskEvent" class="resend-link active">
+            @Translation[ResendButtonText]
+        </a>
+    }
+</div>
+
+
+<NotificationsComponentModal @ref="NotificationModal"></NotificationsComponentModal>

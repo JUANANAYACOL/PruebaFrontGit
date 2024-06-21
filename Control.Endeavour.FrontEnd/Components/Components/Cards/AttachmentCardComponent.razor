@@ -1,0 +1,30 @@
+﻿
+<div class="row">
+    <div class="d-flex flex-column align-items-start">
+        <div class="col">
+            <label><b>@Translation["File"]: </b></label>
+            <label>@ArchiveName</label>
+        </div>
+        <div class="col">
+            <label> <b>@Translation["AnnexType"]: </b></label>
+            <label>@ArchiveExt</label>
+        </div>
+        <div class="col">
+            <label> <b>@Translation["Description"]: </b></label>
+            <label>@AttDescription</label>
+        </div>
+        @if (!string.IsNullOrEmpty(CreateUser) && !string.IsNullOrEmpty(CreateDate))
+        {
+            <div class="col">
+                <label> <b>@Translation["UpdatedBy"]: </b></label>
+                <label>@CreateUser</label>
+            </div>
+            <div class="col">
+                <label> <b>@Translation["Date"]: </b></label>
+                <label>@CreateDate</label>
+            </div>
+        }
+    </div>
+</div>
+
+

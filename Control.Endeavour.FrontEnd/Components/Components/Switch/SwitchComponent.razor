@@ -1,0 +1,23 @@
+﻿<!-- Switch.razor -->
+
+<div class="row Switch align-items-center">
+
+    <div class="col-md-5 switch-container @(CurrentValue ? "active" : "")" style="width: @Width; height: @Height; @(CurrentValue ? $"background-color: {BackgroundColorActive};" : $"background-color: {BackgroundColorDisabled};")" @onclick="ToggleSwitch">
+        <div class="switch-toggle @(CurrentValue ? "active" : "")"></div>
+
+        @if (ShowText)
+        {
+            <div class="row">
+                <p class="col-md-2 word-in-container" style="color:@ColorValueYes ;margin-left: 6px; margin-top: 6px; font-size:@SizeValueYes; font-family:@FontFamilyValueYes;">@(ValueYes)</p>
+                <p class="col-md-2 word-in-container" style="color:@ColorValueNot; margin-left: 6px; margin-top: 6px; font-size:@SizeValueNot; font-family:@FontFamilyValueNot;">@(ValueNot)</p>
+            </div>
+
+        }
+    </div>
+    <div class="col-md-5 d-flex align-items-center">
+
+        <p style="color:@ColorTextState; margin-top: 1rem; font-size:@SizeTextState; font-family:@FontFamilyTextState;">@(CurrentValue ? Translation[TextStateActive] : Translation[TextStateDisabled])</p>
+
+    </div>
+
+</div>

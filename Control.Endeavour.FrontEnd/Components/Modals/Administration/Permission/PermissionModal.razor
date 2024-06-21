@@ -1,0 +1,113 @@
+﻿
+<div class="my-modal">
+    <TelerikRootComponent>
+
+        <GenericModalComponent Title=@(Translation["Administration"] + " - " + Translation["Permissions"]) IsVisible="ModalStatusPermisos" Width="40%" OnModalClosed="HandleModalClosed">
+            <ChildContent>
+
+                <div class="row">
+                    <!-- Parte Izquierda: Input y Label -->
+                    <div class="col align-self-center">
+                        <div class="input-container">
+                            <label for="input1">@Translation["Features"]</label>
+                        </div>
+
+                        <TelerikDropDownList @ref="@SelectDropdown"
+                                             Data="@FuncionalidadList"
+                                             @bind-Value="@FunctionalityId"
+                                             TextField="Functionality1"
+                                             ValueField="FunctionalityId"
+                                             DefaultText="@DefaultTextGrid"
+                                             Enabled="habilitarFuncionalidad"
+                                             OnChange="GetFuncionality"
+                                             Filterable="true"
+                                             FilterOperator="StringFilterOperator.Contains">
+                        </TelerikDropDownList>
+                    </div>
+
+
+                </div>
+                <br />
+                <div class="row ">
+
+                    <div class="d-flex flex-column  ">
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>Con acceso</label>
+                            </div>
+                            <div class="col-md-2">
+                                <TelerikSwitch @bind-Value="@SelectAccessF" OnLabel="" OffLabel="" Class="mt-2"></TelerikSwitch>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>Guardar</label>
+                            </div>
+                            <div class="col-md-2">
+                                <TelerikSwitch @bind-Value="@SelectCreateF" OnLabel="" OffLabel="" Class="mt-2"></TelerikSwitch>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>Modificación de registro</label>
+                            </div>
+                            <div class="col-md-2">
+                                <TelerikSwitch @bind-Value="@SelectModifyF" OnLabel="" OffLabel="" Class="mt-2"></TelerikSwitch>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>Consultar</label>
+                            </div>
+                            <div class="col-md-2">
+                                <TelerikSwitch @bind-Value="@SelectConsultF" OnLabel="" OffLabel="" Class="mt-2"></TelerikSwitch>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>Eliminar</label>
+                            </div>
+                            <div class="col-md-2">
+                                <TelerikSwitch @bind-Value="@SelectDeleteF" OnLabel="" OffLabel="" Class="mt-2"></TelerikSwitch>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>Imprimir</label>
+                            </div>
+                            <div class="col-md-2">
+                                <TelerikSwitch @bind-Value="@SelectPrintF" OnLabel="" OffLabel="" Class="mt-2"></TelerikSwitch>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label>Activo</label>
+                            </div>
+                            <div class="col-md-2">
+                                <TelerikSwitch @bind-Value="@SelectActivoState" OnLabel="" OffLabel="" Class="mt-2"></TelerikSwitch>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                    <br />
+                    <div class="row align-self-center mt-5">
+                        <!-- Parte Derecha: Dos Botones -->
+                        <div class="col">
+                            <div class="text-center">
+                                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button"  BtnIcon="fa-solid fa-floppy-disk" BtnOnClick="Guardar"></ButtonComponent>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+
+</div>

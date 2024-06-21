@@ -1,0 +1,65 @@
+﻿<div class="UploadPDFAutomaticIndexingModal">
+    <NotificationsComponentModal @ref="NotificationModal"></NotificationsComponentModal>
+    <TelerikRootComponent>
+        <GenericModalComponent Title="@Title" IsVisible="ModalStatus" OnModalClosed="HandleModalClosed" Width="55%">
+            <ChildContent>
+
+                <div class="container-fluid mt-1">
+                    <div class="row d-flex justify-content-center">
+                        <div class="col-lg-11 mb-3 mt-1 @UploadPDF">
+                            <label class="noti-2">@FormatMessage:</label>
+                        </div>
+
+                        <div class="col-lg-11 @UploadPDF">
+                            <DragAndDropTemplateComponent AllowedExtensions="@AllowedExtensions" MaxFileCount="1" MaxFileSizeMB="@FileSize" OnFileListChanged="HandleFile"></DragAndDropTemplateComponent>
+                            <span class="red-noti mt-5">@AlertMessage</span>
+                        </div>
+
+                        <div class="col-lg-11 mt-2 @ViewPDF">
+
+                            <TelerikPdfViewer @ref="@PdfViewerRef"
+                                              Width="100%"
+                                              Height="50vh"
+                                              Data="@FileData">
+                                <PdfViewerToolBar>
+                                    <PdfViewerToolBarSelectionTool />
+                                    <PdfViewerToolBarSeparator />
+                                    <PdfViewerToolBarSearchTool />
+                                    <PdfViewerToolBarSeparator />
+                                    <PdfViewerToolBarSpacer />
+                                    <PdfViewerToolBarPagerTool />
+                                    <PdfViewerToolBarSpacer />
+                                    <PdfViewerToolBarSeparator />
+                                    <PdfViewerToolBarZoomTool />
+                                </PdfViewerToolBar>
+                            </TelerikPdfViewer>
+
+                            <label class="noti-2 mt-3 @UploadPDF">@Translation["DisplayedPdfAICorrectMessage"]:</label>
+                        </div>
+
+                        <div class="col-lg-4 mt-4 @ViewDate">
+                            <label class="titulo-azul">@LabelText: <span class="red">*</span></label>
+                        </div>
+
+                        <div class="col-lg-4 mt-4 @ViewDate">
+                            <TelerikDatePicker Class="table-act__datepicker DisabledInput"
+                            @bind-Value="FechaDoc"
+                                               Format="MM/dd/yyyy"
+                                               ShowWeekNumbers="false"
+                                               OnChange="@DisabledAutomaticIndexing"
+                                               Max="@DateTime.Now" Enabled="FileData!=null">
+                            </TelerikDatePicker>
+                        </div>
+
+                        <div class="col-lg-11 d-flex justify-content-center mt-4 @ViewPDF ">
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="btnStyle--Verify" BtnType="button" BtnText="@BtnText" BtnOnClick="HandleAutomaticIndexing" BtnIcon="fa-regular fa-pen-to-square" BtnDisabled="@Disabled" BtnVisible="ButtonVisblefiling"></ButtonComponent>
+                        </div>
+
+
+                    </div>
+                </div>
+
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>

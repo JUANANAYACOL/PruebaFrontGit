@@ -1,0 +1,27 @@
+﻿
+@if (!String.IsNullOrEmpty(LabelText))
+{
+    <label class="mb-2">@LabelText 
+        @if (InputRequired)
+        {
+            <span class="red">*</span>
+        }
+    </label>
+    <div class="from-group">
+        <input class="inputBtnGroup" placeholder="@InputPlaceholder" readonly @attributes="GetInputAttributes()" @bind-value="InputValue" @bind-value:event="oninput" />
+        <button class="btnStyle btnStyle--Group @BtnClassColor @BtnClassModifiers" type="button" @onclick="OnClickBtnMethod" title="@BtnTitle">
+            <i class="fas @BtnIcon"></i>
+        </button>
+    </div>
+}else{
+    <div class="from-group">
+        <input class="inputBtnGroup" placeholder="@InputPlaceholder" readonly @attributes="GetInputAttributes()" @bind-value="InputValue" @bind-value:event="oninput" />
+        <button class="btnStyle btnStyle--Group @BtnClassColor @BtnClassModifiers" type="button" @onclick="OnClickBtnMethod" title="@BtnTitle">
+            <i class="fas @BtnIcon"></i>
+        </button>
+    </div>
+}
+
+
+
+

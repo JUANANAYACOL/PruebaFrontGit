@@ -1,0 +1,217 @@
+﻿@page "/CreateDocumentaryTask"
+@layout MainLayout
+
+<AIServiceModal @ref="AIServiceModal" AIresponse="HandleAIResponseAsync"></AIServiceModal>
+
+<div class="container-fluid mt-1">
+
+    <div class="row titulo">
+        <div class="col-11">
+            <h3>@Translation["DocumentCreation"]</h3>
+        </div>
+        @if (panel_Radicado)
+        {
+            <div class="col-12 col-md">
+                <h3 class="mb-0 titulo-azul">@Translation["FilingResponse"]: @filingCode</h3>
+            </div>
+        }
+    </div>
+
+    <div class="row d-flex align-items-around">
+        <FormatMasterListModal @ref="formatMasterListModal" OnStatusChanged="HandleSelectedFile"></FormatMasterListModal>
+        <div class="col-lg-6 col-xl-2 col-md-6 col-sm-12 panelDoc">
+            <div class="row">
+                <div class="col-xl-2 d-flex justify-content-center align-items-center pasos-mgt">
+                    <div class="numero"><h2>1</h2></div>
+                </div>
+                <div class="col-xl-10 panelDoc">
+                    <h5 class="panelDoc__Titulo">@Translation["SelectedTemplate"]</h5>
+                    <div class="d-flex justify-content-center">
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Grid_Select"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="ShowFormatMasterModal"></ButtonComponent>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (panel_2)
+        {
+            <div class="col-lg-6 col-xl-2 col-md-6 col-sm-12 panelDoc">
+                <DocumentClasificationModal @ref="documentClasificationModal" DocClasification="HandleDocumentClasification"></DocumentClasificationModal>
+                <div class="row">
+                    <div class="col-xl-2 d-flex justify-content-center align-items-center pasos-mgt">
+                        <div class="numero"><h2>2</h2></div>
+                    </div>
+                    <div class="col-xl-10 panelDoc">
+                        <h5 class="panelDoc__Titulo">@Translation["ClassifyDocument"]</h5>
+                        @if (!panel_Radicado)
+                        {
+                            <div class="d-flex justify-content-center">
+                                <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Classify"] BtnIcon="fa-solid fa-list-check" BtnOnClick="ShowDocClasificationModal"></ButtonComponent>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="d-flex justify-content-center">
+                                <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Classify"] BtnIcon="fa-solid fa-list-check" BtnOnClick="ShowDocClasificationMT"></ButtonComponent>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+        @if (panel_3)
+        {
+            <div class="col-lg-6 col-xl-2 col-md-6 col-sm-12 panelDoc">
+                <div class="row">
+                    <div class="col-xl-2 d-flex justify-content-center align-items-center pasos-mgt">
+                        <div class="numero"><h2>3</h2></div>
+                    </div>
+                    <div class="col-xl-10 d-flex flex-column align-items-center">
+                        <h5 class="panelDoc__Titulo">@Translation["ActionToTake"]</h5>
+@*                         <div class="d-flex justify-content-center">
+                            <TelerikDropDownList Data="@systemFieldsTAINSList"
+                                                 Value="@ProcessCode"
+                                                 Id="CD_Action"
+                                                 Width="150px"
+                                                 DefaultText=@Translation["Action"]
+                                                 TextField="Value"
+                                                 ValueField="FieldCode"
+                                                 Filterable="true"
+                                                 ValueChanged="@( (string newValue) => CallAction(newValue) )">
+                            </TelerikDropDownList>
+                        </div> *@
+                        <div class="dropdown">
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="btn-absolute" BtnType="button" BtnText="@action" BtnIcon="@iconAction" BtnOnClick="() => ToggleDropdown(ref isDropdownOpen,ref DropdownMenuRecords)"></ButtonComponent>
+                            <ul class="@DropdownMenuRecords">
+                                <li class="pt-1 pb-1 " @onclick="(e) => ToggleDropdown(ref isDropdownOpen,ref DropdownMenuRecords)">
+                                    <a class="dropdown-item cursor-pointer-class" @onclick="(e) => CallAction(systemFieldsTAINSList[0].FieldCode)"> <i class="fa-solid fa-paper-plane me-2 ml-10"></i>@systemFieldsTAINSList[0].Value </a>
+
+                                </li>
+                                <li class="pt-1 pb-1 " @onclick="(e) => ToggleDropdown(ref isDropdownOpen,ref DropdownMenuRecords)">
+                                    <a class="dropdown-item cursor-pointer-class" @onclick="(e) => CallAction(systemFieldsTAINSList[1].FieldCode)"> <i class="fa-solid fa-pen-to-square me-2 ml-10"></i>@systemFieldsTAINSList[1].Value </a>
+
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (panel_4)
+        {
+            <div class="col-lg-6 col-xl-2 col-md-6 col-sm-12 panelDoc">
+                <SendDocumentModal @ref="sendDocumentsModal" OnStatusChanged="HandleSendDocuments"></SendDocumentModal>
+                <div class="row">
+                    <div class="col-xl-2 d-flex justify-content-center align-items-center pasos-mgt">
+                        <div class="numero"><h2>4</h2></div>
+                    </div>
+                    <div class="col-xl-10 panelDoc">
+                        <h5 class="panelDoc__Titulo">@panelTitle</h5>
+                        <div class="d-flex justify-content-center">
+                            @if (panelTitle.Equals(@Translation["ButtonSend"]))
+                            {
+                                <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText="@panelButton" BtnIcon="fa-solid fa-paper-plane" BtnOnClick="ShowSendDocsModal"></ButtonComponent>
+                            }
+                            else
+                            {
+                                <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText="@panelButton" BtnIcon="fa-solid fa-pen-to-square" BtnOnClick="CreateDocumentTask"></ButtonComponent>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        @if (panel_3)
+        {     
+@*             <div class="col-lg-4">
+
+                <CopiesModal @ref="copyModal" OnStatusChanged="HandleCopys"></CopiesModal>
+                <DocumentRelationModal @ref="docRelationModal" OnStatusChanged="HandleDocumentRelation" Title="@title"></DocumentRelationModal>
+                <AttachmentsModal @ref="attachmentsModal" OnStatusChanged="HandleAttachmentList"></AttachmentsModal>
+                <div class="row d-flex align-items-center mt-4 pasos-mgt">
+                    <div class="col-md-3 d-flex justify-content-center">
+                        @if (!panel_Radicado)
+                        {
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Link"] BtnIcon="fa-solid fa-link" BtnOnClick="ShowDocRelationModal"></ButtonComponent>
+                        }else
+                        {
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Link"] BtnIcon="fa-solid fa-link" BtnOnClick="ShowDocRelationMT"></ButtonComponent>
+                        }
+
+                    </div>
+                    <div class="col-md-3 d-flex justify-content-center">
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Copies"] BtnIcon="fa-regular fa-copy" BtnOnClick="ShowCopiesModal"></ButtonComponent>
+                    </div>
+                    <div class="col-md-3 d-flex justify-content-center">
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Archive"] BtnIcon="fa-solid fa-file-zipper"></ButtonComponent>
+                    </div>
+                    <div class="col-md-3 d-flex justify-content-center">
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Attach"] BtnIcon="fa-solid fa-paperclip" BtnOnClick="ShowAttachmentModal"></ButtonComponent>
+                    </div>
+                </div>
+            </div> *@
+            <div class="col-lg-6 col-xl-2 col-sm-12 panelDoc">
+                <CopiesModal @ref="copyModal" OnStatusChanged="HandleCopys"></CopiesModal>
+                <DocumentRelationModal @ref="docRelationModal" OnStatusChanged="HandleDocumentRelation" Title="@title"></DocumentRelationModal>
+                <AttachmentsModal @ref="attachmentsModal" OnStatusChanged="HandleAttachmentList"></AttachmentsModal>
+                <div class="row">
+                    <div class="col-xl-2 d-flex justify-content-center align-items-center pasos-mgt">
+                        <div class="numero"><i class="fa-solid fa-layer-group"></i></div>
+                    </div>
+                    <div class="col-xl-10 d-flex flex-column align-items-center">
+                        <h5 class="panelDoc__Titulo">@Translation["AdditionalActions"]</h5>
+                        <div class="dropdown">
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="btn-absolute" BtnType="button" BtnText=@Translation["Actions"] BtnIcon="fa-solid fa-layer-group" BtnOnClick="() => ToggleDropdown(ref isDropdownActionOpen,ref DropdownActions)"></ButtonComponent>
+                            <ul class="@DropdownActions">
+                                @if (!panel_Radicado)
+                                {
+                                    <li class="pt-1 pb-1">
+                                        <a class="dropdown-item cursor-pointer-class" @onclick="ShowDocRelationModal"><i class="fa-solid fa-link me-2 ml-10"></i>@Translation["Link"]</a>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li class="pt-1 pb-1">
+                                        <a class="dropdown-item cursor-pointer-class" @onclick="ShowDocRelationMT"><i class="fa-solid fa-link me-2 ml-10"></i>@Translation["Link"]</a>
+                                    </li>
+                                }
+                                <li class="pt-1 pb-1 ">
+                                    <a class="dropdown-item cursor-pointer-class" @onclick="ShowCopiesModal"><i class="fa-solid fa-copy me-2 ml-10"></i>@Translation["Copies"]</a>
+                                </li>
+@*                                 <li class="pt-1 pb-1">
+                                    <a class="dropdown-item cursor-pointer-class"> <i class="fa-solid fa-file-zipper me-2 ml-10"></i>@Translation["Archive"]</a>
+                                </li> *@
+                                <li class="pt-1 pb-1 ">
+                                    <a class="dropdown-item cursor-pointer-class" @onclick="ShowAttachmentModal"> <i class="fa-solid fa-paperclip me-2 ml-10"></i>@Translation["Attach"]</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }       
+    </div>
+    <div class="row text-center p-5">
+        @if (panel_2 && MT_value)
+        {
+            <SecondPasswordModal @ref="modalSecondPass" OnStatusChanged="HandleValidatePasswordAsync"></SecondPasswordModal>
+            <DxRichEdit @ref="@richEditControl" @bind-Selection="@selection" CustomizeRibbon="OnCustomizeRibbon" DocumentContentChanged="OnDocumentContentChanged" />
+        }
+    </div>
+</div>
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleNotiCloseModal" Width="600px">
+    <Body>
+        <div class="card custom-card mt-2">
+            <div class="row p-2">
+                <label><b>@Translation["Action"]: </b>@action</label>
+                <label><b>@Translation["ComunicationClass"]: </b>@docClasContainer.ComunicationClass</label>
+                <label><b>@Translation["DocumentaryTypology"]: </b>@docClasContainer.TypologyName</label>
+                <label><b>@Translation["Recipient"]: </b>@destinationsNames</label>
+                <label><b>@Translation["SentTo"]: </b>@sendDocumentContainer.Recivers.UserName</label>
+                <label><b>@Translation["Instruction"]: </b>@sendDocumentContainer.InstructionName</label>
+                <label><b>@Translation["Observations"]: </b>@sendDocumentContainer.Description</label>
+            </div>
+        </div>
+    </Body>
+</NotificationsComponentModal>
+<NotificationsComponentModal @ref="notificationModal2" OnModalClosed="HandleSecondNotiCloseModal"></NotificationsComponentModal>

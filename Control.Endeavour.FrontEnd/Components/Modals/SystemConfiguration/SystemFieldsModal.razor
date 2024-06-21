@@ -1,0 +1,49 @@
+﻿<div class="my-modal">
+    <TelerikRootComponent>
+        <GenericModalComponent Title=@(Translation["Administration"] + " - " + Translation["GeneralParametersAdministration"]) IsVisible="modalStatus" OnModalClosed="HandleModalClosed" Width="60%">
+            <ChildContent>
+                    <EditForm Model="@systemFieldsDtoRequest" OnValidSubmit="HandleValidSubmit">
+                        
+                        <div class="row p-2">
+                            <div class="col-md-6 mb-2">
+                                <InputModalComponent @ref="inputCode" MethodValueChanged="ValidateEnableButton" @bind-InputValue="systemFieldsDtoRequest.Code" LabelText=@(Translation["Code"]+":") Placeholder=@Translation["EnterCode"] FieldType="InputModalTypeEnum.Code" IsRequired="true" IsDisabled="@IsDisabledCode" InputMaxLength="5"></InputModalComponent>
+                            </div>
+                        
+                            
+                                <div class="col-md-6 d-flex align-items-end justify-content-end">
+                                    <div class="px-2">
+                                        <TelerikSwitch @bind-Value="@systemFieldsDtoRequest.ActiveState" />
+                                    </div>
+                                    <div class="px-2">
+                                    @(systemFieldsDtoRequest.ActiveState ? Translation["Enabled"] : Translation["Disabled"])
+                                    </div>
+
+                                </div>
+                            
+                        
+                        </div>
+                        <div class="row p-2">
+                        <label class="mb-2">@Translation["EnterTheValue"]:<span class="red">*</span> <span style="color: gray">@string.Format(Translation["CharactersOutOf"], characterCounterValue, "200")</span></label>
+                            <div class="px-2">
+                                <textarea class="w-100 custom-textarea custom-textare-noresize mb-2" required placeholder="" maxlength="200" @bind="systemFieldsDtoRequest.Value" @oninput="@(e => CountCharacters(e,ref characterCounterValue,"1"))"></textarea>
+                            </div>
+                        </div>
+                        <div class="row p-2">
+                        <label class="mb-2">@Translation["EnterComment"]: <span style="color: gray">@string.Format(Translation["CharactersOutOf"], characterCounterComment, "200")</span> </label>
+                            <div class="px-2">
+                                <textarea class="w-100 custom-textarea custom-textare-noresize mb-2" placeholder="" maxlength="200" @bind="systemFieldsDtoRequest.Coment" @oninput="@(e => CountCharacters(e,ref characterCounterComment,"2"))"></textarea>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="from-group from-group--margin-top justify-content-center">
+                                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="ResetForm"></ButtonComponent>
+                                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="submit" BtnDisabled="@enableButton" BtnIcon="fa-solid fa-floppy-disk"></ButtonComponent>
+                            </div>
+                        </div>
+                    </EditForm>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>
+
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>

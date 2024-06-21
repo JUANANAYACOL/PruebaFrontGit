@@ -1,0 +1,17 @@
+﻿
+.address-container {
+    height: 57.6px;
+    padding: 0px 20px 0px 20px;
+    width: auto;
+    font-size: 16px;
+    border-radius: 10px;
+    border: 1px solid;
+}
+
+
+.address-container--primaryInLine {
+    background-color: transparent;
+    color: var(--color-btnPrimary);
+    border: 1px solid var(--color-btnPrimary);
+}
+

@@ -1,0 +1,5 @@
+﻿.btnStyle--HeightAuto {
+    min-height: 38px;
+    height: auto;
+    z-index: 2000;
+}

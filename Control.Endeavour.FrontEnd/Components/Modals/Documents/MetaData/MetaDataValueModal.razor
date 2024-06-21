@@ -1,0 +1,140 @@
+﻿<div class="my-modal">
+    <TelerikRootComponent>
+        <GenericModalComponent Title="@Title" IsVisible="modalStatus" OnModalClosed="HandleModalClosed" Width="60%">
+            <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+            <GenericSearchModal @ref="serachModal" OnStatusMultipleUsersChanged="HandleUsersSelected" OnStatusThirdPartyChanged="HandleThirdPartySelected" hasEmailThirdUsers="true" hasEmailUsers="true" multipleSelection="multipleSelection" ConfigurationInUse="configurationInUse" Title=@(Translation["Comunications"] + " - " + Translation["FilingCommunicationReceived"])></GenericSearchModal>
+            <div class="mx-4 my-3">
+                <div class="row mb-2">
+                    <div class="col-lg-12 mb-2">
+                        <label>@Translation["Metadata"]: <label> @metaDataSelected.NameMetaField</label> </label>
+                    </div>
+                    <div class="col-lg-12 mb-2">
+                        <label>@Translation["Datatype"]: <label> @metaDataSelected.FieldTypeValue</label> </label>
+                    </div>
+                    <div class="col-lg-12 mb-2 d-flex @showPanelNumber">
+                        @*Tipo numerico*@
+                        <div class="col">
+                            <InputModalComponent @bind-InputValue="MetaDataValue" MethodValueChanged="EnabledButton" IsRequired="true" LabelText=@(Translation["MetadataValue"] + ": ") IsVisible="true" Placeholder="" InputType="number" />
+                        </div>
+                    </div>
+                    <div class="col-lg-12 mb-2 d-flex  @showPanelAlphaNumeric">
+                        @*Tipo AlfaNumerico*@
+                        <div class="col">
+                            <label class="mb-2">@Translation["MetadataValue"]: <span style="color:gray">@string.Format(Translation["CharactersOutOf"], CharacterCounter, "50")</span> <span class="red">*</span>  </label>
+                            <textarea @bind="@MetaDataValue" class="w-100 custom-textarea" placeholder=@string.Format(Translation["ProcedureInformationMaxCharacters"], "50") required maxlength="50" @oninput="CountCharacters"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 mb-2 d-flex  @showPanelUser">
+                        @*Tipo Funcionarios*@
+                        <div class="col">
+                            <ButtonGroupComponent LabelText=@(Translation["MetadataValue"] + ": ")  MethodValueChanged="EnabledButton" InputPlaceholder=@Translation["AddOfficials"] BtnTitle="" @ref="inputModal" @bind-InputValue="MetaDataValue" InputRequired="false" BtnClassColor="btnStyle--primary" BtnClassModifiers="" BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="@(()=>openSerachModal(1) )"></ButtonGroupComponent>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 mb-2 d-flex  @showPanelThirdParty">
+                        @*Tipo Terceros*@
+                        <div class="col">
+                            <ButtonGroupComponent LabelText=@(Translation["MetadataValue"] + ": ") MethodValueChanged="EnabledButton" InputPlaceholder=@Translation["AddThird"] BtnTitle="" @ref="inputModal" @bind-InputValue="MetaDataValue" InputRequired="false" BtnClassColor="btnStyle--primary" BtnClassModifiers="" BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="@(()=>openSerachModal(2) )"></ButtonGroupComponent>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 mb-2 d-flex  @showPanelList">
+                        @*Tipo Lista*@
+                        <div class="col">
+
+                            <TelerikDropDownList Data="@metaValues"
+                                                 ValueField="ValueText"
+                                                 Value="selectedDropDown"
+                                                 TextField="ValueText"
+                                                 ValueChanged="@((string newValue) => OnDropDownValueChanged(newValue))"
+                                                 OnChange="EnabledButton">
+
+                            </TelerikDropDownList>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 mb-2 d-flex  @showPanelDate">
+                        @*Tipo Fecha*@
+                        <div class="col">
+                            <label class="mb-2">@Translation["MetadataValue"]:  <span class="red">*</span></label>
+                            <TelerikDatePicker @bind-Value="@date"
+                                               Format="MM/dd/yyyy"
+                                               ShowWeekNumbers="false"
+                                               Max="@maxValueTo"
+                                               Min="@minValueTo"
+                                               Class="DisabledInput"
+                                               OnChange="EnabledButton">
+                            </TelerikDatePicker>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 mb-2 d-flex  @showPanelBool">
+                        @*Tipo Switch*@
+                        <label class="mb-2">@Translation["MetadataValue"]:  <span class="red">*</span></label>
+                        <label class="ms-3"><TelerikSwitch @bind-Value="@isActive" Class="me-2" /> @(isActive ? Translation["Enabled"] : Translation["Disabled"])</label>
+                    </div>
+                </div>
+                <div class="row mt-5  d-flex  @showPanelUser">
+                    <table class="table custom-table">
+                        <thead>
+                            <tr>
+                                <th>@Translation["Action"]</th>
+                                <th>@Translation["Name"]</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var user in usersList)
+                            {
+                                <tr>
+                                    <td class="center-item">
+                                        <img src="../img/deleteIcon.svg" alt="Delete Icon" style="width: 20px; height: 20px; cursor: pointer;" onclick="@(()=>DeleteToList(user))" />
+                                    </td>
+                                    <td class="align-items-center" style="word-break: break-word;">
+                                        <span>@user.FullName</span>
+                                    </td>
+
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row mt-5 text-center">
+                    <div class="col-lg-3  mt-2">
+                        <div class="col">
+                            <img src="../img/completo.png" />
+                        </div>
+                        <TelerikCheckBox Value="complete" ValueChanged="@((bool newValue) =>HandleCheckBoxes(newValue,1))"></TelerikCheckBox>
+                        <label>@Translation["Complete"]</label>
+                    </div>
+                    <div class="col-lg-3 mt-2">
+                        <div class="col">
+                            <img src="../img/ausente.png" />
+                        </div>
+                        <TelerikCheckBox Value="absent" ValueChanged="@((bool newValue) =>HandleCheckBoxes(newValue,2))"></TelerikCheckBox>
+                        <label>@Translation["Absent"]</label>
+                    </div>
+
+                    <div class="col-lg-3 mt-2">
+                        <div class="col">
+                            <img src="../img/incompleto.png" />
+                        </div>
+                        <TelerikCheckBox Value="incomplete" ValueChanged="@((bool newValue) =>HandleCheckBoxes(newValue,3))"></TelerikCheckBox>
+                        <label>@Translation["Incomplete"]</label>
+                    </div>
+                    <div class="col-lg-3 mt-2">
+                        <div class="col">
+                            <img src="../img/noAplica.png" />
+                        </div>
+                        <TelerikCheckBox Value="none" ValueChanged="@((bool newValue) =>HandleCheckBoxes(newValue,4))"></TelerikCheckBox>
+                        <label>@Translation["NotApply"]</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="from-group from-group--margin-top justify-content-center">
+
+                        <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="ResetFormAsync"></ButtonComponent>
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button"  BtnIcon="fa-solid fa-floppy-disk" BtnDisabled="saveIsDisable" BtnOnClick="HandleValidSubmit"></ButtonComponent>
+                    </div>
+                </div>
+            </div>
+            
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>

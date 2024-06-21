@@ -1,0 +1,71 @@
+﻿<div class="my-modal">
+
+
+
+    <TelerikRootComponent>
+        <GenericModalComponent Title="@($"{Translation["Security"]} - {Translation["ManagementValidity"]}  - { (IsEditForm? Translation["Edit"]:Translation["Create"])}" )" IsVisible=ModalStatus Width="80%" OnModalClosed="HandleModalClosed">
+            <ChildContent>
+
+                <div class="row">
+                    <div class="col-lg-6 mt-4">
+                        <label class="selectorBlock--labelDropDown">@Translation["DocumentaryVersion"]:<span class="red">*</span></label>
+                        <TelerikDropDownList Data="@docVersionList"
+                                             ValueField="DocumentalVersionId"
+                                             Value="@idDocVersion"
+                                             TextField="Code"
+                                             ValueChanged="@( (int newValue) => GetAdministrativeUnits(newValue) )"
+                                             Filterable="true"
+                                             Enabled="!IsEditForm"
+                                             DefaultText=@Translation["SelectAnOption"]>
+                        </TelerikDropDownList>
+                    </div>
+
+
+                    <div class="col-lg-6 mt-4">
+                        <label for="input2" class="selectorBlock--labelDropDown">@Translation["AdministrativeUnit"]:<span class="red">*</span></label>
+                        <TelerikDropDownList Data="@adminUnitList"
+                                             ValueField="AdministrativeUnitId"
+                                             Value="@idAdminUnit"
+                                             TextField="Name"
+                                             ValueChanged="@( (int newValue) => GetProducOffice(newValue) )"
+                                             Enabled="isEnableAdminUnit"
+                                             Filterable="true"
+                                             DefaultText=@Translation["SelectAnOption"]>
+                        </TelerikDropDownList>
+                    </div>
+
+                    <div class="col-lg-6 mt-4">
+                        <label class="selectorBlock--labelDropDown">@Translation["ProductionOffice"]:<span class="red">*</span></label>
+                        <TelerikDropDownList @bind-Value="@idProOffice"
+                                             Data="@proOfficesList"
+                                             ValueField="ProductionOfficeId"
+                                             TextField="Name"
+                                             Enabled="isEnableProOffice"
+                                             Filterable="true"
+                                             DefaultText=@Translation["SelectAnOption"]
+                                             OnChange="EnableSaveButton">
+                        </TelerikDropDownList>
+                    </div>
+
+                    <div class="col-lg-6 mt-4">
+
+
+                        <InputModalComponent @bind-InputValue="MonthsQuantity" InputMaxLength="2" IsRequired="true" LabelText=@( $"{Translation["Filter_Value"]} ({Translation["Month(s)"]})") IsVisible="true" MethodValueChanged=EnableSaveButton Placeholder="" InputType="number" FieldType="InputModalTypeEnum.Filing" InputMaxNumberValue="12" />
+
+
+                    </div>
+
+                    <div class="col-lg-12 mt-4">
+                        <div class="from-group from-group--margin-top justify-content-center">
+                            <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="@(ResetForm)"></ButtonComponent>
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnIcon="fa-solid fa-floppy-disk" BtnOnClick="HandleValidSubmit" BtnDisabled=SaveDisable></ButtonComponent>
+                        </div>
+
+                    </div>
+
+                </div>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+    <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+</div>

@@ -1,0 +1,142 @@
+﻿/*Estilo de contenedor principal de los menus*/
+.main-container-menu {
+    border-top-right-radius: 18px !important;
+}
+
+/*Estilo de todos subniveles*/
+.levels {
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+/*Estilo de todos los nombres de menu y subniveles*/
+.span {
+    font-size: 15px;
+}
+
+
+/* Estilo para el boton del menu*/
+.menu-option {
+    color: #697A8D;
+    min-height: 47px;
+}
+
+
+
+/* Estilo para el boton del menu cuando este seleccionado*/
+    .menu-option.main-button {
+        background-color: #f4f5f7; /* Color azul por defecto */
+        position: relative;
+        padding-left: 12px;
+        color: #41BAEA; /* Mantener el color de texto original */
+        /*border-left: 7px solid #41BAEA;*/ /* Borde izquierdo azul por defecto */
+    }
+
+    /* Estilos para la linea azul que indica un nav-link (icono) activo*/
+        .menu-option.main-button::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 5px; /* Ancho de la línea azul */
+            background: #41BAEA; /* Color azul */
+            border-top-right-radius: 10px; /* Esquina derecha superior redondeada */
+            border-bottom-right-radius: 10px; /* Esquina derecha inferior redondeada */
+        }
+
+
+        /* Estilo para el icono de flecha en el botón principal seleccionado */
+        .main-button.btn-selected .bi {
+            color: #8592A3; /* Color blanco */
+        }
+
+/* Estilos para todas las opciones/subniveles */
+.sub-option {
+    color: #697A8D;
+}
+
+    /* Cambiar el color del texto solo cuando una subopción está seleccionada */
+    .sub-option.btn-selected .text-color-sub {
+        font-weight: bold; /* Hacer que el texto se vuelva en negrita (bold) cuando está seleccionado */
+        /*color: #697A8D;*/
+    }
+
+    /* Aplicar el color original del texto cuando no está seleccionado */
+    .sub-option:not(.btn-selected) .text-color-sub {
+        font-weight: normal; /* Hacer que el texto vuelva a la fuente normal cuando no está seleccionado */
+    }
+
+    /* Evitar que se aplique ningún otro estilo a las subopciones seleccionadas */
+    .sub-option .btn-selected {
+        background-color: transparent; /* Fondo transparente */
+        border: none; /* Sin borde */
+    }
+
+        .sub-option .btn-selected .bi {
+            display: none; /* Ocultar el ícono de flecha */
+        }
+
+
+/* Estilo de enfoque personalizado para los botones */
+.btn:focus {
+    outline: none; /* Elimina el borde azul predeterminado */
+    box-shadow: none;
+}
+
+
+.icon-menu{
+    width: 25px;
+    margin-right: 6px;
+}
+
+
+.btn-selected-with-options {
+    border-bottom: 2px #41BAEA solid !important;
+    background-color: transparent;
+    border: none;
+    border-radius: 0 0 5px 5px;
+    color: #41BAEA;
+    padding: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.btn-without-options:hover {
+    background-image: url('/icons/icon_point_selected.png');
+    background-position: left center;
+    background-repeat: no-repeat;
+    padding-left: 12px;
+    color: #41BAEA;
+    position: relative;
+}
+
+.btn-without-options {
+    background-image: url('/icons/icon_point.png');
+    background-position: left center;
+    background-repeat: no-repeat;
+    padding-left: 12px;
+    color: #697A8D;
+    position: relative;
+}
+
+.btn-selected.btn-without-options {
+    background-image: url('/icons/icon_point_selected.png');
+    background-position: left center;
+    background-repeat: no-repeat;
+    padding-left: 12px;
+    color: #41BAEA;
+    position: relative;
+}
+
+
+.pl-2 {
+    margin-left: 10px;
+}
+
+.pl-3 {
+    margin-left: 10px;
+}
+
+.pl-4 {
+    margin-left: 10px;
+}

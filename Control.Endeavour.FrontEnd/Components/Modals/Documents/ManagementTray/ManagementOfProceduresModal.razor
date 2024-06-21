@@ -1,0 +1,219 @@
+﻿<div class="my-modal">
+    <TelerikRootComponent>
+
+        <GenericModalComponent Title=@Translation["ProceduresManagement"] IsVisible="@modalStatus" Width="80%" OnModalClosed="HandleModalClosed">
+            <ChildContent>
+                <div class="container mt-5 mb-5">
+                    
+                    <div class="row p-2 @classSimpleProcessing">
+                        <div class="col-md-8">
+                            <div class="row">
+                                <div class="col-12 col-md">
+                                    <h3 class="mb-0 titulo-azul">@Translation["FilingUpper"]:</h3>
+                                </div>
+                                <div class="col-12 col-md">
+                                    <h3 class="mb-0 titulo-azul">@numRadicado</h3>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 col-md">
+                                    <h5 class="mb-0 titulo-azul">@Translation["DocumentID"]:</h5>
+                                </div>
+                                <div class="col-12 col-md">
+                                    <h5 class="mb-0">@documentoId</h5>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 col-md">
+                                    <h5 class="mb-0 titulo-azul">@Translation["Gantt_Year"]:</h5>
+                                </div>
+                                <div class="col-12 col-md">
+                                    <h5 class="mb-0">@anio</h5>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="row p-2 @classBulkProcessing">
+                        <div class="col-md-8">
+                            <div class="row mb-2">
+                                <div class="col-12 col-md">
+                                    <h3 class="mb-0 titulo-azul">@Translation["BulkDocumentProcessing"]</h3>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12 col-md">
+                                    <h5 class="mb-0 titulo-azul">@Translation["DocumentIDs"]:</h5>
+                                </div>
+                                <div class="col-12 col-md">
+                                    <h5 class="mb-0">@documentoId</h5>
+                                </div>
+                            </div>
+                            
+                        </div>
+
+                    </div>
+
+                    <div id="panel-1" class="row pb-30" style="display: @panel_1">
+
+                        <div class="col-md-1 d-flex justify-content-center align-items-center">
+                            <div class="numero"><h2>1</h2></div>
+                        </div>
+
+                        <div class="row col-md-9">
+
+                            <div class="col-md-4">
+                                <label style="margin-bottom:6px;">@Translation["Action"]: <span class="red">*</span></label>
+
+                                <TelerikDropDownList Data="@LstTypeActions"
+                                                     Value="@ValueTipoAction"
+                                                     Id="GR_TipoAcc"
+                                                     DefaultText="@texAcctionType"
+                                                     TextField="Name"
+                                                     ValueField="ActionId"
+                                                     Filterable="true"
+                                                     ValueChanged="@((int Value) => EnablePanel(Value))"
+                                                     FilterOperator="StringFilterOperator.Contains">
+                                </TelerikDropDownList>
+                            </div>
+                            
+
+                        </div>
+
+                    </div>
+                    <div id="panel-2" class="row pb-30 @panel_2" >
+                        <div class="col-md-1 d-flex justify-content-center align-items-center">
+                            <div class="numero"><h2>2</h2></div>
+                        </div>
+
+                        <div class="row col-md-11 @panel_2_type_user">
+                            <div class="row mb-3">
+
+                                <div class="col-md-4 mt-2 ">
+                                    <h5 class="mb-0">@Translation["ManagerSearch"]</h5>
+                                    <label class="noti-2">@Translation["SelectionManagers"]</label>
+                                </div>
+                                <div class="col-md-2 mt-3 text-center">
+                                    <button class="btn btn-primary btn-lg btn-style" type="button" @onclick="showModalSearchUser">@Translation["Search"]</button>
+                                </div>
+                            </div>
+
+                            @* Cartas de los remitentes del tramite   *@
+                            @foreach (var tramite in UserSenderTramite)
+                            {
+                                <div class="card mt-1 shadow p-3 mb-2 rounded">
+
+                                    <div class="row">
+                                        <div class="col-md-6 mt-2 d-flex align-items-center justify-content-center">
+
+                                            <UserCardComponent FullName="@tramite.UserInfo.UserName"
+                                                               AdministrativeUnitName="@tramite.UserInfo.UserAdministrativeUnitName" Positionname="@tramite.UserInfo.UserPosition"
+                                                               ProductionOfficeName="@tramite.UserInfo.UserProductionOfficeName"></UserCardComponent>
+                                        </div>
+                                        <div class="col-md-6 mt-2">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="row">
+                                                        <label style="margin-bottom: 6px;">@Translation["SelectedInstruction"]: <span class="red">*</span></label>
+                                                        <TelerikDropDownList Data="@LstTypeInstructions"
+                                                                             Value="@tramite.InstructionId"
+                                                                             Id="GR_TipoAcc"
+                                                                             DefaultText=@Translation["SelectedPlaceholderInstruction"]
+                                                                             TextField="Name"
+                                                                             ValueField="InstructionId"
+                                                                             ValueChanged="@((int Value) => ChangeValueAction("action",tramite,tramite.Position,Value))"
+                                                                             Filterable="true"
+                                                                             FilterOperator="StringFilterOperator.Contains">
+                                                        </TelerikDropDownList>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                    <label style="margin-bottom: 6px;">@Translation["Subject"]: <span style="color: gray">@string.Format(Translation["CharactersOutOf"], tramite.CountCharacters, "500")</span> </label>
+                                                    <textarea class="w-100 custom-textarea" id="GR_Asunto" required placeholder="" maxlength="500" @bind="tramite.Subject" @oninput="@(e => CountCharacters(e,tramite))"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            }
+
+
+                            @* Cartas de las copias del tramite *@
+
+                            @foreach (var copies in userListCopies)
+                            {
+                                <div class="card mt-1 shadow p-3 mb-2 bg-white rounded">
+
+                                    <div class="row d-flex align-items-center ">
+                                        <div class="col-md-1 text-center">
+
+                                            <h3> <i class="bi bi-copy"></i></h3>
+                                        </div>
+                                        <div class="col-md-11">
+                                            <UserCardComponent FullName="@copies.UserName"
+                                                               AdministrativeUnitName="@copies.UserAdministrativeUnitName" Positionname="@copies.UserPosition"
+                                                               ProductionOfficeName="@copies.UserProductionOfficeName"></UserCardComponent>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <div class="row col-md-11 @panel_2_type_close">
+
+                            <label class="mb-2">@Translation["Justification"]: <span style="color:gray">@string.Format(Translation["CharactersOutOf"], characterCounter, "200")</span> <span class="red">*</span></label>
+                                <textarea @bind="commentaryClosed" style="margin-left:13px;" class="w-100 custom-textarea" id="GR_Asunto" placeholder="" required maxlength="200" @oninput="@(e => CountCharacters(e))"></textarea>
+                            
+                        </div>
+
+                    
+
+
+                    </div>
+
+                <div id="panel-3" class="row pb-40 @panel_3">
+
+                    <div class="col-md-1 d-flex justify-content-center align-items-center">
+                        <div class="numero"><h2>3</h2></div>
+                    </div>
+
+                    <div class="row col-md-9">
+
+                        <div class="row">
+                                <h5 class="mb-0">@Translation["ProcessDocumet"]</h5>
+                                <label class="noti-2">@Translation["CompleteProcess"]</label>
+                            <div class="col-md-4 mt-2">
+                                    <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Tramit"] BtnIcon="fa-solid fa-paper-plane" BtnOnClick="HandleTramite"></ButtonComponent>
+                            </div>
+                        </div>
+                        <div>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>
+@* <GenericSearchModal @ref="GenericSearchModal" 
+    OnStatusMultipleUsersChanged="HandleUserSelectedChanged" 
+    ConfigurationInUse="1"
+    multipleSelection=true
+    showCopiesColumn=true
+    Title=@(Translation["ProceduresManagement"] + " - " + Translation["UserFinder"])>
+</GenericSearchModal> *@
+<GenericUserSearchModal @ref="genericUserSearch" Title="@(Translation["ProceduresManagement"] + " - " + Translation["UserFinder"])"
+                        IsVisible="UserModalStatus"
+                        OnSelectedUserData="HandleUserSelectedChanged"
+                        TypeOfSearch="1"
+                        OnModalClosed="HandleModalUserClosed" Width="90%"
+                        IsValidateReplacements="@true"
+                        AllowToCheckReplament="@true"
+                        AllowMultipleSelection="@true"
+                        AllowCopiesSelection="@true">
+</GenericUserSearchModal>
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalTramiteClosed"></NotificationsComponentModal>
+<NotificationsComponentModal @ref="notificationModalSucces" OnModalClosed="HandleModalSuccesClosed"></NotificationsComponentModal>

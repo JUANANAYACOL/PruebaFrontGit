@@ -1,0 +1,159 @@
+﻿@page "/AdministrativeUnit"
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.AdministrativeUnit.Request
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.AdministrativeUnit.Response
+@layout MainLayout;
+
+<div class="container-fluid mt-5">
+    <AdministrativeUnitModal @ref="modalAdministrativeUnit" OnStatusUpdate="HandleChangedData"></AdministrativeUnitModal>
+
+    <!-- Parte 1: Título y Contenido alineado a la izquierda -->
+    <div class="row titulo">
+        <div class="col-lg-8">
+            <h1>@(Translation["Administration"] + " - " + Translation["AdministrativeUnits"])</h1>
+
+        </div>
+        <!-- Parte 2: Botón azul alineado a la derecha -->
+        <div class="col-lg-4 text-end">
+
+            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers=" ml-10" BtnType="button" BtnText="@(Translation["Create"])" BtnOnClick="ShowModalCreate" BtnIcon="fa-solid fa-plus"></ButtonComponent>
+        </div>
+    </div>
+
+    <div class="row m-0">
+
+        <div class="col-lg-12">
+            <h6 class="titulo-azul"> @Translation["SearchByFilters"]:</h6>
+        </div>
+        <div class="col-lg-3 mt-1">
+            <label for="input2" class="mb-2">@Translation["DocumentaryVersions"]<span class="red">*</span></label>
+            <TelerikDropDownList Data="@documentalVersionsList"
+                                 Id="DocTypeJ"
+                                 DefaultText="@Translation["SelectAType"]"
+                                 TextField="Code"
+                                 ValueField="DocumentalVersionId"
+                                 @bind-Value="IdDocumental"
+                                 OnChange="EnableSaveButton"
+                                 Filterable="true"
+                                 FilterOperator="StringFilterOperator.Contains">
+            </TelerikDropDownList>
+        </div>
+
+        <div class="col-lg-3 mt-1">
+            <InputModalComponent @bind-InputValue="codeFilter" IsDisabled="false" LabelText="@Translation["Code"]" Placeholder="@Translation["Code"]" InputMaxLength="5" />
+        </div>
+
+        <div class="col-lg-3 mt-1">
+            <InputModalComponent @bind-InputValue="NameFilter" IsDisabled="false" LabelText="@Translation["Name"]" Placeholder="@Translation["Name"]" InputMaxLength="100" />
+        </div>
+
+        <div class="col-lg-3 mt-2 d-flex justify-content-end">
+            <div class="from-group mt-4">
+                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnClassModifiers="btn-block" BtnType="button" BtnText=@Translation["Clear"] BtnOnClick="ResetFiltersAsync" BtnIcon="fa-solid fa-eraser"></ButtonComponent>
+
+                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10 btn-block" BtnType="button" BtnText=@Translation["Search"] BtnOnClick="ApplyFiltersAsync" BtnIcon="fa-solid fa-magnifying-glass" BtnDisabled="saveIsDisable"></ButtonComponent>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Parte 3: Grilla -->
+    <div class="row mt-4">
+        <div class="col">
+            <TelerikGrid Data="@administrativeUnitList" PageSize="10"
+                         Sortable="true"
+                         FilterMode="GridFilterMode.FilterMenu"
+                         Resizable="true"
+                         Reorderable="false"
+                         EditMode="GridEditMode.Popup"
+                         SelectionMode="GridSelectionMode.None">
+                <GridToolBarTemplate>
+                    <GridCommandButton Command="ExcelExport" Icon="@SvgIcon.FileExcel" Enabled="administrativeUnitList.Count>0">@Translation["ExportToExcel"]</GridCommandButton>
+                    <label class="k-checkbox-label"><TelerikCheckBox @bind-Value="@ExportAllPages" Enabled="administrativeUnitList.Count>0" /> @Translation["ExportAllPages"]</label>
+                </GridToolBarTemplate>
+                <GridExport>
+                    <GridExcelExport FileName="telerik-grid-export" AllPages="@ExportAllPages" OnBeforeExport="@OnBeforeExcelExport" />
+                </GridExport>
+                <GridColumns>
+
+                    <GridCommandColumn Width="80px" Title=@Translation["Edit"] HeaderClass="center-wrap" Visible="true">
+                        <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                            <GridCommandButton Title=@Translation["Edit"] Icon="@SvgIcon.Pencil" OnClick="@((args)=> ShowModalEdit((AdministrativeUnitsDtoResponse)args.Item))"></GridCommandButton>
+                        </div>
+                    </GridCommandColumn>
+                    <GridCommandColumn Width="80px" Title=@Translation["Delete"] HeaderClass="center-wrap" Visible="true">
+                        <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                            <GridCommandButton Title=@Translation["Delete"] Icon="@SvgIcon.Trash" OnClick="@((args)=> ShowModalDelete((AdministrativeUnitsDtoResponse)args.Item))"></GridCommandButton>
+                        </div>
+                    </GridCommandColumn>
+                    <GridColumn Field=@nameof(AdministrativeUnitsDtoResponse.Name)
+                                Title=@Translation["Name"]
+                                Width="150px"
+                                Filterable="false"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(AdministrativeUnitsDtoResponse.Code)
+                                Title=@Translation["Code"]
+                                Width="150px"
+                                Filterable="false"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(AdministrativeUnitsDtoResponse.ActiveState)
+                                Title=@Translation["Status"]
+                                Width="150px"
+                                Filterable="false"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap">
+
+                        <Template>
+                            @{
+                                AdministrativeUnitsDtoResponse rowData = (AdministrativeUnitsDtoResponse)context;
+                                if (rowData != null)
+                                {
+                                    bool activeState = (rowData.ActiveState);
+                                    string active = activeState ? Translation["Enabled"] : Translation["Disabled"];
+                                    @active
+                                }
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field=@nameof(AdministrativeUnitsDtoResponse.CreateUser)
+                                Title=@Translation["UserRecorded"]
+                                Width="200px"
+                                TextAlign="ColumnTextAlign.Center"
+                                Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(AdministrativeUnitsDtoResponse.CreateDate)
+                                Title=@Translation["DateRecorded"]
+                                Width="200px"
+                                TextAlign="ColumnTextAlign.Center"
+                                Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(AdministrativeUnitsDtoResponse.UpdateUser)
+                                Title=@Translation["UserUpdated"]
+                                Width="200px"
+                                TextAlign="ColumnTextAlign.Center"
+                                Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(AdministrativeUnitsDtoResponse.UpdateDate)
+                                Title=@Translation["DateUpdated"]
+                                Width="200px"
+                                TextAlign="ColumnTextAlign.Center"
+                                Filterable="false" HeaderClass="center-wrap" />
+                </GridColumns>
+
+                <NoDataTemplate>
+                    <img src="../img/noDataFound.png" width="8%" height="8%" />
+                    <p> @Translation["NoGridInfo"]</p>
+                </NoDataTemplate>
+            </TelerikGrid>
+        </div>
+    </div>
+
+    <!-- Parte 4: Botones en la izquierda, centro y derecha -->
+    @if (dataChargue)
+    {
+        <NewPaginationComponent @ref="paginationComponent" T="AdministrativeUnitsDtoResponse" M="AdministrativeUnitFilterDtoRequest" Uri="@UriFilterAdministrativeUnit" Filter="@administrativeUnitFilter" PaginationInfo="@paginationInfo" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+    }
+
+
+
+</div>
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+

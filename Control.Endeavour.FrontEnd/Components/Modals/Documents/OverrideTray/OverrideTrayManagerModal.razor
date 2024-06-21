@@ -1,0 +1,65 @@
+﻿    
+<TelerikRootComponent>
+
+    <GenericModalComponent Title=@(Translation["Administration"] + " - " + Translation["CancellationManager"]) IsVisible="modalStatus" OnModalClosed="HandleModalClosed">
+        <ChildContent>
+            <div class="row mt-2">
+                <div class="col-md-7 mt-1">
+                    <label>@Translation["RequestType"]<span class="red" style="visibility: @IsRequired">*</span></label>
+                    <TelerikDropDownList Data="@TypeCodeList"
+                                         Value="@TypeCode"
+                                         TextField="Value"
+                                         ValueField="Code"
+                                         DefaultText="@DFCode"
+                                         Filterable="true"
+                                         Enabled="@Habilitar"
+                                         ValueChanged="@((string value) => BindTypeCode(value))"
+                                         FilterOperator="StringFilterOperator.Contains">
+                    </TelerikDropDownList>
+                </div>
+                <div class="col-md-5 mt-2">
+                    <div class="from-group mt-4 d-flex align-items-end justify-content-start">
+                        <div class="px-2">
+                            <TelerikSwitch @bind-Value="@activeState" />
+                        </div>
+                        <div class="px-2">
+                            @(activeState ? Translation["Enabled"] : Translation["Disabled"])
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-1">
+                <div class="col-md-6 mt-3">
+                    <InputModalComponent LabelText=@Translation["UserName"] Placeholder=@Translation["ManagerName"] MethodValueChanged="ValidateEnableButton" IsVisible="true" IsDisabled="true" @bind-InputValue="@vUserSelected.UserName"></InputModalComponent>
+                </div>
+                <div class="col-5 mt-5">
+                    <div class="col-12">
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["SelectManager"] BtnIcon="fa-solid fa-magnifying-glass" BtnDisabled="isEnableReceiverButton" BtnOnClick="OpenNewModalUser"></ButtonComponent>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row align-self-center mt-5">
+                <div class="col">
+                    <div class="text-center">
+                        <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="reset"></ButtonComponent>
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnIcon="fa-solid fa-floppy-disk" BtnDisabled="enableButton" BtnOnClick="Save"></ButtonComponent>
+                    </div>
+                </div>
+            </div>
+            <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+        </ChildContent>
+    </GenericModalComponent>
+</TelerikRootComponent>
+@* <GenericSearchModal @ref="genericSearchModal" ConfigurationInUse="1" multipleSelection=false showCopiesColumn=false
+                    Title=@Translation["UserFinder"] OnStatusUserChanged="HandleUserChanged"></GenericSearchModal> *@
+
+<GenericUserSearchModal @ref="genericUserSearch" Title="@Translation["UserFinder"]" IsVisible="UserModalStatus"
+                        OnSelectedUserData="HandleUserChanged"
+                        TypeOfSearch="1"
+                        OnModalClosed="HandleModalUserClosed" Width="90%"
+                        AllowMultipleSelection="@false"
+                        IsValidateReplacements="@true"
+                        AllowToCheckReplament="@false"
+                        AllowCopiesSelection="@false">
+</GenericUserSearchModal>

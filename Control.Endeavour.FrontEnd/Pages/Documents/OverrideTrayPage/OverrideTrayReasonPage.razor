@@ -1,0 +1,132 @@
+﻿@page "/OverrideTrayReason"
+@using Control.Endeavour.FrontEnd.Models.Models.Documents.OverrideTray.Response
+@using Control.Endeavour.FrontEnd.Models.Models.Documents.OverrideTray.Request
+@layout MainLayout
+
+<OverrideTrayReasonModal @ref="modalReason" OnChangeData="HandleRefreshGridDataAsync"></OverrideTrayReasonModal>
+
+
+<div class="container-fluid mt-5">
+    <div class="row">
+        <div class="col-8">
+            <h1>@(Translation["Administration"] + " - " + Translation["CancellationReasons"])</h1>
+
+        </div>
+@*         <div class="col-4 text-end mt-5">
+            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers=" ml-10" BtnType="button" BtnText=@Translation["Create"] BtnOnClick="ShowModal" BtnIcon="fa-solid fa-plus"></ButtonComponent>
+        </div> *@
+    </div>
+    <div class="row">
+        <!-- Contenedor para los Tres Inputs -->
+        <div class="col-md-8">
+            <div class="row mt-2">
+                <!-- Parte Izquierda: Input y Label -->
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <InputModalComponent @bind-InputValue="@NameReason" IsDisabled="false" InputMaxLength="200" LabelText=@Translation["CancellationReason"] Placeholder=@Translation["CancellationReason"] />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="mb-2">@Translation["CancellationType"]</label>
+                    <TelerikDropDownList Data="@ReasonCodeList"
+                                         Value="@ReasonCode"
+                                         TextField="Value"
+                                         ValueField="Code"
+                                         DefaultText="@DTReason"
+                                         ValueChanged="@((string value) => ReasonCode = value)"
+                                         Filterable="true"
+                                         FilterOperator="StringFilterOperator.Contains">
+                    </TelerikDropDownList>
+                </div>
+                <div class="col-md-4">
+                    <label class="mb-2">@Translation["RequestType"]</label>
+                    <TelerikDropDownList Data="@TypeCodeList"
+                                         Value="@TypeCode"
+                                         TextField="Value"
+                                         ValueField="Code"
+                                         DefaultText="@DTTypeCode"
+                                         Filterable="true"
+                                         ValueChanged="@((string value) => TypeCode = value)"
+                                         FilterOperator="StringFilterOperator.Contains">
+                    </TelerikDropDownList>
+                </div>
+            </div>
+        </div>
+        <!-- Contenedor para los Tres Botones -->
+        <div class="col-md-4">
+            <div class="row ">
+                <!-- Parte Derecha: Dos Botones -->
+                <div class="from-group from-group--margin-top justify-content-center">
+                    <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="reset"></ButtonComponent>
+                    <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Search"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="GetReason"></ButtonComponent>
+                    <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Create"] BtnIcon="fa-solid fa-plus" BtnOnClick="ShowModal"></ButtonComponent>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-2">
+
+    <TelerikGrid Data="ReasonList" PageSize="10"
+                 Resizable="true"
+                 SelectionMode="GridSelectionMode.None">
+@*         <GridToolBarTemplate>
+            <GridCommandButton Command="ExcelExport" Icon="@SvgIcon.FileExcel">@Translation["ExportToExcel"]</GridCommandButton>
+            <label class="k-checkbox-label"><TelerikCheckBox @bind-Value="@ExportAllPages" /> @Translation["ExportAllPages"]</label>
+        </GridToolBarTemplate>
+        <GridExport>
+            <GridExcelExport FileName="telerik-grid-export" AllPages="@ExportAllPages" OnBeforeExport="@OnBeforeExcelExport" />
+        </GridExport> *@
+        <GridColumns>
+            <GridCommandColumn Width="80px" Title=@Translation["Edit"] HeaderClass="center-wrap" Visible="true">
+                <GridCommandButton Icon="@SvgIcon.Pencil" OnClick="@((args)=> ShowModalEdit(args.Item as OverrideTrayReasonDtoResponse))"></GridCommandButton>
+            </GridCommandColumn>
+            <GridCommandColumn Width="80px" Title=@Translation["Delete"] HeaderClass="center-wrap" Visible="true">
+                <div class="d-flex justify-content-around">
+                    <GridCommandButton Icon="@SvgIcon.Trash" OnClick="@((args)=> ShowModalDelete(args.Item as OverrideTrayReasonDtoResponse))"></GridCommandButton>
+                </div>
+            </GridCommandColumn>
+            <GridColumn Field="NameReason"
+                        Title=@Translation["CancellationReason"]
+                        Width="150px"
+                        TextAlign="ColumnTextAlign.Center"
+                        HeaderClass="center-wrap" />
+            <GridColumn Field="NameReasonCode"
+                        Title=@Translation["CancellationType"]
+                        Width="150px"
+                        TextAlign="ColumnTextAlign.Center"
+                        HeaderClass="center-wrap" />
+            <GridColumn Field="NameTypeCode"
+                        Title=@Translation["RequestType"]
+                        Width="150px"
+                        TextAlign="ColumnTextAlign.Center"
+                        HeaderClass="center-wrap" />
+            <GridColumn Field="ActiveState"
+                        Title=@Translation["Status"]
+                        Width="150px"
+                        TextAlign="ColumnTextAlign.Center"
+                        HeaderClass="center-wrap">
+
+                <Template>
+                    @{
+                        OverrideTrayReasonDtoResponse rowData = (OverrideTrayReasonDtoResponse)context;
+                        if (rowData != null)
+                        {
+                            bool activeState = (rowData.ActiveState);
+                            string active = activeState ? Translation["Enabled"] : Translation["Disabled"];
+                            @active
+                        }
+                    }
+                </Template>
+            </GridColumn>
+        </GridColumns>
+        <NoDataTemplate>
+            <img src="../img/noDataFound.png" width="8%" height="8%" />
+            <p> @Translation["NoGridInfo"]</p>
+        </NoDataTemplate>
+    </TelerikGrid>
+    <NewPaginationComponent @ref="paginationComponetPost" T="OverrideTrayReasonDtoResponse" M="OverrideTrayReasonDtoRequest" Uri="@UriFilterReasons" Filter="@reason" PaginationInfo="@paginationInfo" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+    <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+    <NotificationsComponentModal @ref="notificationModalSucces"></NotificationsComponentModal>
+</div>

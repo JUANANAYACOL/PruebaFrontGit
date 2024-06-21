@@ -1,0 +1,31 @@
+﻿
+.custom-dropdown-item {
+    color: #333;
+    background-color: #EAEAEA;
+    transition: all 0.3s ease;
+}
+
+
+    .custom-dropdown-item:hover {
+        color: #fff;
+        background-color: #007bff;
+    }
+
+
+.dropdown-menu {
+    background-color: #EAEAEA;
+    max-width: 100%;
+    overflow: auto;
+}
+
+.dropdown-style {
+    background-color: transparent;
+    color: black;
+    border: none;
+}
+
+body.dark .dropdown-style {
+    background-color: transparent;
+    color: white;
+    border: none;
+}

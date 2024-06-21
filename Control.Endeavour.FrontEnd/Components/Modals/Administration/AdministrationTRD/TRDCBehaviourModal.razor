@@ -1,0 +1,313 @@
+﻿@using Control.Endeavour.FrontEnd.Models.Models.Administration.AdministracionTRD.Response
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.MetaField.Response
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.MetaTitles.Request
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.VUser.Response
+
+
+<GenericSearchModal OnStatusUserChanged="HandleGenericSearchStatusChanged"
+                    OnStatusMultipleUsersChanged="HandleGenericMultipleSearchStatusChanged"
+                    OnModalClosed="HandleClosed"
+                    @ref="genericSearchModal"
+                    ConfigurationInUse="1"
+                    multipleSelection=multipleSelectionManager
+                    showCopiesColumn=false
+                    Title=@(Translation["Administration"] + " - " + Translation["DRBT"] + " - " + Translation["UserSearch"])></GenericSearchModal>
+
+<div class="my-modal z-3">
+
+    <TelerikRootComponent>
+        <GenericModalComponent Title=@(Translation["Edit"] + "/" + Translation["Add"] + " " + Translation["DRBT"]) IsVisible="modalStatus" OnModalClosed="HandleModalClosed" Width="70%">
+            <ChildContent>
+                <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <label class="mt-2">@Translation["CorrespondenceType"]: <span class="red">*</span></label>
+                            <TelerikDropDownList Data="@correspondenceList"
+                                                 ValueField="Code"
+                                                 @bind-Value="correspondenceCode"
+                                                 TextField="Value"
+                                                 Filterable="true"
+                                                 Enabled="true"
+                                                 OnChange="EnableSaveButton"
+                                                 DefaultText=@Translation["SelectAnOption"]></TelerikDropDownList>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <label class="mt-2">@Translation["ComunicationClass"]: <span class="red">*</span></label>
+                            <TelerikDropDownList Data="@classList"
+                                                 ValueField="Code"
+                                                 @bind-Value="classCode"
+                                                 TextField="Value"
+                                                 Filterable="true"
+                                                 Enabled="true"
+                                                 OnChange="EnableSaveButton"
+                                                 DefaultText=@Translation["SelectAnOption"]></TelerikDropDownList>
+                        </div>
+                    </div>
+
+                    <div class="row mt-2">
+                        <TelerikTabStrip PersistTabContent="true" @bind-ActiveTabIndex="@currentTab">
+                            <TabStripTab Title=@(Translation["GeneralBehavior"])>
+
+                                <div class="row">
+                                    <label>
+                                        <div class="row align-items-lg-center">
+                                            <div class="col-lg-12">
+                                                <TelerikCheckBox Title=@(Translation["Submission"]) Value="radicationCheck" ValueChanged="@((bool newValue) => radicationCheck=newValue)"> </TelerikCheckBox>
+                                                <label>
+                                                    @(Translation["Submission"])
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </label>
+                                    <label class="col-lg-12">
+                                        <div class="row align-items-lg-center">
+                                            <div class="col-lg-12">
+                                                <TelerikCheckBox Title=@(Translation["CrcGroup"]) Value="pqrCheck" ValueChanged="@((bool newValue) => pqrCheck=newValue)"> </TelerikCheckBox>
+                                                <label>
+                                                    @(Translation["CrcGroup"])
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </label>
+                                    <label class="col-lg-12">
+                                        <div class="row align-items-lg-center">
+                                            <div class="col-md-3">
+                                                <TelerikCheckBox Title=@(Translation["RequiresResponse"]) Value="requireResponseCheck" ValueChanged="@((bool newValue) => checkAsignValue(newValue))"> </TelerikCheckBox>
+                                                <label>
+                                                    @(Translation["RequiresResponse"])
+                                                </label>
+                                            </div>
+
+                                            @if (requireResponseCheck)
+                                            {
+                                                <div class="col-md-9">
+                                                    <div class="row align-items-lg-center">
+                                                        <div class="col-md-3">
+                                                            <TelerikDropDownList Data="@timeType"
+                                                                                 Id="DocTypeJ"
+                                                                                 DefaultText=@Translation["SelectAnOption"]
+                                                                                 @bind-Value=timeTypeSelected
+                                                                                 TextField="Value"
+                                                                                 ValueField="Value"
+                                                                                 Filterable="true"
+                                                                                 OnChange="EnableSaveButton"
+                                                                                 FilterOperator="StringFilterOperator.Contains">
+                                                            </TelerikDropDownList>
+                                                        </div>
+
+                                                        <div class="col-md-3">
+                                                            <label>
+                                                                @(Translation["ResponseTime"] + ":")
+                                                            </label>
+                                                        </div>
+
+                                                        <div class="col-md-5">
+                                                            <div class="row">
+                                                                <div class="col">
+                                                                    <InputModalComponent IsVisible=true @ref="inputdaysOrHoursNumber" MethodValueChanged="EnableSaveButton" @bind-InputValue="daysOrHoursNumber" IsRequired="true" LabelText="" Placeholder="" InputType="number" FieldType="InputModalTypeEnum.NumbersOnly" />
+                                                                </div>
+
+                                                                <div class="col mt-2">
+                                                                    <label>
+                                                                        @timeTypeSelected
+                                                                    </label>
+                                                                </div>
+
+                                                            </div>
+
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+                                            }
+
+                                        </div>
+                                    </label>
+
+                                    @if (docTypologyList != null && (classCode == "CL,R" || classCode == "") && docTypologyList.Count > 0)
+                                    {
+                                        <div class="col-lg-6 mt-2">
+                                            <label class="mt-2">@(Translation["DocumentaryTypologyOfResponse"] + ":")</label>
+                                            <TelerikDropDownList Data="@docTypologyList"
+                                                                 ValueField="DocumentaryTypologyBehaviorId"
+                                                                 @bind-Value="documentaryTypologyBehaviourId"
+                                                                 TextField="@nameof(DocumentaryTypologiesBehaviorsDtoResponse.DocumentaryTypologyName)"
+                                                                 Filterable="true"
+                                                                 Enabled="true"
+                                                                 DefaultText=@Translation["SelectAnOption"]>
+                                            </TelerikDropDownList>
+
+                                        </div>
+                                    }
+
+                                </div>
+
+                            </TabStripTab>
+                            <TabStripTab Title=@(Translation["LeadingManager"])>
+                                <div class="row">
+
+                                    <div class="col-lg-8">
+                                        <ButtonGroupComponent LabelText=@(Translation["User"]+":") InputPlaceholder=@Translation["AddUser"] BtnTitle=@Translation["AddUser"] @ref="inputManagerLeader" @bind-InputValue="managerLeaderName" InputRequired="true" BtnClassColor="btnStyle--primary" BtnClassModifiers="" BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="(()=> OpenLeaderManager(false))"></ButtonGroupComponent>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <label class="mt-2">@(Translation["Instruction"] + ":") <span class="red" >*</span></label>
+                                        <TelerikDropDownList Data="@instructionList"
+                                                             ValueField="Code"
+                                                             @bind-Value="instructioLeadernCode"
+                                                             TextField="Value"
+                                                             Filterable="true"
+                                                             Enabled="true"
+                                                             DefaultText=@Translation["SelectAnOption"]
+                                                             OnChange="EnableSaveButton">
+                                        </TelerikDropDownList>
+                                    </div>
+                                </div>
+                            </TabStripTab>
+                            <TabStripTab Title=@(Translation["OtherManagers"])>
+
+                                <div class="row">
+
+                                    <div class="col-lg-12">
+                                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers=" ml-10  btn-block" BtnType="button" BtnText=@Translation["Add"] BtnOnClick="@(()=>OpenLeaderManager(true,true))" BtnIcon="fa-solid fa-plus"></ButtonComponent>
+                                    </div>
+
+                                    <div class="col-lg-12 mt-2">
+                                        <TelerikGrid Data="usersManageres" PageSize="10"
+                                                     Sortable="true"
+                                                     FilterMode="GridFilterMode.FilterMenu"
+                                                     ScrollMode="@GridScrollMode.Virtual"
+                                                     Height="480px" RowHeight="60"
+                                                     Resizable="true"
+                                                     Reorderable="false"
+                                                     EditMode="GridEditMode.Popup"
+                                                     SelectionMode="GridSelectionMode.None"
+                                                     Class="">
+                                            <GridColumns>
+
+                                                <GridCommandColumn Width="30px" Title=@Translation["Delete"] HeaderClass="center-wrap" Visible="true">
+
+                                                    <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                                                        <GridCommandButton Title=@Translation["Delete"] Icon="@SvgIcon.Trash" OnClick="@((args)=> HandleRecordToDelete((VUserDtoResponse)args.Item))"></GridCommandButton>
+                                                    </div>
+                                                </GridCommandColumn>
+                                                <GridColumn Field=@nameof(VUserDtoResponse.FullName) Title=@Translation["Name"] Width="100px" Filterable="true" />
+                                            </GridColumns>
+                                            <NoDataTemplate>
+                                                <img src="../img/noDataFound.png" width="8%" height="8%" />
+                                                <p> @Translation["NoGridInfo"]</p>
+                                            </NoDataTemplate>
+                                        </TelerikGrid>
+
+                                    </div>
+
+
+                                </div>
+                            </TabStripTab>
+                            <TabStripTab Title=@Translation["Alarms"] Visible="false">
+                                <div class="row">
+
+                                    <label class="mt-2">@Translation["ConfigurationTypologyAlarms"]<span class="red" *></span></label>
+                                    <div class="row mt-3">
+                                        <div class="col-lg-2 d-flex justify-content-end">
+                                            @Translation["Days"]
+                                        </div>
+                                        <div class="col-lg-2 d-flex justify-content-start">
+                                            %
+                                        </div>
+                                    </div>
+                                    <div class="row mt-1 align-items-lg-center">
+                                        <div class="col-lg-1">@(Translation["Alarm"] + " 1")</div>
+                                        <div class="col-lg-1">
+                                            <InputModalComponent IsVisible=true @ref="inputDaysAlarm1" @bind-InputValue="daysAlarm1" IsRequired="false" LabelText="" Placeholder="" FieldType="InputModalTypeEnum.NumbersOnly" />
+                                        </div>
+                                        <div class="col-lg-1">
+                                            <InputModalComponent IsVisible=true @ref="inputPercentAlarm1" @bind-InputValue="percentAlarm1" IsRequired="false" LabelText="" Placeholder="" FieldType="InputModalTypeEnum.NumbersOnly" />
+                                        </div>
+                                        <div class="col-lg-3">@Translation["Informative"]</div>
+                                    </div>
+                                    <div class="row mt-1 align-items-lg-center">
+                                        <div class="col-lg-1">@(Translation["Alarm"] + " 2")</div>
+                                        <div class="col-lg-1">
+                                            <InputModalComponent IsVisible=true @ref="inputDaysAlarm2" @bind-InputValue="daysAlarm2" IsRequired="false" LabelText="" Placeholder="" FieldType="InputModalTypeEnum.NumbersOnly" />
+                                        </div>
+                                        <div class="col-lg-1">
+                                            <InputModalComponent IsVisible=true @ref="inputPercentAlarm2" @bind-InputValue="percentAlarm2" IsRequired="false" LabelText="" Placeholder="" FieldType="InputModalTypeEnum.NumbersOnly" />
+                                        </div>
+                                        <div class="col-lg-3">@Translation["Preventive"]</div>
+                                    </div>
+                                    <div class="row mt-1 align-items-lg-center">
+                                        <div class="col-lg-1">@(Translation["Alarm"] + " 3")</div>
+                                        <div class="col-lg-1">
+                                            <InputModalComponent IsVisible=true @ref="inputDaysAlarm3" @bind-InputValue="daysAlarm3" IsRequired="false" LabelText="" Placeholder="" FieldType="InputModalTypeEnum.NumbersOnly" />
+                                        </div>
+                                        <div class="col-lg-1">
+                                            <InputModalComponent IsVisible=true @ref="inputPercentAlarm3" @bind-InputValue="percentAlarm3" IsRequired="false" LabelText="" Placeholder="" FieldType="InputModalTypeEnum.NumbersOnly" />
+                                        </div>
+                                        <div class="col-lg-3">@Translation["ImmediateAction"]</div>
+                                    </div>
+
+                                </div>
+
+                            </TabStripTab>
+                            <TabStripTab Title=@(Translation["Copies"])>
+
+                                <div class="row">
+
+                                    <div class="col-lg-12">
+                                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers=" ml-10  btn-block" BtnType="button" BtnText=@Translation["Add"] BtnOnClick="@(()=>OpenLeaderManager(true,true,1))" BtnIcon="fa-solid fa-plus"></ButtonComponent>
+                                    </div>
+
+                                    <div class="col-lg-12 mt-2">
+                                        <TelerikGrid Data="userCopies" PageSize="10"
+                                                     Sortable="true"
+                                                     FilterMode="GridFilterMode.FilterMenu"
+                                                     ScrollMode="@GridScrollMode.Virtual"
+                                                     Height="480px" RowHeight="60"
+                                                     Resizable="true"
+                                                     Reorderable="false"
+                                                     EditMode="GridEditMode.Popup"
+                                                     SelectionMode="GridSelectionMode.None"
+                                                     Class="">
+                                            <GridColumns>
+
+                                                <GridCommandColumn Width="30px" Title=@Translation["Delete"] HeaderClass="center-wrap" Visible="true">
+
+                                                    <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                                                        <GridCommandButton Title=@Translation["Delete"] Icon="@SvgIcon.Trash" OnClick="@((args)=> HandleCopyToDelete((VUserDtoResponse)args.Item))"></GridCommandButton>
+                                                    </div>
+                                                </GridCommandColumn>
+                                                <GridColumn Field=@nameof(VUserDtoResponse.FullName) Title=@Translation["Name"] Width="100px" Filterable="true" />
+                                            </GridColumns>
+                                            <NoDataTemplate>
+                                                <img src="../img/noDataFound.png" width="8%" height="8%" />
+                                                <p> @Translation["NoGridInfo"]</p>
+                                            </NoDataTemplate>
+                                        </TelerikGrid>
+
+                                    </div>
+
+
+                                </div>
+                            </TabStripTab>
+                        </TelerikTabStrip>
+
+                    </div>
+
+                    <div class="row">
+                        <div class="from-group from-group--margin-top justify-content-center">
+
+                            <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="ResetFormAsync"></ButtonComponent>
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnIcon="fa-solid fa-floppy-disk" BtnDisabled="saveIsDisable" BtnOnClick="HandleValidSubmit"></ButtonComponent>
+                        </div>
+                    </div>
+                </div>
+
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>

@@ -1,0 +1,163 @@
+﻿@page "/branchoffice"
+@layout MainLayout;
+
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.BranchOffice.Response
+@using Control.Endeavour.FrontEnd.Models.Models.Administration.BranchOffices
+
+
+<BranchOfficesModal @ref="modalbranchOffice" OnDataSaved="HandleNewData" OnChangeData="HandleRefreshGridDataAsync" OnAddressStatus="HandleAddressModal"></BranchOfficesModal>
+<AddressModal @ref="modalAddress" OnStatusChangedMultipleSelection="HandleAddressSelectedChanged"></AddressModal>
+
+<div class="container-fluid mt-5">
+    <!-- Parte 1: Título y Contenido alineado a la izquierda -->
+    <div class="row titulo">
+        <div class="col-8">
+            <h1>@(Translation["Administration"] + " - " + Translation["CompanyBranches"])</h1>
+        </div>
+        <!-- Parte 2: Botón azul alineado a la derecha -->
+        <div class="col-4 text-end">
+            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers=" ml-10" BtnType="button" BtnText=@Translation["Create"] BtnOnClick="ShowModalCreate" BtnIcon="fa-solid fa-plus"></ButtonComponent>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <h6 class="titulo-azul"> @Translation["SearchByFilters"]:</h6>
+        </div>
+
+
+        <div class="col-lg-4">
+            <InputModalComponent @ref="CodeInput" @bind-InputValue="Code" IsRequired=" false" InputMaxLength="5" FieldType="InputModalTypeEnum.NotEmpty" LabelText=@( $"{Translation["Code"]}:") Placeholder=@Translation["Code"] />
+
+
+        </div>
+
+        <div class="col-lg-4">
+            <InputModalComponent @ref="BranchOfficeInput" @bind-InputValue="BranchOfficeName" IsRequired=" false" InputMaxLength="100" FieldType="InputModalTypeEnum.NotEmpty" LabelText=@( $"{Translation["OfficeName"]}:") Placeholder=@Translation["OfficeName"] />
+        </div>
+
+
+        <div class="col-lg-4">
+
+
+            <div class="from-group from-group--margin-top justify-content-end">
+
+                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="OnClickReset"></ButtonComponent>
+                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Search"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="GetBranchsOffices"></ButtonComponent>
+            </div>
+
+
+        </div>
+
+
+    </div>
+
+
+    <!-- Parte 3: Grilla -->
+    <div class="row mt-4">
+        <div class="col">
+            <TelerikGrid Data="@branchOfficesList" PageSize="10"
+                         Sortable="true"
+                         FilterMode="GridFilterMode.FilterMenu"
+                         Resizable="true"
+                         Reorderable="false"
+                         EditMode="GridEditMode.Popup"
+                         SelectionMode="GridSelectionMode.None">
+                <GridColumns>
+                    <GridCommandColumn Width="80px" Title=@Translation["Edit"] HeaderClass="center-wrap" Visible="true">
+                        <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                            <GridCommandButton Title=@Translation["Edit"] Icon="@SvgIcon.Pencil" OnClick="@((args)=> ShowModalEdit((BranchOfficesDtoResponse)args.Item))"></GridCommandButton>
+                        </div>
+
+                    </GridCommandColumn>
+
+                    <GridCommandColumn Width="80px" Title=@Translation["Delete"] HeaderClass="center-wrap" Visible="true">
+                        <div class="custom-style-grid d-flex flex-wrap justify-content-around">
+                            <GridCommandButton Title=@Translation["Delete"] Icon="@SvgIcon.Trash" OnClick="@((args)=> ShowModalDelete((BranchOfficesDtoResponse)args.Item))"></GridCommandButton>
+                        </div>
+                    </GridCommandColumn>
+
+
+                    <GridColumn Field="@nameof(BranchOfficesDtoResponse.Code)"
+                                Title=@Translation["Code"]
+                                Width="150px"
+                                Filterable="false"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="@nameof(BranchOfficesDtoResponse.NameOffice)"
+                                Title=@Translation["OfficeName"]
+                                Width="150px"
+                                Filterable="false"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="@nameof(BranchOfficesDtoResponse.Region)"
+                                Title=@Translation["RegionalMacro"]
+                                Width="150px"
+                                Filterable="false"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field="@nameof(BranchOfficesDtoResponse.Territory)"
+                                Title=@Translation["Territory"]
+                                Width="150px"
+                                Filterable="false"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(BranchOfficesDtoResponse.ActiveState) TextAlign="ColumnTextAlign.Center" Title=@Translation["Status"] Width="170px" Filterable="false" HeaderClass="center-wrap">
+                        <Template>
+                            @{
+                                BranchOfficesDtoResponse rowData = (BranchOfficesDtoResponse)context;
+                                if (rowData != null)
+                                {
+                                    bool activeState = (bool)rowData.ActiveState!;
+                                    string active = activeState ? Translation["Enabled"] : Translation["Disabled"];
+                                    @active
+                                }
+                            }
+                        </Template>
+                    </GridColumn>
+                    <GridColumn Field="@nameof(BranchOfficesDtoResponse.AddressString)"
+                                Title=@Translation["Address"]
+                                Width="150px"
+                                Filterable="false"
+                                TextAlign="ColumnTextAlign.Center"
+                                HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(BranchOfficesDtoResponse.CreateUser)
+                                Title=@Translation["UserRecorded"]
+                                Width="200px"
+                                TextAlign="ColumnTextAlign.Center"
+                                Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(BranchOfficesDtoResponse.CreateDate)
+                                Title=@Translation["DateRecorded"]
+                                Width="200px"
+                                TextAlign="ColumnTextAlign.Center"
+                                Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(BranchOfficesDtoResponse.UpdateUser)
+                                Title=@Translation["UserUpdated"]
+                                Width="200px"
+                                TextAlign="ColumnTextAlign.Center"
+                                Filterable="false" HeaderClass="center-wrap" />
+                    <GridColumn Field=@nameof(BranchOfficesDtoResponse.UpdateDate)
+                                Title=@Translation["DateUpdated"]
+                                Width="200px"
+                                TextAlign="ColumnTextAlign.Center"
+                                Filterable="false" HeaderClass="center-wrap" />
+
+                </GridColumns>
+                <NoDataTemplate>
+                    <img src="../img/noDataFound.png" width="8%" height="8%" />
+                    <p> @Translation["NoGridInfo"]</p>
+                </NoDataTemplate>
+            </TelerikGrid>
+            @if (dataChargue)
+            {
+                <NewPaginationComponent @ref="PaginationComponent" T="BranchOfficesDtoResponse" M="BranchOfficeFilterDtoRequest" Uri="@UriFilterBranchOffice" Filter="@FilterDtoRequest" PaginationInfo="@paginationInfo" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+
+            }
+        </div>
+    </div>
+
+    <!-- Parte 4: Botones en la izquierda, centro y derecha -->
+</div>
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+
+
+

@@ -1,0 +1,98 @@
+﻿<div class="my-modal">
+    <TelerikRootComponent>
+        <GenericModalComponent Title=@(Translation["Administration"] + " - " + Translation["TemplateAdministration"]) IsVisible="modalStatus" OnModalClosed="HandleModalClosed" Width="70%">
+            <ChildContent>
+                <EditForm Model="@TemplateDtoRequest" OnValidSubmit="HandleValidSubmit">
+
+                    <div class="row m-3">
+                        <div class="col-md-12">
+                            <h5>@Translation["NotificationsTemplatesMessage"]</h5>
+                        </div>
+                        <div class="col-md-12 text-end">
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers=" ml-10" BtnType="button" BtnText=@Translation["Create"] BtnOnClick="GoCreateTemplateSendgridAsync" BtnIcon="fa-solid fa-plus"></ButtonComponent>
+                        </div>
+                    </div>
+                    <div class="row p-2 m-3">
+                        <div class="col-md-6 mb-2">
+                            <InputModalComponent InputMaxLength="100" @bind-InputValue="@TemplateDtoRequest.Name" LabelText=@(Translation["Name"]+":") Placeholder=@Translation["Name"] IsRequired="true"></InputModalComponent>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <InputModalComponent InputMaxLength="100" @bind-InputValue="@TemplateDtoRequest.SendGridTempId" LabelText=@(Translation["SendGridID"]+":") Placeholder=@Translation["ActionName"] IsRequired="true"></InputModalComponent>
+                        </div>
+
+                        <div class="col-md-6 mb-2">
+                            <InputModalComponent @bind-InputValue="@NumberOfTemplateFields" InputMaxLength="2" IsRequired="false" LabelText=@Translation["DynamicWords"] Placeholder=@Translation["DynamicWords"] InputType="number" FieldType="InputModalTypeEnum.Filing" InputMaxNumberValue="99" />
+                        </div>
+                        <div class="col-md-6 mb-2 d-flex flex-column justify-content-between">
+                            <label class="titulo-azul">
+                                @Translation["FinishSendGridTemplate"]
+                            </label>
+                            <div class="k-form k-form-md k-form-vertical">
+                                <div class="k-form-field">
+
+                                    <div class="k-form-field-wrap">
+                                        <TelerikRadioGroup Data="@optionsRecordClosed"
+                                                           Value="@ResponseRecordClosed"
+                                                           ValueChanged="@( (string newValue) => OnValueChangedRecordClosed(newValue) )"
+                                                           ValueExpression="@( () => ResponseRecordClosed)"
+                                                           Layout="@RadioGroupLayout.Horizontal">
+                                        </TelerikRadioGroup>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div> 
+
+                    <div class="row p-2 m-3">
+                        @if (int.TryParse(NumberOfTemplateFields, out int count) && count > 0)
+                        {
+                            @for (int i = 0; i < templates.Count; i++)
+                            {
+                                int currentIndex = i;  // Captura el índice actual en una variable local
+                                <div class="col-md-12 mb-2">
+                                    <div class="row">
+                                        <!-- Input for KeyName -->
+                                        <div class="col-md-6">
+                                            <InputModalComponent InputMaxLength="2" IsRequired="false" LabelText=@(Translation["KeyName"]+":") @bind-InputValue="@templates[currentIndex].KeyName" Placeholder=@Translation["KeyName"] InputType="number" FieldType="InputModalTypeEnum.Filing" InputMaxNumberValue="99" />
+                                        </div>
+
+                                        <!-- Checkboxes -->
+                                        <div class="col-md-6">
+                                            <div class="mb-2">
+                                                <label class="form-label">@Translation["QuestionTemplatesSites"]</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="@($"checkbox1-{currentIndex}")" checked="@(templates[currentIndex].KeyType == 1)" @onchange="() => UpdateSelectedOption(currentIndex, 1)">
+                                                <label class="form-check-label" for="@($"checkbox1-{currentIndex}")">@Translation["Subject"]</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="@($"checkbox2-{currentIndex}")" checked="@(templates[currentIndex].KeyType == 2)" @onchange="() => UpdateSelectedOption(currentIndex, 2)">
+                                                <label class="form-check-label" for="@($"checkbox2-{currentIndex}")">@Translation["BodyMailText"]</label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="checkbox" id="@($"checkbox3-{currentIndex}")" checked="@(templates[currentIndex].KeyType == 3)" @onchange="() => UpdateSelectedOption(currentIndex, 3)">
+                                                <label class="form-check-label" for="@($"checkbox3-{currentIndex}")">@Translation["Both"]</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                        }
+                    </div>
+
+                    <div class="row">
+                        <div class="from-group from-group--margin-top justify-content-center">
+                            <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser"  BtnOnClick="ResetFormAsync"></ButtonComponent>
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="submit" BtnDisabled=@IsEnabledBtn BtnIcon="fa-solid fa-floppy-disk"></ButtonComponent>
+                        </div>
+                    </div>
+                    
+                </EditForm>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>
+
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>

@@ -1,0 +1,120 @@
+﻿@using Control.Endeavour.FrontEnd.Models.Models.Administration.MetaData.Request;
+<div class="my-modal">
+
+
+
+    <TelerikRootComponent>
+        <GenericModalComponent Title=@Translation["MetaDataVisualization"] IsVisible="modalStatus" OnModalClosed="HandleModalClosed" width="70%">
+            <ChildContent>
+
+
+                <div class="row mb-5">
+                    <TelerikGrid Data="metaDataList"
+                                 PageSize="6"
+                                 Sortable="true"
+                                 FilterMode="GridFilterMode.FilterMenu"
+                                 Resizable="true"
+                                 ScrollMode=GridScrollMode.Scrollable
+                                 Reorderable="false"
+                                 EditMode="GridEditMode.Popup"
+                                 SelectionMode="GridSelectionMode.None">
+                        <GridColumns>
+
+                            <GridCommandColumn Width="80px" Title="@Translation["Edit"]" HeaderClass="center-wrap" Visible="true">
+                                <GridCommandButton Icon="@SvgIcon.Pencil" Title=@Translation["Edit"] OnClick="@((args)=> MetaFieldSelected((MetaDataRelationDtoRequest) args.Item))"></GridCommandButton>
+                            </GridCommandColumn>
+                            <GridColumn Title=@Translation["Status"]
+                                        Width="150px"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap">
+                                <Template>
+                                    @{
+                                        MetaDataRelationDtoRequest rowData = (MetaDataRelationDtoRequest)context;
+
+                                        switch (rowData.ColorData)
+                                        {
+                                            case "MDC,V":
+                                                <img src="../img/completo.png" />
+                                                break;
+                                            case "MDC,AZ":
+                                                <img src="../img/ausente.png" />
+                                                break;
+                                            case "MDC,A":
+                                                <img src="../img/incompleto.png" />
+                                                break;
+                                            case "MDC,NE":
+                                                <img src="../img/noAplica.png" />
+                                                break;
+                                        }
+                                    }
+                                </Template>
+
+                            </GridColumn>
+                            <GridColumn Field=@nameof(MetaDataRelationDtoRequest.NameMetaField)
+                                        Title=@Translation["Metadata"]
+                                        Width="150px"
+                                        Filterable="false"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                            <GridColumn Field=@nameof(MetaDataRelationDtoRequest.DataText)
+                                        Title=@Translation["MetadataValue"]
+                                        Width="150px"
+                                        Filterable="false"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                            <GridColumn Field=@nameof(MetaDataRelationDtoRequest.FieldTypeValue)
+                                        Title=@Translation["MetadataType"]
+                                        Width="150px"
+                                        Filterable="false"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                          
+                            <GridColumn Field=@nameof(MetaDataRelationDtoRequest.Mandatory)
+                                        Title=@Translation["Mandatory"]
+                                        Width="150px"
+                                        Filterable="false"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap">
+
+                                <Template>
+                                    @{
+                                        MetaDataRelationDtoRequest rowData = (MetaDataRelationDtoRequest)context;
+                                        if (rowData != null)
+                                        {
+                                            bool activeState = (bool)rowData.Mandatory!;
+                                            string active = activeState ? Translation["Apply"] : Translation["NotApply"];
+                                            @active
+                                        }
+                                    }
+                                </Template>
+
+                            </GridColumn>
+                            <GridColumn Field=@nameof(MetaDataRelationDtoRequest.CreateUser)
+                                        Title=@Translation["UserRecorded"]
+                                        Width="100px"
+                                        Filterable="false"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+                            <GridColumn Field=@nameof(MetaDataRelationDtoRequest.CreateDate)
+                                        Title=@Translation["DateRecorded"]
+                                        Width="100px"
+                                        Filterable="false"
+                                        TextAlign="ColumnTextAlign.Center"
+                                        HeaderClass="center-wrap" />
+
+                        </GridColumns>
+
+                        <NoDataTemplate>
+                            <img src="../img/noDataFound.png" width="8%" height="8%" />
+                            <p> @Translation["NoGridInfo"]</p>
+                        </NoDataTemplate>
+                    </TelerikGrid>
+
+
+
+                </div>
+
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>

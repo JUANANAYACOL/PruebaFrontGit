@@ -1,0 +1,85 @@
+﻿.labelModalContiner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--color-gris-main);
+    border-radius: 13px;
+    padding: 14px;
+    height: 233px;
+}
+
+body.dark .labelModalContiner {
+    background-color: #2d2d2d;
+}
+
+.contenedor-modal {
+    width: 500px;
+    height: 190px;
+    border-radius: 20px;
+    padding: 26px;
+    position: relative;
+    z-index: 2000;
+    background-color: var(--color-blanco);
+    overflow-x:auto;
+    overflow-y: hidden;
+}
+
+body.dark .contenedor-modal {
+    background-color: var(--color-gris-oscuro-5);
+}
+
+.contenedor-modal__column1 {
+    float: left;
+    width: 100px;
+}
+
+.contenedor-modal__column2 {
+    float: left;
+    width: 366px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.row {
+    width: 100%;
+}
+
+.svg-button {
+    border: none;
+    padding: 0;
+    margin: 0;
+    background: none;
+}
+
+.t-window-action-close::before {
+    content: url('../icons/Close.png') !important;
+}
+
+.contenedor-modal__esquema, .text-Container {
+    width: 466px;
+}
+
+.text-Container label {
+    font-size: 12px;
+}
+
+@font-face {
+    font-family: CCode39;
+    src: url("/fonts/ConnectCode39.woff") format('woff')
+}
+
+#barcode {
+    font-weight: normal;
+    font-style: normal;
+    line-height: normal;
+    font-family: 'CCode39', sans-serif;
+    text-align: center;
+    font-size: 15px;
+}

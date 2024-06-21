@@ -1,0 +1,152 @@
+﻿
+<div class="my-modal">
+    <TelerikRootComponent>
+        <GenericModalComponent Title=@Translation["ClassifyDocuments"] IsVisible="modalStatus" Width="80%" OnModalClosed="HandleModalClosed">
+            <ChildContent>
+                    <div class="row m-0 pb-10">
+                        <!-- dropdowns encargados de filtra la busqueda y el boton -->
+                        <div class="col-md-3 mt-4">
+                        <label class="input-container">@Translation["ComunicationClass"]<span class="red">*</span></label>
+                            <TelerikDropDownList Data="@systemFieldsCLList"
+                                                 Value="@systemParamCL"
+                                                 ValueField="Code"
+                                                 TextField="Value"
+                                                 Filterable="true"
+                                                 DefaultText="@defaulTextCL"
+                                                 Enabled="dropdownsEnable"
+                                                 ValueChanged="@( (string newValue) => Dropdown(newValue, true) )">
+                            </TelerikDropDownList>
+                        </div>
+                        @if(dropdown)
+                        {
+                            <div class="col-md-3 mt-4">
+                            <label class="input-container">@Translation["ShippingMethod"]<span class="red">*</span></label>
+                                <TelerikDropDownList Data="@systemFieldsMRList"
+                                                     ValueField="Code"
+                                                     Value="@systemParamMR"
+                                                     TextField="Value"
+                                                     Filterable="true"
+                                                     DefaultText="@defaulTextMR"
+                                                     Enabled="dropdownsEnable"
+                                                     ValueChanged="@((string newValue) => Dropdown2(newValue) )">
+                                </TelerikDropDownList>
+                            </div>
+                        }
+                    </div>
+                    <div class="row m-0 pb-10">
+                        <div class="col-9">
+                            <div class="card row mt-3 col-12 typology-destination-pt">
+                                <div class="col-12 d-flex flex-column justify-content-around">
+                                    <label class="mb-4"><b>@Translation["DocumentaryTypology"]</b></label>
+                                    <label><b>@Translation["DocumentaryTypology"]:</b> @docClasification.TypologyName</label>
+                                    <label><b>@Translation["AdministrativeUnit"]:</b> @docClasification.AdministrativeUnitName</label>
+                                    <label><b>@Translation["ProductionOffice"]:</b> @docClasification.ProductionOfficeName</label>
+                                    <label><b>@Translation["Serie"]:</b> @docClasification.SeriesName</label>
+                                    <label><b>@Translation["SubSerie"]:</b> @docClasification.SubSeriesName</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3 mt-3">
+                            <div class="col-6">
+                                <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["SearchTypology"] BtnIcon="fa-solid fa-magnifying-glass" BtnDisabled="isEnableTRDButton" BtnOnClick="OpenModalTRD"></ButtonComponent>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row m-0 pb-10">
+                        <div class="col-9">
+                            <div class="card row mt-3 col-12">
+                                <div class="col-12 d-flex flex-column justify-content-around typology-destination-pt">                 
+                                    <div class="table-responsive custom-table-container">
+                                        <table class="table custom-table custom-table-container">
+                                            <thead>
+                                                <tr>
+                                                    <th hidden="@SeenSortDocs">@Translation["Delete"]</th>
+                                                    <th>@Translation["User"]</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (systemParamCL.Equals("CL,I"))
+                                                {
+                                                    @if (docClasification.DestinationsUser != null)
+                                                    {
+                                                        @foreach (var fileInfo in docClasification.DestinationsUser)
+                                                        {
+                                                            <tr>
+                                                                <td hidden="@SeenSortDocs">
+                                                                    <div class="d-flex justify-content-space-evely mt-5 table-content">
+                                                                        <i title=@Translation["Delete"] @onclick="@(() => DeleteUserResiver(fileInfo))" class="fa-solid fa-trash-can delete-button"></i>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <UserCardComponent FullName="@fileInfo?.FullName"
+                                                                                       AdministrativeUnitName="@fileInfo?.AdministrativeUnitName" Positionname="@fileInfo?.Charge"
+                                                                                       ProductionOfficeName="@fileInfo?.ProductionOfficeName"></UserCardComponent>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    }
+
+                                                }
+                                                else
+                                                {
+                                                    @if (docClasification.DestinationsAdministration != null)
+                                                    {
+                                                        @foreach (var fileInfo in docClasification.DestinationsAdministration)
+                                                        {
+                                                            <tr>
+                                                                <td hidden="@SeenSortDocs">
+                                                                    <div class="d-flex justify-content-space-evely mt-5 table-content">
+                                                                        <i title=@Translation["Delete"] @onclick="@(() => DeleteThirdResiver(fileInfo))" class="fa-solid fa-trash-can delete-button"></i>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <ThirdCardComponent IdentificationNumber="@fileInfo?.IdentificationNumber"
+                                                                                        Names="@fileInfo?.FullName"
+                                                                                        CompanyName="@fileInfo?.CompanyName"
+                                                                                        Email="@fileInfo?.Email"></ThirdCardComponent>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    }
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>                                                                       
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-3 mt-3">
+                            <div class="col-7">
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["SearchRecipients"] BtnIcon="fa-solid fa-magnifying-glass" BtnDisabled="isEnableReceiverButton" BtnOnClick="OpenNewModalUser"></ButtonComponent>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row m-0 pb-10">
+                        <div class="col-9">
+                            <div class="row mt-3 col-12">
+                                <div class="col-xl-12">
+                                <label class="mb-1">@Translation["Subject"]<span class="red">* </span><span class="span-gray">@string.Format(Translation["CharactersOutOf"], contadorcarac, "500")</span></label>
+                                <textarea @bind="descriptionInput" disabled="@texAreaEnable" class="w-100 custom-textarea" id="DT_Asunto" required placeholder=@(string.Format(Translation["ProcedureInformationMaxCharacters", "500"])) maxlength="500" @oninput="ContarCaracteres"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row d-flex mt-5 pb-10 justify-content-center">
+                        <div class="col-2 d-flex justify-content-center">
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Accept"] BtnIcon="fa-solid fa-check" BtnDisabled="enableButton" BtnOnClick="SelectSortDocAsync"></ButtonComponent>
+                        </div>
+                    </div>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>
+@* <GenericSearchModal @ref="genericSearchModal" ConfigurationInUse=changeModal multipleSelection=true showCopiesColumn=false Title="@modalTitle"
+                    OnStatusMultipleUsersChanged="HandleReciversUserChanged" OnStatusChangedMultipleSelection="HandleReciversThirdParyChanged"></GenericSearchModal> *@
+<GenericDocTypologySearchModal @ref="genericDocTypologySearchModal" title=@Translation["DocumentRetentionTable"] OnStatusChanged="HandleTRDSelectedChanged"></GenericDocTypologySearchModal>
+
+<GenericUserSearchModal @ref="genericUserSearch" Title="@modalTitle" IsVisible="UserModalStatus"
+                        OnSelectedUserData="HandleSelectedUserData"
+                        TypeOfSearch="@changeModal"
+                        OnModalClosed="HandleModalUserClosed" Width="90%"
+                        AllowMultipleSelection="@true">
+</GenericUserSearchModal>

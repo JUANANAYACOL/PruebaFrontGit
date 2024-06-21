@@ -1,0 +1,215 @@
+﻿@page "/QuickFiling"
+
+@layout MainLayout
+<AttachmentsModal @ref="ModalAttachments" Type="@Filing" OnStatusChanged="HandleAttachments"></AttachmentsModal>
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+<LabelModal @ref="LabelModal" OnModalClosed="HandleModalClosed"></LabelModal>
+<div class="container-fluid mt-1">
+    <!-- Parte 1: Título y Contenido alineado a la izquierda -->
+    <div class="row titulo">
+        <div class="col-8">
+            <h3>@titleView</h3>
+        </div>
+        <!-- Parte 2: Botón azul alineado a la derecha -->
+        <div class="col-4 text-end">
+            @* <button class="btn btn-primary btn-lg btn-block" @onclick="mostrarModal">Crear</button> *@
+        </div>
+    </div>
+    <div class="row mt-2 d-flex justify-content-center">
+
+        <div id="panel-1" class="row mt-2 pb-30 ">
+            <!--@panel_1-->
+            <div class="col-lg-1 d-flex justify-content-center align-items-center">
+                <div class="numero"><h2>1</h2></div>
+            </div>
+
+            <div class="row col-lg-11">
+
+                <div class="col-lg-8">
+                    <label class="mb-2">@Translation["ComunicationClass"]: <span class="red">*</span></label>
+
+                    <TelerikDropDownList Data="@classCodeList"
+                                         @bind-Value="@quickFilingDtoRequest.ClassCode"
+                                         Id="GR_ReceptionCode"
+                                         DefaultText=@Translation["SelectAnOption"]
+                                         TextField="Value"
+                                         ValueField="Code"
+                                         Filterable="true"
+                                         OnChange="ValidateFields"
+                                         Enabled="@DisableDropDown"
+                                         FilterOperator="StringFilterOperator.Contains">
+                    </TelerikDropDownList>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="panel-2" class="row mt-2 pb-30 ">
+            <!--@panel_2-->
+
+            <div class="col-lg-1 d-flex justify-content-center align-items-center">
+                <div class="numero"><h2>2</h2></div>
+            </div>
+
+            <div class="row col-lg-11">
+                <div class="col-lg-12 mt-2">
+                    <label class="mb-2">@Translation["PhysicalDescription"]<span class="red">*</span>: <span style="color:gray">@string.Format(Translation["CharactersOutOf"], contadorcarac, "50")</span> </label>
+                    <textarea @bind="quickFilingDtoRequest.PhysicalDescription" class="w-100 custom-textarea" id="GR_Asunto" placeholder="" required maxlength="50" @oninput="ContarCaracteres" @attributes="GetDisabledAttribute()"></textarea>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="panel-3" class="row pb-40">
+            <!--@panel_3-->
+
+            <div class="col-lg-1 d-flex justify-content-center align-items-center">
+                <div class="numero"><h2>3</h2></div>
+            </div>
+
+            <div class="row col-lg-11">
+
+                <div class="row">
+                    <h5 class="mb-0">@Translation["UploadAttachments"]</h5>
+                    <label class="noti-2">@Translation["OptionalUploadAttachmentMessage"]:</label>
+                    <div class="col-lg-4 mt-2">
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Attachments/Annexes"] BtnIcon="fa-solid fa-upload" BtnOnClick="showModalAttachments" BtnDisabled="@DisableButtons"></ButtonComponent>
+                    </div>
+
+                    <div class="col-lg-12 @TablaAdjuntos" id="tableAttachments" style="margin-top:31px;">
+                        <div class="table-responsive custom-table-container">
+                            <table class="table custom-table">
+                                <thead>
+                                    <tr>
+                                        <th>@*<img src="../img/carbonDocumentAdd.svg" alt="Upload file" style="cursor:pointer; width: 25px; height: 25px;" />*@</th>
+                                        <th>@Translation["Detail"]</th>
+                                        <th>@Translation["File"]</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var fileInfo in listAttachment)
+                                    {
+                                        <tr>
+                                            <td class="center-item">
+                                                <img src="../img/deleteIcon.svg" alt="Delete Icon" style="width: 20px; height: 20px; cursor: pointer;" @onclick="() => RemoverFile(fileInfo)" />
+                                            </td>
+                                            <td class="align-items-center" style="word-break: break-word;">
+                                                <span>@fileInfo.AttDescription</span>
+                                            </td>
+                                            <td class="center-item">
+                                                <i class="@fileInfo.IconPath" style="font-size: 20px;"></i>
+                                                <span>@fileInfo.ArchiveName . @fileInfo.ArchiveExt</span>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div id="panel-4" class="row pb-40 ">
+            <!--@panel_4-->
+
+            <div class="col-lg-1 d-flex justify-content-center align-items-center">
+                <div class="numero"><h2>4</h2></div>
+            </div>
+
+            <div class="row col-lg-11">
+
+                <div class="col-lg-8">
+                    <InputModalComponent @bind-InputValue="@NumberOfRecievers" InputMinValue="1" IsRequired="true" LabelText=@(Translation["NumberRecipients"] + ":") IsVisible="true" Placeholder="" InputType="number" MethodValueChanged="ValidateFields" IsDisabled="DisableButtons" FieldType="InputModalTypeEnum.Filing" InputMaxLength="4" />
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Parte 8: GR - Paso 5-->
+        <div id="panel-5" class="row pb-40 @panel_5">
+            <!--@panel_5-->
+
+            <div class="col-lg-1 d-flex justify-content-center align-items-center">
+                <div class="numero"><h2>5</h2></div>
+            </div>
+
+            <div class="row col-lg-11">
+
+                <div class="col-lg-4">
+                    <h5 class="mb-0">@Translation["GenerateFiling"]</h5>
+                    <label class="noti-2">@Translation["FilingNumber"]:</label>
+                    <div class="col-lg-12 mt-2">
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Radicate"] BtnIcon="fa-solid fa-paper-plane" BtnOnClick="HandleFormCreate" BtnDisabled="@DisableButtons"></ButtonComponent>
+                    </div>
+                </div>
+                <div class="col-lg-8">
+                    <div class="row d-flex justify-content-end">
+                        <div class="col-lg-4">
+                            <h3 class="mb-0 titulo-azul">@Translation["FilingUpper"]:</h3>
+                            <h5 class="mb-0">@Translation["DocumentID"]:</h5>
+                            @* <label class="noti-2">@Translation["Gantt_Year"]:</label> *@
+                        </div>
+                        <div class="col-lg-8">
+                            <h3 class="mb-0 titulo-azul">@Radicado</h3>
+                            <h5 class="mb-0">@IdDocumento</h5>
+                            @* <label class="noti-2">@Anio</label> *@
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Parte 9: GR - Paso 6-->
+        <div id="panel-6" class="row pb-40 @panel_6">
+
+            <!--@panel_6-->
+
+            <div class="col-lg-1 d-flex justify-content-center align-items-center">
+                <div class="numero"><h2>6</h2></div>
+            </div>
+
+            <div class="row col-lg-11">
+
+                <div class="col-lg-12">
+                    <h5 class="mb-0">@Translation["GenerateLabel"]</h5>
+                    <label class="noti-2">@Translation["ViewDownloadLabel"]</label>
+                    <div class="col-lg-12 mt-2">
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["Label"] BtnIcon="fa-solid fa-barcode" BtnOnClick="showModalLabel"></ButtonComponent>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+        <div id="panel-9" class="row pb-40 @panel_6">
+            <!--@panel_8-->
+
+            <div class="col-lg-1 d-flex justify-content-center align-items-center">
+                <div class="numero"><h2>7</h2></div>
+            </div>
+
+            <div class="row col-lg-11">
+
+                <div class="col-lg-4">
+                    <h5 class="mb-0">@Translation["CreateNewFiling"]</h5>
+                    <label class="noti-2">@Translation["CleanRecordMessage"]</label>
+                    <div class="col-lg-12 mt-2">
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["New"] BtnIcon="fa-solid fa-file-circle-plus" BtnOnClick="ResetQuickFiling"></ButtonComponent>
+                    </div>
+                </div>
+
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+    
+</div>  

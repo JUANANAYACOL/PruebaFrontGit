@@ -1,0 +1,129 @@
+﻿@using Control.Endeavour.FrontEnd.Models.Models.Administration.MetaValues.Request;
+
+<div class="my-modal">
+    <TelerikRootComponent>
+        <GenericModalComponent Title=@(Translation["Administration"] + " - " + Translation["MetaFields"]) IsVisible="modalStatus" OnModalClosed="HandleModalClosed" width="60%">
+            <ChildContent>
+                <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+                <div class="container">
+                    <div class="row">
+                        <div>
+                        </div><div class="col-lg-3">
+                            <InputModalComponent @ref="codeInput" @bind-InputValue="metaFieldRequest.Code" InputMaxLength="5" IsRequired="true" FieldType="InputModalTypeEnum.Code" LabelText=@Translation["Code"] Placeholder=@Translation["EnterCode"] MethodValueChanged="EnableSaveButton" />
+                        </div>
+
+                        <div class="col-lg-3">
+                            <InputModalComponent @ref="nameInput" @bind-InputValue="metaFieldRequest.NameMetaField"  InputMaxLength="100" IsRequired="true" LabelText=@Translation["Name"] Placeholder=@Translation["EnterName"] MethodValueChanged="EnableSaveButton" />
+
+                        </div>
+                        <div class="col-lg-3">
+                            <label>@Translation["Type"]<span class="red">*</span> </label>
+                            <TelerikDropDownList Data="@systemParamListModal"
+                                                 ValueField="Code"
+                                                 Value="@metaFieldRequest.FieldType"
+                                                 ValueExpression="@( () => metaFieldRequest.FieldType )"
+                                                 TextField="Value"
+                                                 ValueChanged="@((string newValue) => GetFieldTypeCode(newValue))"
+                                                 Enabled="true"
+                                                 Filterable="true"
+                                                 DefaultText=@Translation["SelectAnOption"]
+                                                 Class="mt-2">
+                            </TelerikDropDownList>
+                        </div>
+
+                        <div class="col-lg-3 mt-3">
+
+                            <div class="from-group mt-3 d-flex align-items-end justify-content-start">
+
+
+                                <div class="px-2">
+                                    <TelerikSwitch @bind-Value="@active" />
+                                </div>
+                                <div class="px-2">
+                                    @(active ? Translation["Enabled"] : Translation["Disabled"])
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row  mt-3">
+
+                        <div class="row text-start">
+
+                            <div class="col-lg-4">
+
+
+                                <TelerikCheckBox Value="isAnonymous" ValueChanged="@((bool newValue) =>HandleCheckBoxes(newValue,1))"> </TelerikCheckBox>
+                                <label>@Translation["AnonymizedData"]</label>
+                            </div>
+                            <div class=" col-lg-4">
+
+
+                                <TelerikCheckBox Value="mandatory" ValueChanged="@((bool newValue) =>HandleCheckBoxes(newValue,2))"> </TelerikCheckBox>
+                                <label>@Translation["MandatoryData"]</label>
+
+                            </div>
+
+                            <div class=" col-lg-4">
+                                <TelerikCheckBox Value="topograhpy" ValueChanged="@((bool newValue) =>HandleCheckBoxes(newValue,3))"></TelerikCheckBox>
+                                <label>@Translation["TopographicLocation"]</label>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row mt-5 d-flex @showPanel">
+                        <hr />
+                        <div>
+                            <label class="mb-4">@Translation["MetaValuesList"]:</label>
+                        </div>
+                        <div class="col-lg-6">
+                            <InputModalComponent @ref="orderInput" @bind-InputValue="orderString" InputMaxLength="3" IsRequired="true" LabelText=@($"{Translation["Order"]}: ") IsVisible="true" Placeholder="" InputType="number" FieldType="InputModalTypeEnum.Filing" InputMaxNumberValue="999" MethodValueChanged="EnableSaveAddButton" />
+                        </div>
+                        <div class="col-lg-6">
+                            <label class="mb-2">@Translation["Filter_Value"]: <span class="red">*</span></label>
+                            <div class="from-group">
+
+                                <InputModalComponent @ref="valueInput" @bind-InputValue="valueString" InputMaxLength="100" IsRequired="true" FieldType="InputModalTypeEnum.Name" LabelText="" Placeholder="" MethodValueChanged="EnableSaveAddButton" />
+                                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers=" ml-10" BtnType="button" BtnText="" BtnOnClick="AddToList" BtnIcon="fa-solid fa-plus" BtnDisabled="saveIsDisableAdd"></ButtonComponent>
+                            </div>
+                        </div>
+                        <div class="row mt-5" hidden="@(!metaValueCreateList.Any())">
+                            <table class="table custom-table">
+                                <thead>
+                                    <tr>
+                                        <th>@Translation["Action"]</th>
+                                        <th>@Translation["Order"]</th>
+                                        <th>@Translation["Filter_Value"]</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var metaValueInfo in metaValueCreateList)
+                                    {
+                                        <tr>
+                                            <td class="center-item">
+                                                <img src="../img/deleteIcon.svg" alt="Delete Icon" style="width: 20px; height: 20px; cursor: pointer;" onclick="@(()=>DeleteToList(metaValueInfo))" />
+                                            </td>
+                                            <td class="align-items-center" style="word-break: break-word;">
+                                                <span>@metaValueInfo.ValueOrder</span>
+                                            </td>
+                                            <td class="center-item">
+
+                                                <span>@metaValueInfo.ValueText</span>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="from-group from-group--margin-top justify-content-center">
+                        <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="ResetForm"></ButtonComponent>
+                        <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnIcon="fa-solid fa-floppy-disk" BtnOnClick="HandleValidSubmit" BtnDisabled="saveIsDisable"></ButtonComponent>
+                    </div>
+                </div>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>

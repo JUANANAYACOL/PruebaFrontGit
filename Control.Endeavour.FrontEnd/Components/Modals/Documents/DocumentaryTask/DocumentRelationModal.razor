@@ -1,0 +1,44 @@
+﻿
+<div class="my-modal">
+    <TelerikRootComponent>
+        <GenericModalComponent Title="@Title" IsVisible="modalStatus" Width="60%" OnModalClosed="HandleModalClosed">
+            <ChildContent>
+                <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+                <div class="d-flex flex-column text-center mt-4">
+                    <h2>@Translation["FilingNumber"]</h2>
+                    <div class="row mt-3">
+                        <div class="@hidenButton offset-1">
+                            <InputModalComponent @bind-InputValue="@nRadicado" IsDisabled="disAbleInput" IsVisible="true" LabelText="" Placeholder="@placeHolder"></InputModalComponent>
+                        </div>
+                        @if (disAbleButton)
+                        {
+                            <div class="col-2">
+                                <ButtonComponent BtnClassColor="btnStyle--primary" BtnType="button" BtnText=@Translation["SeeDocument"] BtnIcon="fa-solid fa-folder-open" BtnClassModifiers="" BtnOnClick="HandleViewAttachment"></ButtonComponent>
+                            </div>
+                        }
+
+                        @if (nRadicado.Count() > 0)
+                        {
+                            isEnableActionButton = false;
+                        }
+                        else
+                        {
+                            isEnableActionButton = true;
+                        }
+                    </div>
+                    <div>
+                        <div class="col mt-3 d-flex justify-content-center">
+
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="me-3" BtnType="button" BtnText=@Translation["Add"] BtnIcon="fa-solid fa-plus" BtnDisabled="isEnableActionButton" BtnOnClick="SelectDocRelationAsync"></ButtonComponent>
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="me-3" BtnType="button" BtnText=@Translation["Verify"] BtnIcon="fa-solid fa-square-check" BtnVisible="IsValidateDocumentVisible" BtnOnClick="ShowModalInfo"></ButtonComponent>
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="me-3" BtnType="button" BtnText=@Translation["Link"] BtnIcon="fa-solid fa-link" BtnVisible="IsLinkDocumentVisible" BtnOnClick="LinkNewDocument"></ButtonComponent>
+
+                        </div>
+                    </div>
+                </div>
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>
+<ValidateDocumentGeneralInfoModal @ref="validateDocumentInfo"></ValidateDocumentGeneralInfoModal>
+<ViewDocumentModal @ref="viewDocumentModal"></ViewDocumentModal>

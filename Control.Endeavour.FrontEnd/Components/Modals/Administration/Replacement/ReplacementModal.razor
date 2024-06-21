@@ -1,0 +1,60 @@
+﻿<div class="my-modal">
+    <TelerikRootComponent>
+        <GenericModalComponent Title=@(Translation["Administration"] + " - " + Translation["Replacements"]) IsVisible="modalStatus" OnModalClosed="HandleModalClosed" width="70%">
+            <ChildContent>
+                <NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+                
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <label class="mb-2">@Translation["Since"] <span class="red">*</span></label>
+                                    <TelerikDatePicker @bind-Value="@from"
+                                                       Format="dd/MM/yyyy"
+                                                       ShowWeekNumbers="false"
+                                                       Min="DateTime.Today"
+                                                       Max="@maxValueTo"
+                                                       OnChange="@updateMinValue" 
+                                                       Class="mb-2 DisabledInput">
+                                    </TelerikDatePicker>
+                                    <label class="mb-2">@Translation["To"] <span class="red">*</span> </label>
+                                    <TelerikDatePicker @bind-Value="@to"
+                                                       Format="dd/MM/yyyy"
+                                                       ShowWeekNumbers="false"
+                                                       Min="@minValueTo"
+                                                       OnChange="@updateMaxValue"
+                                                       Class="DisabledInput">
+                                    </TelerikDatePicker>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="row mb-2">
+                                        <ButtonGroupComponent LabelText=@Translation["User"] InputPlaceholder=@Translation["AddUser"] BtnTitle=@Translation["AddUser"] @ref="inputUserFullname" @bind-InputValue="userFullname" InputRequired="true" BtnClassColor="btnStyle--primary" BtnClassModifiers="" BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="(()=> OpenNewModal(false))" ></ButtonGroupComponent>
+                                    </div>
+                                    <div class="row">
+                                        <ButtonGroupComponent LabelText=@Translation["Replacement"] InputPlaceholder=@Translation["AddUser"] BtnTitle=@Translation["AddUser"] @ref="inputReplacementFullname" @bind-InputValue="replacementFullname" InputRequired="true" BtnClassColor="btnStyle--primary" BtnClassModifiers="" BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="(()=> OpenNewModal(true))"></ButtonGroupComponent>
+                                    </div>
+                                </div>
+                                <div class="col-lg-12">
+
+                                    <div class="mt-3 mb-1">
+                                        <label class="mb-2">@Translation["Reason"]: <span style="color:gray">@string.Format(Translation["CharactersOutOf"], CharacterCounter, "200") <span class="red">* </span></span> </label>
+                                        <textarea @bind="@replacemenetCreateDtoRequest.Reason" class="w-100 custom-textarea"   placeholder="" required maxlength="200" @oninput="CountCharacters"></textarea>
+                                    </div>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="from-group from-group--margin-top justify-content-center">
+
+                            <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="ResetForm"></ButtonComponent>
+                            <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnIcon="fa-solid fa-floppy-disk" BtnOnClick="HandleValidSubmit" BtnDisabled="saveIsDisable"></ButtonComponent>
+                        </div>
+                    </div>
+                </div>
+
+            </ChildContent>
+        </GenericModalComponent>
+    </TelerikRootComponent>
+</div>

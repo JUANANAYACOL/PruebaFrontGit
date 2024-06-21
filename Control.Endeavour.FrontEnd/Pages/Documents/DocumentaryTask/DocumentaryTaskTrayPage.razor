@@ -1,0 +1,257 @@
+﻿@page "/DocumentaryTaskTray"
+@layout MainLayout
+
+<h3>@Translation["DocumentTaskTray"]</h3>
+
+
+
+<ValidateDocumentGeneralInfoModal @ref="generalInformationModal"></ValidateDocumentGeneralInfoModal>
+@* <GenericSearchModal @ref="genericSearchModal" ConfigurationInUse="1" multipleSelection="false" showCopiesColumn="false"
+                    Title=@Translation["UserFinder"] OnStatusUserChanged="HandleUserSelectedChanged"></GenericSearchModal> *@
+<GenericUserSearchModal @ref="genericUserSearch" Title="@Translation["UserFinder"]" IsVisible="UserModalStatus"
+                        OnSelectedUserData="HandleUserChanged"
+                        TypeOfSearch="1"
+                        OnModalClosed="HandleModalUserClosed" Width="90%"
+                        AllowMultipleSelection="@false"
+                        IsValidateReplacements="@true"
+                        AllowToCheckReplament="@false"
+                        AllowCopiesSelection="@false">
+</GenericUserSearchModal>
+
+<DocTaskWorkFlowModal @ref="docTaskWorkFlowModal"></DocTaskWorkFlowModal>
+
+<div class="card row mt-3 col-12">
+    <div class="card-body">
+        <div class="col-12 mb-3">
+            <h3 class="style-bg"><b>@Translation["MyTasks"]</b></h3>
+        </div>
+        <div class="row d-flex justify-content-around pb-4">
+            <!-- Tarjeta 1 -->
+            <div class="col-6 col-lg-4 col-xl-2 col-md-6 col-sm-12 mb-3" @onclick="(e) => GetDataCards(codeP, id1, new List<string>(){codePR, codeFR},new List<bool>() {true, false, true, true})">
+                <!-- Contenido de la tarjeta 1 -->
+                <DynamicCardComponent BorderColor="#CB4A33"
+                                      ShadowColor="#CB4A33"
+                                      ImageUrl="../img/docCreado.svg"
+                                      LabelText=@Translation["CreatedDoc"]
+                                      CardNumber="@created" />
+            </div>
+            <!-- Tarjeta 2 -->
+            <div class="col-6 col-lg-4 col-xl-2 col-md-6 col-sm-12 mb-3" @onclick="(e) => GetDataCards(codeI, id2, new List<string>(){codeRV},new List<bool>(){false, true, false, false})">
+                <!-- Contenido de la tarjeta 2 -->
+                <DynamicCardComponent BorderColor="#01B0B2"
+                                      ShadowColor="#01B0B2"
+                                      ImageUrl="../img/docRevisar.svg"
+                                      LabelText=@Translation["DocToReview"]
+                                      CardNumber="@review" />
+            </div>
+            <!-- Tarjeta 3 -->
+            <div class="col-6 col-lg-4 col-xl-2 col-md-6 col-sm-12 mb-3" @onclick="(e) => GetDataCards(codeI, id2, new List<string>(){codeAP},new List<bool>(){false, true, false, false})">
+                <!-- Contenido de la tarjeta 3 -->
+                <DynamicCardComponent BorderColor="#92376F"
+                                      ShadowColor="#92376F"
+                                      ImageUrl="../img/docAprobar.svg"
+                                      LabelText=@Translation["DocToApprove"]
+                                      CardNumber="@approve" />
+            </div>
+            <!-- Tarjeta 4 -->
+            <div class="col-6 col-lg-4 col-xl-2 col-md-6 col-sm-12 mb-3" @onclick="(e) => GetDataCards(codeI, id2, new List<string>(){codeFR},new List<bool>(){false, true, false, false})">
+                <!-- Contenido de la tarjeta 5 -->
+                <DynamicCardComponent BorderColor="#B8364F"
+                                      ShadowColor="#B8364F"
+                                      ImageUrl="../img/docFirmar.svg"
+                                      LabelText=@Translation["DocToSign"]
+                                      CardNumber="@toSign" />
+            </div>
+            <!-- Tarjeta 5 -->
+            <div class="col-6 col-lg-4 col-xl-2 col-md-6 col-sm-12 mb-3" @onclick="(e) => GetDataCards(codeP, id1, new List<string>(){codeFR},new List<bool>(){true, false, true, true})">
+                <!-- Contenido de la tarjeta 4 -->
+                <DynamicCardComponent BorderColor="#12A955"
+                                      ShadowColor="#12A955"
+                                      ImageUrl="../img/docFirmado.svg"
+                                      LabelText=@Translation["DocSigned"]
+                                      CardNumber="@signed" />
+            </div>
+            <!-- Tarjeta 6 -->
+            <div class="col-6 col-lg-4 col-xl-2 col-md-6 col-sm-12 mb-3" @onclick="(e) => GetDataCards(codeP, id1, new List<string>(){codeFR, codeAP, codePR, codeRV},new List<bool>(){false, false, true, true})">
+                <!-- Contenido de la tarjeta 6 -->
+                <DynamicCardComponent BorderColor="#CB4A33"
+                                      ShadowColor="#CB4A33"
+                                      ImageUrl="../img/docCreado.svg"
+                                      LabelText=@Translation["DocInvolved"]
+                                      CardNumber="@involved" />
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card row mt-3 col-12">
+    <div class="card-body">
+        <div class="d-flex flex-xl-row flex-column">
+            <div class="col-8 mb-3 d-flex flex-row gap-5">
+                <h3 class="col-xl-4 col-8 style-bg"><b>@Translation["SearchByFilters"]</b></h3>
+            </div>
+        </div>
+        <div class="row d-flex">
+            <div class="col-xl-3">
+                <InputModalComponent @ref="docTaskInput" @bind-InputValue="taskIdValue" IsDisabled="false" IsVisible="true" LabelText=@Translation["DocumentaryTaskID"] Placeholder="" InputType="number"></InputModalComponent>
+            </div>
+            <div class="col-xl-2 mt-4 form-check form-switch">
+                <label class="mt-2"><TelerikSwitch @bind-Value="@activeState" /> @Translation["FilterByDates"]</label>
+                @if (activeState)
+                {
+                    startDate = true;
+                    endDate = true;
+                }
+                else
+                {
+                    startDate = false;
+                    endDate = false;
+                }
+            </div>
+            <div class="col-xl-3 mt-4">
+                <div class="mt-2">
+                    <TelerikDatePicker @bind-Value="@StartValue"
+                                       Format="MMMM dd yyyy"
+                                       Enabled=startDate>
+                    </TelerikDatePicker>
+                </div>
+            </div>
+            <div class="col-xl-3 mt-4">
+                <div class="mt-2">
+                    <TelerikDatePicker @bind-Value="@EndValue"
+                                       Format="MMMM dd yyyy"
+                                       Enabled=endDate>
+                    </TelerikDatePicker>
+                </div>
+            </div>
+        </div>
+        <div class="row d-flex flex-lg-row flex-column">
+            <div class="col-xl-6 mt-4">
+                <label class="mb-2">@Translation["Subject"] <span class="span-gray">@string.Format(Translation["CharactersOutOf"], characterCounter, "500")</span><span class="span-gray"></span></label>
+                <textarea @bind="descriptionInput" class="w-100 custom-textarea" id="DT_Asunto" placeholder=@(string.Format(Translation["ProcedureInformationMaxCharacters", "500"])) maxlength="500" oninput="@ContarCaracteres"></textarea>
+            </div>
+            <div class="col-xl-3 mt-4">
+                <ButtonGroupComponent LabelText=@Translation["User"] InputPlaceholder="Seleccione usuario" BtnTitle=@Translation["SearchRecipients"] @bind-InputValue="@vUserSelected.UserName" BtnClassColor="btnStyle--primary"
+                                      BtnClassModifiers="" BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="ShowUsersModal"></ButtonGroupComponent>
+            </div>
+            <div class="col-xl-3 mt-5">
+                <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Clear"] BtnIcon="fa-solid fa-eraser" BtnOnClick="ResetGrid"></ButtonComponent>
+                <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnText=@Translation["Search"] BtnIcon="fa-solid fa-magnifying-glass" BtnOnClick="GetDocumentsTaskFilter"></ButtonComponent>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mt-3">
+    <TelerikGrid Data="documentaryTaskList" PageSize="10"
+                 Resizable="true"
+                 EditMode="GridEditMode.Popup"
+                 SelectionMode="GridSelectionMode.None">
+@*         <GridToolBarTemplate>
+            <GridCommandButton Command="ExcelExport" Icon="@SvgIcon.FileExcel">@Translation["ExportToExcel"]</GridCommandButton>
+            <label class="k-checkbox-label"><TelerikCheckBox @bind-Value="@ExportAllPages" /> @Translation["ExportAllPages"]</label>
+        </GridToolBarTemplate>
+        <GridExport>
+            <GridExcelExport FileName="telerik-grid-export" AllPages="@ExportAllPages" OnBeforeExport="@OnBeforeExcelExport" />
+        </GridExport> *@
+        <GridColumns>
+            <GridCommandColumn Width="80px" Title=@Translation["OpenTask"] HeaderClass="center-wrap" Visible="true">
+                <GridCommandButton Icon="@SvgIcon.FileTxt" Title=@Translation["OpenTask"] OnClick="@((args)=> HandleTaskManagementSubmit((VDocumentaryTaskDtoResponse)args.Item))"></GridCommandButton>
+            </GridCommandColumn>
+            <GridCommandColumn Width="80px" Title=@Translation["Delete"] HeaderClass="center-wrap" Visible="grid4">
+                @{
+                    var item = (VDocumentaryTaskDtoResponse)context;
+
+                    if (item.ControlId == null)
+                    {
+                        <div class="d-flex justify-content-around">
+                            <GridCommandButton Icon="@SvgIcon.Trash" Title=@Translation["DeleteTask"] OnClick="@((args)=> ShowDeleteModal((VDocumentaryTaskDtoResponse)args.Item))"></GridCommandButton>
+                        </div>
+                    }
+                }
+            </GridCommandColumn>
+            <GridCommandColumn Width="95px" Title=@Translation["Information"] HeaderClass="center-wrap" Visible="grid4">
+                @{
+                    var item = (VDocumentaryTaskDtoResponse)context;
+
+                    if (item.ControlId != null)
+                    {
+                        <div class="d-flex justify-content-around">
+                            <GridCommandButton Icon="@SvgIcon.InfoCircle" Title=@Translation["GeneralInformation"] OnClick="@((args)=> ShowModalGeneralInformation((VDocumentaryTaskDtoResponse)args.Item))"></GridCommandButton>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="d-flex justify-content-around">
+                            <GridCommandButton Icon="@SvgIcon.InfoCircle" Title=@Translation["GeneralInformation"] OnClick="@((args)=> ShowModalDocTaskWorkFlow((VDocumentaryTaskDtoResponse)args.Item))"></GridCommandButton>
+                        </div>
+                    }
+                }
+            </GridCommandColumn>
+            <GridColumn Field="ViewState"
+                        Title=@Translation["Readed"]
+                        Width="80px"
+                        Filterable="false"
+                        TextAlign="ColumnTextAlign.Center"
+                        HeaderClass="center-wrap">
+                <Template>
+                    @{
+                        var item = (VDocumentaryTaskDtoResponse)context;
+                    }
+                    <TelerikCheckBox @bind-Value="item.ViewState" Enabled="false"/>
+                </Template>
+            </GridColumn>
+            <GridColumn Field="TaskId"
+                        Title=@Translation["TaskID"]
+                        Width="150px"
+                        Filterable="true"
+                        TextAlign="ColumnTextAlign.Center"
+                        HeaderClass="center-wrap" />
+            <GridColumn Field="Class"
+                        Title=@Translation["Class"]
+                        Width="150px"
+                        Filterable="true"
+                        TextAlign="ColumnTextAlign.Center"
+                        HeaderClass="center-wrap" />
+            <GridColumn Field="ControlId"
+                        Title=@Translation["ControlID"]
+                        Width="150px"
+                        Filterable="true"
+                        TextAlign="ColumnTextAlign.Center"
+                        HeaderClass="center-wrap" 
+                        Visible="grid3"/>
+            <GridColumn Field="@user"
+                        Title="@title"
+                        Width="150px"
+                        Filterable="true"
+                        TextAlign="ColumnTextAlign.Center"
+                        HeaderClass="center-wrap"
+                        Visible=grid1/>
+            <GridColumn Field="UserTaskName"
+                        Title=@Translation["SentBy"]
+                        Width="150px"
+                        Filterable="true"
+                        TextAlign="ColumnTextAlign.Center"
+                        HeaderClass="center-wrap" 
+                        Visible=grid2/>
+            <GridColumn Field="TaskDate"
+                        Title=@Translation["CreationDate"]
+                        Width="150px"
+                        Filterable="true"
+                        TextAlign="ColumnTextAlign.Center"
+                        HeaderClass="center-wrap" />
+            <GridColumn Field="TaskDescription"
+                        Title=@Translation["Subject"]
+                        Width="220px"
+                        Filterable="true"
+                        TextAlign="ColumnTextAlign.Center"
+                        HeaderClass="center-wrap" />
+        </GridColumns>
+        <NoDataTemplate>
+            <img src="../img/noDataFound.png" width="8%" height="8%" />
+            <p> @Translation["NoGridInfo"]</p>
+        </NoDataTemplate>
+    </TelerikGrid>
+    
+    <NewPaginationComponent @ref="paginationComponent" T="VDocumentaryTaskDtoResponse" M="FilterManagementDtoRequest" Filter="@filter" Uri="@UriFilterDocs" PaginationInfo="@paginationInfo" OnPaginationRefresh="HandlePaginationGrid"></NewPaginationComponent>
+</div>
+<NotificationsComponentModal @ref="notificationModal" OnModalClosed="HandleModalNotiClose"></NotificationsComponentModal>
+<NotificationsComponentModal @ref="notificationModalSucces"></NotificationsComponentModal>

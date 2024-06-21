@@ -1,0 +1,157 @@
+﻿@page "/SecurityManagement"
+@layout MainLayout;
+
+
+
+
+<NotificationsComponentModal @ref="notificationModal" ></NotificationsComponentModal>
+
+
+<div class="container-fluid mt-5">
+    <!-- Parte 1: Título y Contenido alineado a la izquierda -->
+
+    <div class="row titulo">
+        <div class="col-lg-12">
+
+            <h1>@(Translation["Security"] + " - " + Translation["SecurityManagement"])</h1>
+
+        </div>
+
+
+    </div>
+    <div class="row">
+
+
+        <TelerikTabStrip @bind-ActiveTabIndex="@CurrentTab">
+            <TabStripTab Title="@Translation["ChangePasswordTime"]">
+
+                <div class="row">
+
+                
+                    <div class="col-lg-3">
+
+                        <InputModalComponent @bind-InputValue="MonthsQuantity" IsDisabled=@(MonthsActive) InputMaxLength="2" IsRequired="true" LabelText=@( $"{Translation["Filter_Value"]} ({Translation["Month(s)"]})") IsVisible="true" MethodValueChanged=EnableSaveButton Placeholder="" InputType="number" FieldType="InputModalTypeEnum.Filing" InputMaxNumberValue="12" />
+
+                    </div>
+                    <div class="col-lg-3">
+                        <InputModalComponent @bind-InputValue="MonthsUser" IsDisabled=true IsRequired="false" LabelText=@Translation["UserUpdated"] IsVisible="true" Placeholder="" FieldType="InputModalTypeEnum.None" />
+
+                    </div>
+
+                    <div class="col-lg-3">
+                        <InputModalComponent @bind-InputValue="MonthsDate" IsDisabled=true IsRequired="false" LabelText=@Translation["DateUpdated"] IsVisible="true" Placeholder="" FieldType="InputModalTypeEnum.None" />
+                    </div>
+
+
+                    <div class="col-lg-3">
+                        <ButtonComponent BtnClassColor="btnStyle--primary from-group--margin-top" BtnVisible=@(MonthsActive) BtnClassModifiers="mt-4 ml-10" BtnType="button" BtnText=@Translation["Edit"] BtnIcon="fa-solid fa-pencil" BtnOnClick="@(()=> EditData(false))" />
+                        @{
+                            if (!MonthsActive)
+                            {
+                                <div class="from-group from-group--margin-top justify-content-center">
+                                    <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Cancel"] BtnIcon="fa-solid fa-eraser" BtnOnClick="@(()=>EditData(true))"></ButtonComponent>
+                                    <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnIcon="fa-solid fa-floppy-disk" BtnOnClick="UpdateParemeter" BtnDisabled="MonthsSaveDisable"></ButtonComponent>
+                                </div>
+                            }
+
+
+                        }
+
+
+                     
+
+                    </div>
+
+
+                </div>
+
+
+            </TabStripTab>
+
+            <TabStripTab Title="@Translation["Inactivity"]">
+
+                <div class="row">
+
+                    <div class="col-lg-3">
+                        <InputModalComponent @bind-InputValue="MinutesQuantity" IsDisabled=@(MinutesActive) InputMaxLength="2" IsRequired="true" LabelText=@($"{Translation["Filter_Value"]} ({Translation["Minute(s)"]})") IsVisible="true" MethodValueChanged=EnableSaveButton Placeholder="" InputType="number" FieldType="InputModalTypeEnum.Filing" InputMaxNumberValue="99" />
+
+                    </div>
+                    <div class="col-lg-3">
+                        <InputModalComponent @bind-InputValue="MinutesUser" IsDisabled=true IsRequired="false" LabelText=@Translation["UserUpdated"] IsVisible="true" Placeholder="" FieldType="InputModalTypeEnum.None" />
+
+                    </div>
+                    <div class="col-lg-3">
+                        <InputModalComponent @bind-InputValue="MinutesDate" IsDisabled=true IsRequired="false" LabelText=@Translation["DateUpdated"] IsVisible="true" Placeholder="" FieldType="InputModalTypeEnum.None" />
+                    </div>
+                    <div class="col-lg-3">
+
+                        <ButtonComponent BtnClassColor="btnStyle--primary from-group--margin-top" BtnVisible=@(MinutesActive) BtnClassModifiers="mt-4 ml-10" BtnType="button" BtnText=@Translation["Edit"] BtnIcon="fa-solid fa-pencil" BtnOnClick="@(()=> EditData(false))" />
+
+
+                        @{
+                            if (!MinutesActive)
+                            {
+                                <div class="from-group from-group--margin-top justify-content-center">
+                                    <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Cancel"] BtnIcon="fa-solid fa-eraser" BtnOnClick="@(()=>EditData(true))"></ButtonComponent>
+                                    <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnIcon="fa-solid fa-floppy-disk" BtnOnClick="UpdateParemeter" BtnDisabled=MinutesSaveDisable></ButtonComponent>
+                                </div>
+                            }
+
+
+                        }
+
+
+                    </div>
+
+
+                </div>
+            </TabStripTab>
+            <TabStripTab Title="@Translation["PasswordHistory"]">
+
+                <div class="row">
+
+                  
+                    <div class="col-lg-3">
+                        <InputModalComponent @bind-InputValue="PasswordQuantity" IsDisabled=@(PasswordActive) InputMaxLength="1" IsRequired="true" LabelText=@Translation["Filter_Value"] IsVisible="true" MethodValueChanged=EnableSaveButton Placeholder="" InputType="number" FieldType="InputModalTypeEnum.Filing" InputMaxNumberValue="9" />
+
+                    </div>
+                    <div class="col-lg-3">
+                        <InputModalComponent @bind-InputValue="PasswordUser" IsDisabled=true IsRequired="false" LabelText=@Translation["UserUpdated"] IsVisible="true" Placeholder="" FieldType="InputModalTypeEnum.None" />
+
+                    </div>
+                    <div class="col-lg-3">
+                        <InputModalComponent @bind-InputValue="PasswordDate" IsDisabled=true IsRequired="false" LabelText=@Translation["DateUpdated"] IsVisible="true" Placeholder="" FieldType="InputModalTypeEnum.None" />
+                    </div>
+
+
+                    <div class="col-lg-3">
+                        <ButtonComponent BtnClassColor="btnStyle--primary from-group--margin-top" BtnVisible=@(PasswordActive) BtnClassModifiers="mt-4 ml-10" BtnType="button" BtnText=@Translation["Edit"] BtnIcon="fa-solid fa-pencil" BtnOnClick="@(()=> EditData(false))" />
+
+                        @{
+                            if (!PasswordActive)
+                            {
+                                <div class="from-group from-group--margin-top justify-content-center">
+                                    <ButtonComponent BtnClassColor="btnStyle--primaryInLine" BtnType="button" BtnText=@Translation["Cancel"] BtnIcon="fa-solid fa-eraser" BtnOnClick="@(()=>EditData(true))"></ButtonComponent>
+                                    <ButtonComponent BtnClassColor="btnStyle--primary" BtnClassModifiers="ml-10" BtnType="button" BtnIcon="fa-solid fa-floppy-disk" BtnOnClick="UpdateParemeter" BtnDisabled=PasswordSaveDisable></ButtonComponent>
+                                </div>
+                            }
+
+
+                        }
+
+
+                    </div>
+
+
+                </div>
+            </TabStripTab>
+
+        </TelerikTabStrip>
+
+
+    </div>
+
+
+
+
+</div>

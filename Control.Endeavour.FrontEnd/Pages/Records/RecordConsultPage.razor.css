@@ -1,0 +1,60 @@
+﻿/*.footer-card {
+    position: absolute;
+    bottom: 20px;
+}*/
+
+.min-height {
+    min-height: 100px;
+}
+
+.btnGrid {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background-color: white;
+    cursor: pointer;
+    box-shadow: 2px 4px 6px 0px rgb(0 0 0 / 17%);
+}
+
+    .btnGrid:hover {
+        background-color: #41BAEA;
+    }
+
+    .btnGrid:disabled {
+        background-color: #e0e0e0;
+        box-shadow: 2px 4px 6px 0px rgb(0 0 0 / 0%);
+    }
+
+    .btnGrid svg {
+        width: 20px;
+        fill: #41BAEA !important;
+    }
+
+    .btnGrid:hover svg {
+        fill: white !important;
+    }
+
+    .btnGrid:disabled svg {
+        fill: #c2c2c2 !important;
+    }
+
+.w-45 {
+    width: 45px;
+}
+
+.card-Info {
+    border: 1px solid #d2cfcf;
+    margin: 0px 18px 24px 18px;
+    border-radius: 8px;
+}
+
+.imgEstado {
+    width: 35px;
+    height: 35px;
+    padding: 0px;
+}
+
+.k-grid{
+    height: 125vh !important;
+}

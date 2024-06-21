@@ -1,0 +1,62 @@
+﻿.background-trasparent {
+    background-color: transparent;
+}
+
+.custom-border {
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.white-border {
+    border-color: white !important;
+}
+
+.white-icon {
+    color: white !important;
+}
+
+.custom-hover:hover {
+    background-color: #44b9e8 !important;
+}
+
+.custom-styles-input {
+    font-size: 24px;
+    font-weight: 700;
+    text-align: center;
+    font-family: 'Roboto', sans-serif;
+}
+
+    .custom-styles-input::placeholder {
+        color: black !important;
+        font-size: 24px;
+        font-weight: 700;
+        text-align: center;
+        font-family: 'Roboto';
+    }
+
+    body.dark .custom-styles-input::placeholder {
+        color: var(--color-blanco) !important;
+    }
+
+.custom-white-font {
+    color: white !important;
+    font-family: 'Roboto', sans-serif !important;
+    text-align: center;
+}
+
+    .custom-white-font::placeholder {
+        color: white !important;
+    }
+
+.custom-input {
+    box-shadow: none;
+}
+
+    .custom-input:required:invalid {
+        border-color: #FF7A00 !important;
+    }
+
+
+    .custom-input:focus {
+        border-color: #fff !important; /* Cambia el color del borde de nuevo a blanco cuando el campo está enfocado */
+    }
